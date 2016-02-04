@@ -20,9 +20,7 @@ import javax.swing.JTextPane;
  * @author Eric-Wubbo Lameijer
  */
 public class NewCardWindow extends JFrame {
-  /**
-   * 
-   */
+  // [CCCC] Default serialization ID (not used).
   private static final long serialVersionUID = 3419171802910744055L;
 
   // [CCCC] Allows the creation/editing of the content on the front of the
@@ -142,10 +140,12 @@ public class NewCardWindow extends JFrame {
     // (in this case the OK button) is pressed.
 
     // logging
-    System.out.printf("Front: %s, back %s\n", m_frontOfCard.getText(), m_backOfCard.getText());
+    System.out.printf("Front: %s, back %s\n", m_frontOfCard.getText(),
+        m_backOfCard.getText());
 
     // create a new card
-    Card candidateCard = new Card(m_frontOfCard.getText(), m_backOfCard.getText());
+    Card candidateCard = new Card(m_frontOfCard.getText(),
+        m_backOfCard.getText());
     if (Deck.canAddCard(candidateCard)) {
       Deck.addCard(candidateCard);
       m_frontOfCard.setText("");
@@ -158,9 +158,11 @@ public class NewCardWindow extends JFrame {
         errorMessage = "Cannot add card: the front of a card cannot be blank.";
       } else {
         // must be duplicate card
-        errorMessage = "Cannot add card: there already is another card with " + "the same front";
+        errorMessage = "Cannot add card: there already is another card with "
+            + "the same front";
       }
-      JOptionPane.showMessageDialog(null, errorMessage, "Cannot add card", JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(null, errorMessage, "Cannot add card",
+          JOptionPane.ERROR_MESSAGE);
     }
 
     // postconditions: If adding succeeded, the front and back should
@@ -200,7 +202,8 @@ public class NewCardWindow extends JFrame {
     // Now ensure that front and back of card are shown nicely in the
     // window.
     // Also add the two buttons (Cancel and OK).
-    JSplitPane upperPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, m_frontOfCard, m_backOfCard);
+    JSplitPane upperPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+        m_frontOfCard, m_backOfCard);
     upperPanel.setResizeWeight(0.5);
     GridBagConstraints frontConstraints = new GridBagConstraints();
     frontConstraints.gridx = 0;

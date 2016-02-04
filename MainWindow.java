@@ -85,12 +85,14 @@ public class MainWindow extends JFrame implements DeckChangeListener {
     // add menu
     JMenu fileMenu = new JMenu("File");
     JMenuItem quitItem = new JMenuItem("Quit");
-    quitItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.CTRL_MASK));
+    quitItem.setAccelerator(
+        KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.CTRL_MASK));
     quitItem.addActionListener(e -> saveAndQuit());
     fileMenu.add(quitItem);
     JMenu cardManagementMenu = new JMenu("Manage Cards");
     JMenuItem addCardItem = new JMenuItem("Add Card");
-    addCardItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
+    addCardItem.setAccelerator(
+        KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
     addCardItem.addActionListener(e -> openNewCardWindow());
     cardManagementMenu.add(addCardItem);
     JMenuBar mainMenuBar = new JMenuBar();

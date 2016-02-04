@@ -8,7 +8,13 @@ Eb+22+30(do21/1) [1/5 voor rest]
 -Problems & Ideas (things that we may want to change)
 
 Errors: OK
-Sweep: Card OK Deck OK DeckChangeListener OK DeckContents OK
+Sweep: Card OK Deck OK DeckChangeListener OK DeckContents OK MainWindow
+Commit
+Change 
+Errors
+Sweep [changes]
+Test
+Commit
 
 Changes:
 
