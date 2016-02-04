@@ -1,0 +1,107 @@
+Eb+22+30(do21/1) [1/5 voor rest]
+
+
+-Flow
+-Glossary (domain knowledge, and what means what)
+-HowTo (bepaalde veranderingen doorvoeren)
+-Map (where the data is) => Just for classes
+-Problems & Ideas (things that we may want to change)
+
+Errors: OK
+Sweep: Card OK Deck OK DeckChangeListener OK DeckContents OK
+
+Changes:
+
+Flow
+
+-Start the program
+Invoke the main() method of MainWindow, which calls the MainWindow constructor to construct the window itself.
+This shows a frame, with the PROGRAM_NAME as its name.
+The main window - if there are no cards to be studied - contains a text describing the GUI shortcuts (provided by getUICommands) as well as the deck size provided by getDeckSizeMessage. The label containing this is called m_messageLabel.
+How do you decide whether there are cards to be studied? By looking at the deck. Unless otherwise specified, Eb loads the deck with the DEFAULT_DECKNAME (which is "default.deck") at the first call of a public Deck method (which calls deckExists(), which ensures that the deck indeed exists, or otherwise quits the program in a horrible way ;)). deckHasBeenLoaded is a nice utility function to encapsulate the low level ==null calls. This loading simply happens by looking for the deck file, which simply is the deck's name with the extension ".deck" (which is encoded in DECKFILE_EXTENSION). Anyway, Deck.loadDeckWithName loads the file.
+But what if the file does not exist yet? Then Deck.createDeckWithName is called.
+What these actually do: Deck is a kind of wrapper that is 'THE' deck of Eb, the target and anchor of all GUI elements. The contents are simply a static pointer in the Deck class (m_contents) pointing to a DeckContents object
+Then a deck is created, with Deck.m_name set to the name. getFileHandle / 
+getDeckFileHandle are used to transform a deck name to the name of the deck 
+file. The getCurrentDeck() of MainWindow gets this deck, sysexit with error if 
+it is unloadable.
+The decksize is found with getCardCount. This looks at the m_cards list of 
+cards, and returns their count.
+Quitting calls MainWindow.saveAndQuit, which saves the deck (with Deck.save) 
+before exiting Eb.
+
+Creating a new card opens the NewCardWindow (using the function originally called "openNewCardWindow"). This window has panels (m_frontOfCard and m_backOfCard) to create the contents of the front and back.
+The NewCardWindow also has a cancel button (m_cancelButton) to cancel the creation of the card and get back to the main/calling window (this happens using the "close" function, and an OK button which the user can press to add the created card to the current deck - or at least try to, the card may be a duplicate or invalid for some reason. The NewCardWindow also has utility classes, like EscapeKeyListener with its keyPressed method, which checks of every keypress whether it presses 'escape', and if it does, closes the frame (works the same as pressing the cancel button). The EnterKeyListener is similar, but in this case it is attached to the back of the card and activates the OK-button (after all, if the user has completed the back of the card, he probably wants to press enter to save it).
+How to save a card? Well, the NewCardWindow creates a Card (using the Card constructor, which fills m_frontOfCard and m_backOfCard) and submits it to the current deck (getting access to the central deck point using DeckManager.getInstance(), which has of course the m_instance
+as the pointer to the sole instance of the class, as per the Singleton pattern). 
+Anyway, the 'submitCandidateCardToDeck' method is called, which checks the front and back of the card, retrieving them via the getFront() and getBack() methods. It checks, using the method canAddCard whether the front of the card is both vanlid and really new (isNotYetPresentInDeck) and whether the back of the card is also okay. If everything is okay, the "addCard" method is called and the card is inserted into the deck, and the textboxes are emptied to make room for new input for the new card. If not, a warning is displayed.
+Anyway, if a card is added, the DeckChangeListeners are activated (their respondToChangedDeck functions are called); in the MainWindow this causes the updateMessageLabel to be called.
+
+
+
+Glossary
+
+Card: one of the cards that is studied. A card has contents (front and back, 'stimulus' and 'response', as well as a history (number of repetitions and failure rate and such).
+Deck: a collection cards that can be studied
+
+
+HowTo
+
+Check whether a string is null or empty: Utilities.isStringNullOrEmpty
+Check whether a string is a valid identifier/token: Utilities.isStringValidIdentifier
+Check whether an error has occurred which has to lead to program end (or a warning!) Utilities.require
+Check whether the user has pressed Escape and therefore the cancel button needs to be pressed: EscapeKeyListener (inner class in NewCardWindow)
+Check whether the user has pressed Enter and therefore (for example) the ok-button needs to be pressed: EnterKeyListener (inner class in NewCardWindow)
+Change a component (especially a text-containing component) so that tab and possibly enter won't influence the text, but will cause the focus to shift: Utilities.makeTabTransferFocus and Utilities.makeTabAndEnterTransferFocus  
+
+Coding style: 
+	*exceptions: if you use Pokemon exception handling, add e.printStackTrace(); [ERROR 1]
+	*require: Class.methodName error: message. If constructor: Class() or Class(Type[,Type])
+
+Construct a class 
+
+Construct a method [CPPCCC]
+	-preconditions
+			-parameters
+			-global settings?
+
+Add a system-specific line break: Utilities.EOL
+
+Map
+DeckChangeListener: an interface for objects that need to know when the contents of the current deck has been changed; it is a functional interface, containing only one method, respondToChangedDeck
+DeckManager: the central locus of control of the content, being the focal point where the GUI touches the
+actual decks and their content.
+Deck: THE deck used by Eb, basically a wrapper for the current deck (like "Chinese.deck") which is represented by a DeckContents object
+DeckContents: a (logical) deck, with a name and a list of cards
+Extension: the extension of a deck file (".deck") is called DECKFILE_EXTENSION found in the DECK class
+Utilities: contains all kinds of things that are not domain specific
+MainWindow: the main window of the application
+NewCardWindow: a window in which the user can create a new card, which is to be added to the deck.
+
+Problems & Ideas
+Problem 1: DeckManager.getInstance().getCurrentDeck().getCardCount() is ugly
+Problem 2: Hard to undo changes, no version control yet.
+Problem 3: I have to ensure that whenever I create or load a deck, it gets the MainWindow as listener for DeckChangeEvents. Okay. may need to make the deck a singleton.
+Problem 4: who should take the responsibility for giving the filehandle? I guess the DeckContents, as that has the name.
+
+Problem 1 -
+Option 1: If I make Deck a singleton class I get
+	Deck.getInstance().getCardCount(), which is at least a bit better
+Option 2: If I make Deck a static class, I get 
+	Deck.getCardCount(), which is what I want. However, this has two disadvantages:
+	1) I can't use serialization/deserialization anymore for load/save, as my data members are static now. This is very annoying!
+		This could be solved with Google Proto, database calls or XML creation, but each takes a few hours to master sufficiently. Parsing/deparsing
+		is also possible, but is not very maintainable and will incur continuous overhead.
+	2) as I won't be returning 'Deck' and such, it is harder to indicate success and failure of something. I mean: I can throw exceptions
+	   if a deck is not found, but you shouldn't use exceptions for normal program behaviour. I can give a return value, but return values
+	   can happily be ignored, especially if they don't contain vital information (like the Deck). I can give 'success' as a second argument, but
+	   while that may be harder to ignore, Java passes by value and wrapping something in an boolean object seems overkill. I can use a 'canLoadDeck' 
+	   function, and barf an assert/runtime crash if it is not used properly, but needing to define an extra function for every function 
+	   that can legally fail is also not elegant.
+Option 3: I can make DeckManager 'wrapping' functions, so DeckManager.getCardCount() calls the full DeckManager.getInstance().getCurrentDeck().getCardCount() 
+	However, this is ugly as it leads to interface duplication, wrapping all Deck's methods in 
+	
+Ideas
+DeckManager: may want to make getCurrentDeck() static, so one less indirection to call.
+Sanitize the front and deck, removing leading and lagging whitespace?
+Better error message; either front or duplicate.
