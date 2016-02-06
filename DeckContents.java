@@ -127,8 +127,16 @@ public class DeckContents implements Serializable {
     Utilities.require(m_cards != null, "Deck.isNotYetPresentInDeck error: "
         + "the list of cards has not been properly initialized yet.");
 
+    for (Card card : m_cards) {
+      if (card.getFront().equals(front)) {
+        return false; // a card with the same front IS present in the deck.
+      }
+    }
+
+    // if you get here, no card with the checked-for front has been found
+    return true;
+
     // Postconditions: none, really. Simple return of a boolean
-    return !m_cards.contains(front);
   }
 
   /**

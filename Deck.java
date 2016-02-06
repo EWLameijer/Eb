@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * [CC] A Deck is a collection of cards (usually all belonging to a specific
@@ -24,11 +26,14 @@ import java.io.ObjectOutputStream;
  */
 public class Deck {
 
-  // The "singleton" pointer to the contents managed by this deck [CCC
+  // The "singleton" pointer to the contents managed by this deck [CCCC]
   private static DeckContents m_contents = null;
 
-  // The name of the default deck [CCC
+  // The name of the default deck [CCCC]
   private static final String DEFAULT_DECKNAME = "default";
+
+  // The objects which should be notified of any change in the deck
+  private static Set<DeckChangeListener> m_deckChangeListeners = new HashSet<DeckChangeListener>();
 
   /**
    * [CPPRCCC] Returns the number of cards in this deck.
@@ -81,7 +86,8 @@ public class Deck {
     // postconditions: m_currentDeck cannot be null, but that is ensured
     // by the Deck.createDeckWithName call, which exits with an error if
     // a deck cannot be created.
-    Utilities.require(deckHasBeenLoaded(), "Deck.deckExists error: " + "there is no valid deck.");
+    Utilities.require(deckHasBeenLoaded(),
+        "Deck.deckExists error: " + "there is no valid deck.");
   }
 
   /**
@@ -95,8 +101,10 @@ public class Deck {
   public static boolean loadDeck(String name) {
 
     // checking preconditions
-    Utilities.require(Utilities.isStringValidIdentifier(name), "Deck.loadDeck: name must be a valid identifier, "
-        + "meaning that it exists and contains non-whitespace " + "characters.");
+    Utilities.require(Utilities.isStringValidIdentifier(name),
+        "Deck.loadDeck: name must be a valid identifier, "
+            + "meaning that it exists and contains non-whitespace "
+            + "characters.");
 
     File deckFile = DeckContents.getDeckFileHandle(name);
 
@@ -108,13 +116,15 @@ public class Deck {
     // so the file must exist. But does it contain a valid deck?
     // anyway, first save the old deck to be safe.
     save();
-    try (ObjectInputStream objInStream = new ObjectInputStream(new FileInputStream(deckFile))) {
+    try (ObjectInputStream objInStream = new ObjectInputStream(
+        new FileInputStream(deckFile))) {
       m_contents = (DeckContents) objInStream.readObject();
       return (m_contents != null);
     } catch (Exception e) {
       // something goes wrong with deserializing the deck; so
       // you also can't read the file
-      System.out.println("Deck.loadDeckWithName: could not load deck from file");
+      System.out
+          .println("Deck.loadDeckWithName: could not load deck from file");
       e.printStackTrace();
       return false;
     }
@@ -130,7 +140,8 @@ public class Deck {
    * @return an optional containing the newly created deck, or null if deck
    *         creation was not possible
    */
-  public static void createDeckWithName(String name) throws IllegalArgumentException {
+  public static void createDeckWithName(String name)
+      throws IllegalArgumentException {
 
     // checking preconditions
     Utilities.require(Utilities.isStringValidIdentifier(name),
@@ -147,8 +158,8 @@ public class Deck {
 
     // postconditions: the deck should exist (deck.save handles any errors
     // occurring during saving the deck).
-    Utilities.require(deckHasBeenLoaded(),
-        "Deck.createDeckWithName error: " + "problem creating and/or writing the new deck.");
+    Utilities.require(deckHasBeenLoaded(), "Deck.createDeckWithName error: "
+        + "problem creating and/or writing the new deck.");
   }
 
   /**
@@ -165,17 +176,30 @@ public class Deck {
       // If there is no deck, there is no necessity to save it...
       return;
     }
-    try (ObjectOutputStream objOutStream = new ObjectOutputStream(new FileOutputStream(m_contents.getFileHandle()))) {
+    try (ObjectOutputStream objOutStream = new ObjectOutputStream(
+        new FileOutputStream(m_contents.getFileHandle()))) {
       objOutStream.writeObject(m_contents);
     } catch (Exception e) {
       // something goes wrong with serializing the deck; so
       // you also can't create the file
       e.printStackTrace();
-      Utilities.require(false, "Deck.save error: cannot write the new deck to disk.");
+      Utilities.require(false,
+          "Deck.save error: cannot write the new deck to disk.");
     }
 
     // postconditions: the save has to be a success! Which it is if no
     // exception occurred - in other words, if you get here.
+  }
+
+  /**
+   * [CPPRCCC] Notifies all listeners of the deck having changed.
+   */
+  private static void notifyOfDeckChange() {
+    // preconditions: none (I assume the deck has really changed)
+    for (DeckChangeListener deckChangeListener : m_deckChangeListeners) {
+      deckChangeListener.respondToChangedDeck();
+    }
+    // postconditions: none
   }
 
   /**
@@ -193,6 +217,7 @@ public class Deck {
     // for the rest, delegate everything (preconditions, postconditions and
     // error handling) to the logical deck itself (the contents)
     m_contents.addCard(card);
+    notifyOfDeckChange();
   }
 
   /**
@@ -211,5 +236,29 @@ public class Deck {
     // for the rest, delegate everything (preconditions, postconditions and
     // error handling) to the logical deck itself (the contents)
     return m_contents.canAddCard(card);
+  }
+
+  /**
+   * [CPPRCCC] Adds a DeckChangeListener to the deck, to be notified of updates
+   * in the status of deck.
+   * 
+   * @param deckChangeListener
+   *          the object that should be added to the set of objects to be
+   *          notified when the deck changes.
+   */
+  public static void addDeckChangeListener(
+      DeckChangeListener deckChangeListener) {
+    // preconditions: deckChangeListener should not be null. It should also
+    // not already be present in the set; that would be bad programming.
+    Utilities.require(deckChangeListener != null,
+        "Deck.addDeckChangeListener error: the candidate listener cannot "
+            + "be null.");
+    Utilities.require(!m_deckChangeListeners.contains(deckChangeListener),
+        "Deck.addDeckChangeListener error: attempt to register the same "
+            + "DeckChangeListener object twice.");
+
+    m_deckChangeListeners.add(deckChangeListener);
+    // postconditions: none (I trust add to work, and out-of-memory or such
+    // to be unlikely)
   }
 }

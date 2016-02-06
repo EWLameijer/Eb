@@ -107,6 +107,7 @@ public class MainWindow extends JFrame implements DeckChangeListener {
     setSize(1000, 700);
     setDefaultCloseOperation(EXIT_ON_CLOSE);
     setVisible(true);
+    Deck.addDeckChangeListener(this);
     // postconditions: none
   }
 

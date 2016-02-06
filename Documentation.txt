@@ -5,16 +5,23 @@ Eb+22+30(do21/1) [1/5 voor rest]
 -Glossary (domain knowledge, and what means what)
 -HowTo (bepaalde veranderingen doorvoeren)
 -Map (where the data is) => Just for classes
+-Design
 -Problems & Ideas (things that we may want to change)
 
-Errors: OK
-Sweep: Card OK Deck OK DeckChangeListener OK DeckContents OK MainWindow
+
+Change OK
+Errors OK
+Sweep [changes] OK <just addition>
+Test OK
 Commit
+
 Change 
 Errors
 Sweep [changes]
 Test
 Commit
+
+
 
 Changes:
 
@@ -41,7 +48,7 @@ The NewCardWindow also has a cancel button (m_cancelButton) to cancel the creati
 How to save a card? Well, the NewCardWindow creates a Card (using the Card constructor, which fills m_frontOfCard and m_backOfCard) and submits it to the current deck (getting access to the central deck point using DeckManager.getInstance(), which has of course the m_instance
 as the pointer to the sole instance of the class, as per the Singleton pattern). 
 Anyway, the 'submitCandidateCardToDeck' method is called, which checks the front and back of the card, retrieving them via the getFront() and getBack() methods. It checks, using the method canAddCard whether the front of the card is both vanlid and really new (isNotYetPresentInDeck) and whether the back of the card is also okay. If everything is okay, the "addCard" method is called and the card is inserted into the deck, and the textboxes are emptied to make room for new input for the new card. If not, a warning is displayed.
-Anyway, if a card is added, the DeckChangeListeners are activated (their respondToChangedDeck functions are called); in the MainWindow this causes the updateMessageLabel to be called.
+Anyway, if a card is added, the DeckChangeListeners are activated (their respondToChangedDeck functions are called) by the notifyOfDeckChange method in Deck; in the MainWindow this causes the updateMessageLabel to be called (this has been enabled by registering the MainWindow to listen to changes in the deck with the Deck.addDeckChangeListener() method.
 
 
 
@@ -75,14 +82,30 @@ Add a system-specific line break: Utilities.EOL
 
 Map
 DeckChangeListener: an interface for objects that need to know when the contents of the current deck has been changed; it is a functional interface, containing only one method, respondToChangedDeck
-DeckManager: the central locus of control of the content, being the focal point where the GUI touches the
-actual decks and their content.
-Deck: THE deck used by Eb, basically a wrapper for the current deck (like "Chinese.deck") which is represented by a DeckContents object
+Deck: THE deck used by Eb, basically a wrapper for the current deck (like "Chinese.deck") which is represented by a DeckContents object. Has contents (m_contents) and contains the name of the deck that should be loaded by default (called "default")
 DeckContents: a (logical) deck, with a name and a list of cards
 Extension: the extension of a deck file (".deck") is called DECKFILE_EXTENSION found in the DECK class
 Utilities: contains all kinds of things that are not domain specific
 MainWindow: the main window of the application
 NewCardWindow: a window in which the user can create a new card, which is to be added to the deck.
+
+Design
+1) Maak een scherm dat Eb heet
+2) Zorg dat Eb's status op het scherm verschijnt => hoeveel kaarten er in het huidige deck zijn, en wat de commando's zijn om dingen te veranderen.
+	-Cannot create deck. Waarom? => serialization error
+	=> Finished: Zaterdag 9 januari 2016
+3) Zorg dat er een menu is voor Ctrl+Q, OK 10 jan 2016
+	en dat dat werkt OK 10 jan 2016
+4) Zorg dat
+	a) er een item is voor Ctrl+N OK 10 jan 2016
+	 b) en dat dat werkt: dwz: windoowtje tonen 26 jan 2016
+	c) en zorgen dat het editbare top en bodem heeft 26 jan 2016
+	d) en zorgen voor OK en Cancel knoppen 26 jan 2016
+	e) en zorgen dat de OK-knop de kaart naar het deck savet! 26 jan 2016
+	d) en zorgen dat het de boodschap op het hoofdscherm updates 6 feb 2016
+
+
+
 
 Problems & Ideas
 Problem 1: DeckManager.getInstance().getCurrentDeck().getCardCount() is ugly
@@ -108,6 +131,6 @@ Option 3: I can make DeckManager 'wrapping' functions, so DeckManager.getCardCou
 	However, this is ugly as it leads to interface duplication, wrapping all Deck's methods in 
 	
 Ideas
-DeckManager: may want to make getCurrentDeck() static, so one less indirection to call.
 Sanitize the front and deck, removing leading and lagging whitespace?
 Better error message; either front or duplicate.
+
