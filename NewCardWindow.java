@@ -164,7 +164,7 @@ public class NewCardWindow extends JFrame {
       JOptionPane.showMessageDialog(null, errorMessage, "Cannot add card",
           JOptionPane.ERROR_MESSAGE);
     }
-
+    m_frontOfCard.requestFocusInWindow();
     // postconditions: If adding succeeded, the front and back should
     // be blank again, if it didn't, they should be the same as they were
     // before (so nothing changed). Since the logic of the postcondition

@@ -9,12 +9,9 @@ Eb+22+30(do21/1) [1/5 voor rest]
 -Problems & Ideas (things that we may want to change)
 
 
-Change OK
-Errors OK
-Sweep [changes] OK <just addition>
-Test OK
-Commit
+4f OK
 
+5
 Change 
 Errors
 Sweep [changes]
@@ -103,6 +100,7 @@ Design
 	d) en zorgen voor OK en Cancel knoppen 26 jan 2016
 	e) en zorgen dat de OK-knop de kaart naar het deck savet! 26 jan 2016
 	d) en zorgen dat het de boodschap op het hoofdscherm updates 6 feb 2016
+	f) en zorgen dat de OK-knop de focus weer naar de front verschuift
 
 
 
