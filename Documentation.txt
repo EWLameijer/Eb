@@ -85,6 +85,7 @@ Extension: the extension of a deck file (".deck") is called DECKFILE_EXTENSION f
 Utilities: contains all kinds of things that are not domain specific
 MainWindow: the main window of the application
 NewCardWindow: a window in which the user can create a new card, which is to be added to the deck.
+StudyOptionsWindow: a window in which the user can set the study options, like the intervals to be used.
 
 Design
 1) Maak een scherm dat Eb heet
@@ -101,6 +102,11 @@ Design
 	e) en zorgen dat de OK-knop de kaart naar het deck savet! 26 jan 2016
 	d) en zorgen dat het de boodschap op het hoofdscherm updates 6 feb 2016
 	f) en zorgen dat de OK-knop de focus weer naar de front verschuift
+5) Allow reviewing cards [add option window to set interval]
+	a) Add a Ctrl+T option to the help label, that there is also an option window
+	b) Add a menu option, including Ctrl+T 
+	c) let Ctrl+T from menu or shortcut open the Study Options window.
+	d) Give the study options window a label, a textbox, and a combobox (sec...years)
 
 
 
