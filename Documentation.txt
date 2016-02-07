@@ -24,6 +24,7 @@ Changes:
 
 Flow
 
+*Starting Eb*
 -Start the program
 Invoke the main() method of MainWindow, which calls the MainWindow constructor to construct the window itself.
 This shows a frame, with the PROGRAM_NAME as its name.
@@ -40,6 +41,7 @@ cards, and returns their count.
 Quitting calls MainWindow.saveAndQuit, which saves the deck (with Deck.save) 
 before exiting Eb.
 
+*Adding cards to the currently active deck*
 Creating a new card opens the NewCardWindow (using the function originally called "openNewCardWindow"). This window has panels (m_frontOfCard and m_backOfCard) to create the contents of the front and back.
 The NewCardWindow also has a cancel button (m_cancelButton) to cancel the creation of the card and get back to the main/calling window (this happens using the "close" function, and an OK button which the user can press to add the created card to the current deck - or at least try to, the card may be a duplicate or invalid for some reason. The NewCardWindow also has utility classes, like EscapeKeyListener with its keyPressed method, which checks of every keypress whether it presses 'escape', and if it does, closes the frame (works the same as pressing the cancel button). The EnterKeyListener is similar, but in this case it is attached to the back of the card and activates the OK-button (after all, if the user has completed the back of the card, he probably wants to press enter to save it).
 How to save a card? Well, the NewCardWindow creates a Card (using the Card constructor, which fills m_frontOfCard and m_backOfCard) and submits it to the current deck (getting access to the central deck point using DeckManager.getInstance(), which has of course the m_instance
@@ -47,6 +49,8 @@ as the pointer to the sole instance of the class, as per the Singleton pattern).
 Anyway, the 'submitCandidateCardToDeck' method is called, which checks the front and back of the card, retrieving them via the getFront() and getBack() methods. It checks, using the method canAddCard whether the front of the card is both vanlid and really new (isNotYetPresentInDeck) and whether the back of the card is also okay. If everything is okay, the "addCard" method is called and the card is inserted into the deck, and the textboxes are emptied to make room for new input for the new card. If not, a warning is displayed.
 Anyway, if a card is added, the DeckChangeListeners are activated (their respondToChangedDeck functions are called) by the notifyOfDeckChange method in Deck; in the MainWindow this causes the updateMessageLabel to be called (this has been enabled by registering the MainWindow to listen to changes in the deck with the Deck.addDeckChangeListener() method.
 
+*Checking/setting the study options of a deck*
+Pressing Ctrl+T opens the study options window. In it are an option to set the length of the first study interval This length can be edited in the UI at the place labeled by the label m_initialIntervalLabel, by providing the quantity (3 of 3 hours) in the textfield m_initialIntervalQuantityField, and the unit (the hours in "3 hours") in the combobox m_initialIntervalUnitField
 
 
 Glossary
@@ -107,6 +111,7 @@ Design
 	b) Add a menu option, including Ctrl+T 
 	c) let Ctrl+T from menu or shortcut open the Study Options window.
 	d) Give the study options window a label, a textbox, and a combobox (sec...years)
+	e) Add buttons: back to study, reset to default, set study settings to this 
 
 
 
