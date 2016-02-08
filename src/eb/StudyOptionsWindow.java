@@ -2,6 +2,7 @@ package eb;
 
 import java.awt.FlowLayout;
 
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -33,10 +34,17 @@ public class StudyOptionsWindow extends JFrame {
   // hours), the combobox the unit (the hours in "3 hours").
   private JTextField m_initialIntervalQuantityField;
 
-  // @@@[CCC Combobox used (in combination with a text field) to set the value
-  // for
-  // the initial study interval. Contains the hours of "3 hours"
+  // [CCCC] Combobox used (in combination with a text field) to set the value
+  // for the initial study interval. Contains the hours of "3 hours"
   private JComboBox<String> m_initialIntervalUnitField;
+  
+  // [CCCC] Button that closes this window, not saving any changes made
+  private JButton m_cancelButton;
+  
+  // @@@[CCC Button that restores the defaults to those of Eb 
+  private JButton m_restoreEbDefaultsButton;
+  
+  
 
   /**
    * [CPPRCCC] Creates a new Study Options window.

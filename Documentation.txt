@@ -50,7 +50,8 @@ Anyway, the 'submitCandidateCardToDeck' method is called, which checks the front
 Anyway, if a card is added, the DeckChangeListeners are activated (their respondToChangedDeck functions are called) by the notifyOfDeckChange method in Deck; in the MainWindow this causes the updateMessageLabel to be called (this has been enabled by registering the MainWindow to listen to changes in the deck with the Deck.addDeckChangeListener() method.
 
 *Checking/setting the study options of a deck*
-Pressing Ctrl+T opens the study options window. In it are an option to set the length of the first study interval This length can be edited in the UI at the place labeled by the label m_initialIntervalLabel, by providing the quantity (3 of 3 hours) in the textfield m_initialIntervalQuantityField, and the unit (the hours in "3 hours") in the combobox m_initialIntervalUnitField
+Pressing Ctrl+T opens the study options window. In it are an option to set the length of the first study interval This length can be edited in the UI at the place labeled by the label m_initialIntervalLabel, by providing the quantity (3 of 3 hours) in the textfield m_initialIntervalQuantityField, and the unit (the hours in "3 hours") in the combobox m_initialIntervalUnitField.
+This window also has some buttons: the Cancel-button (m_cancelButton), the button that restores the defaults to those of Eb (the m_restoreEbDefaultsButton)
 
 
 Glossary
@@ -107,11 +108,26 @@ Design
 	d) en zorgen dat het de boodschap op het hoofdscherm updates 6 feb 2016
 	f) en zorgen dat de OK-knop de focus weer naar de front verschuift
 5) Allow reviewing cards [add option window to set interval]
-	a) Add a Ctrl+T option to the help label, that there is also an option window
-	b) Add a menu option, including Ctrl+T 
-	c) let Ctrl+T from menu or shortcut open the Study Options window.
-	d) Give the study options window a label, a textbox, and a combobox (sec...years)
+	a) Add a Ctrl+T option to the help label, that there is also an option window Feb 8 2016
+	b) Add a menu option, including Ctrl+T  Feb 8 2016
+	c) let Ctrl+T from menu or shortcut open the Study Options window. Feb 8 2016
+	d) Give the study options window a label, a textbox, and a combobox (sec...years) Feb 8 2016
 	e) Add buttons: back to study, reset to default, set study settings to this 
+	
+	5) Add the possibility to review cards
+	a) Add the mention of a third option (Ctrl-T) to the Main window // Ctrl-O for open, Ctrl-P 
+	b) Let Ctrl-T open an options window
+	c) Create an Options class, which becomes a member/property of DeckContents
+	d) Add an "time before first review" label + textbox + timebox (min/hrs/days/weeks/months/years)
+	e) Initialize it (programmatically) to 10 minutes
+	f) Add a button 'load default settings of Eb' which resets it to 10 minutes.
+	g) make the main window show the time till review of the first card (in seconds [clock])
+	h) Ensure that the main window, upon loading and in a cycle of 1 minute checks whether there are reviewable cards, loads these into a 'batch'
+	i) Make main-window in review mode (know - don't know)
+	j) after reviewing the batch, checking again whether there are new cards to review, calling that the next batch.
+	k) add option for failed cards - rotating batch or stew (option minutes)
+6) Add repetition schedule (absolute constant 1 day, relative factor X [absolute custom later?])
+7) Eb and git: make the Git-dir contain Eclipse-dir (so with root and class). Add executable JAR (and test it somewhere)
 
 
 
