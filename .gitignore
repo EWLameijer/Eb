@@ -44,3 +44,6 @@ Temporary Items
 
 # Local .deck-files I create for testing
 *.deck
+
+# Ignoring Java class files
+*.class
