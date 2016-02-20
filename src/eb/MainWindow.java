@@ -77,9 +77,9 @@ public class MainWindow extends JFrame implements DeckChangeListener {
 	}
 
 	/**
-	 * @@@[CPPR Opens the study options window, at which one can set the study
-	 *          options for a deck (after which interval the first card should
-	 *          be studied, etc.)
+	 * [CPPRCCC] Opens the study options window, at which one can set the study
+	 * options for a deck (after which interval the first card should
+	 * be studied, etc.)
 	 */
 	private void openStudyOptionsWindow() {
 		// preconditions: none (this method will simply be called when the user

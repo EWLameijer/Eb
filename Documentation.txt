@@ -46,25 +46,33 @@ Creating a new card opens the NewCardWindow (using the function originally calle
 The NewCardWindow also has a cancel button (m_cancelButton) to cancel the creation of the card and get back to the main/calling window (this happens using the "close" function, and an OK button which the user can press to add the created card to the current deck - or at least try to, the card may be a duplicate or invalid for some reason. The NewCardWindow also has utility classes, like EscapeKeyListener with its keyPressed method, which checks of every keypress whether it presses 'escape', and if it does, closes the frame (works the same as pressing the cancel button). The EnterKeyListener is similar, but in this case it is attached to the back of the card and activates the OK-button (after all, if the user has completed the back of the card, he probably wants to press enter to save it).
 How to save a card? Well, the NewCardWindow creates a Card (using the Card constructor, which fills m_frontOfCard and m_backOfCard) and submits it to the current deck (getting access to the central deck point using DeckManager.getInstance(), which has of course the m_instance
 as the pointer to the sole instance of the class, as per the Singleton pattern). 
-Anyway, the 'submitCandidateCardToDeck' method is called, which checks the front and back of the card, retrieving them via the getFront() and getBack() methods. It checks, using the method canAddCard whether the front of the card is both vanlid and really new (isNotYetPresentInDeck) and whether the back of the card is also okay. If everything is okay, the "addCard" method is called and the card is inserted into the deck, and the textboxes are emptied to make room for new input for the new card. If not, a warning is displayed.
+Anyway, the 'submitCandidateCardToDeck' method is called, which checks the front and back of the card, retrieving them via the getFront() and getBack() methods. It checks, using the method canAddCard whether the front of the card is both valid and really new (isNotYetPresentInDeck) and whether the back of the card is also okay. If everything is okay, the "addCard" method is called and the card is inserted into the deck, and the textboxes are emptied to make room for new input for the new card. If not, a warning is displayed.
 Anyway, if a card is added, the DeckChangeListeners are activated (their respondToChangedDeck functions are called) by the notifyOfDeckChange method in Deck; in the MainWindow this causes the updateMessageLabel to be called (this has been enabled by registering the MainWindow to listen to changes in the deck with the Deck.addDeckChangeListener() method.
 
 *Checking/setting the study options of a deck*
-Pressing Ctrl+T opens the study options window. In it are an option to set the length of the first study interval This length can be edited in the UI at the place labeled by the label m_initialIntervalLabel, by providing the quantity (3 of 3 hours) in the textfield m_initialIntervalQuantityField, and the unit (the hours in "3 hours") in the combobox m_initialIntervalUnitField.
-This window also has some buttons: the Cancel-button (m_cancelButton), the button that restores the defaults to those of Eb (the m_restoreEbDefaultsButton)
+Pressing Ctrl+T opens the study options window via the openStudyOptionsWindow method in the MainWindow. In it are an option to set the length of the first study interval. This length can be edited in the UI at the place labeled by the label m_initialIntervalLabel, by providing the "3 hours" in the m_initialIntervalBox TimeIntervalElement, which stores the quantity (3 of 3 hours) in a textfield m_scalarField, and the unit (the hours in "3 hours") in the combobox m_unitComboBox, which gets its values from TimeUnit.getUserInterfaceName() [the full choice of values come from TimeUnit.getUnitNames).
+This window also has some buttons: the Cancel-button (m_cancelButton) which calls the close function, the button that load the default values of Eb (the m_loadEbDefaultsButton), the button that reloads the current deck settings (m_loadCurrentDeckSettingsButton, using the loadCurrentDeckSettings method ) and the button that sets the options of the this Deck (like Chinese) to the given values, m_setToTheseValuesButton.
+The close function is easy. Setting the values to Eb's defaults requires Eb's defaults to be stored somewhere. This requires a kind of standardStudyOptions, being an instance of the StudyOptions class.
+
+The Study Options window reads values from (and sets) StudyOptions objects. The StudyOptions class has a getDefault factory method, which calls the private constructor, setting all options to their default values. It also has data members like m_initialInterval which contain the length of the interval between creating the card and the first required review. Of course, Eb has default values for the initial interval (DEFAULT_INITIAL_INTERVAL). The TimeInterval values are assigned using constructors, copy constructor and init, getUnit() and getScalar() return the unit (like HOUR of "3 hours") and the scalar (the 3 of "3 hours") respectively. And StudyOptions adds the "getInitialInterval" to access its data.
+
+GUI-wise, the doubleToMaxPrecisionString is used to create the numbers in the right format (max 2 places of precision)
+***Return to deck's current settings - extra button
+
+
 
 
 Glossary
 
 Card: one of the cards that is studied. A card has contents (front and back, 'stimulus' and 'response', as well as a history (number of repetitions and failure rate and such).
 Deck: a collection cards that can be studied
-
+Study Options: the collection of options that determines how a SRS deck is to be studied, for example the interval before the first repetition, how much the study interval should increase upon success, whether there is a maximum time the student has before he or she may answer, and so on.
 
 HowTo
 
 Check whether a string is null or empty: Utilities.isStringNullOrEmpty
 Check whether a string is a valid identifier/token: Utilities.isStringValidIdentifier
-Check whether an error has occurred which has to lead to program end (or a warning!) Utilities.require
+Check whether anSS error has occurred which has to lead to program end (or a warning!) Utilities.require
 Check whether the user has pressed Escape and therefore the cancel button needs to be pressed: EscapeKeyListener (inner class in NewCardWindow)
 Check whether the user has pressed Enter and therefore (for example) the ok-button needs to be pressed: EnterKeyListener (inner class in NewCardWindow)
 Change a component (especially a text-containing component) so that tab and possibly enter won't influence the text, but will cause the focus to shift: Utilities.makeTabTransferFocus and Utilities.makeTabAndEnterTransferFocus  
@@ -90,7 +98,11 @@ Extension: the extension of a deck file (".deck") is called DECKFILE_EXTENSION f
 Utilities: contains all kinds of things that are not domain specific
 MainWindow: the main window of the application
 NewCardWindow: a window in which the user can create a new card, which is to be added to the deck.
+StudyOptions: the collection of options that determines how a SRS deck is to be studied, for example the interval before the first repetition, how much the study interval should increase upon success, whether there is a maximum time the student has before he or she may answer, and so on.
 StudyOptionsWindow: a window in which the user can set the study options, like the intervals to be used.
+TimeInputElement: a UI-element that allows users to see (or set) a time, like "0.1 seconds" or "3 day(s)"
+TimeInterval: stores a time interval, like 3 hours (the 3 can be a double) Contains a m_scalar (the 3.5 from 3.5 hours) and a m_unit (the hour from 3.5 hours), which are set by the constructor (which also requires time intervals to have length > 0)
+TimeUnit: enum of times, of SECOND, MINUTE. Stores both string names ("second(s)") [m_name] and time value (Durations) [m_duration]
 
 Design
 1) Maak een scherm dat Eb heet
@@ -112,7 +124,10 @@ Design
 	b) Add a menu option, including Ctrl+T  Feb 8 2016
 	c) let Ctrl+T from menu or shortcut open the Study Options window. Feb 8 2016
 	d) Give the study options window a label, a textbox, and a combobox (sec...years) Feb 8 2016
-	e) Add buttons: back to study, reset to default, set study settings to this 
+	e) Add buttons: back to study, reset to default, set study settings to this  Feb 9 2016
+	f) Ensure the cancel button works Feb 9 2016
+	g) Ensure the default button works Feb 16 2016
+	h) Ensure the save button works (implement a Study Settings object and data member in DeckContents)
 	
 	5) Add the possibility to review cards
 	a) Add the mention of a third option (Ctrl-T) to the Main window // Ctrl-O for open, Ctrl-P 
@@ -137,6 +152,8 @@ Problem 1: DeckManager.getInstance().getCurrentDeck().getCardCount() is ugly
 Problem 2: Hard to undo changes, no version control yet.
 Problem 3: I have to ensure that whenever I create or load a deck, it gets the MainWindow as listener for DeckChangeEvents. Okay. may need to make the deck a singleton.
 Problem 4: who should take the responsibility for giving the filehandle? I guess the DeckContents, as that has the name.
+Problem 5: Can I factor out the close operations?
+Problem 6: fundamentally, the DeckContents have study options,
 
 Problem 1 -
 Option 1: If I make Deck a singleton class I get

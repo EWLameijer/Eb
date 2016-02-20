@@ -25,6 +25,9 @@ public class DeckContents implements Serializable {
 
   // the cards contained by this deck [CCCC]
   private List<Card> m_cards = null;
+  
+  // The study options of this deck (interval increase between reviews etc.)
+  private StudyOptions m_studyOptions = null;
 
   /**
    * [CPPRCCC] Returns the File object representing a deck with name "deckName"
@@ -101,6 +104,7 @@ public class DeckContents implements Serializable {
     // code
     m_name = name;
     m_cards = new ArrayList<Card>();
+    m_studyOptions = StudyOptions.getDefault();
 
     // postconditions: none. The deck should have been constructed,
     // everything should work
