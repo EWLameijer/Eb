@@ -127,6 +127,7 @@ Design
 	e) Add buttons: back to study, reset to default, set study settings to this  Feb 9 2016
 	f) Ensure the cancel button works Feb 9 2016
 	g) Ensure the default button works Feb 16 2016
+	g2) check all code and documentation. (Feb round, +28 days RtM)
 	h) Ensure the save button works (implement a Study Settings object and data member in DeckContents)
 	
 	5) Add the possibility to review cards
