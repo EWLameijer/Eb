@@ -1,6 +1,3 @@
-Eb+22+30(do21/1) [1/5 voor rest]
-
-
 -Flow
 -Glossary (domain knowledge, and what means what)
 -HowTo (bepaalde veranderingen doorvoeren)
@@ -9,35 +6,96 @@ Eb+22+30(do21/1) [1/5 voor rest]
 -Problems & Ideas (things that we may want to change)
 
 
-4f OK
+General change framework
 
-5
-Change 
-Errors
-Sweep [changes]
-Test
-Commit
+1. Change 
+2. Errors
+3. Sweep [changes] // git diff / check
+4. Test
+5. Commit
 
+Now at status: ?.?
 
-
-Changes:
 
 Flow
 
 *Starting Eb*
--Start the program
-Invoke the main() method of MainWindow, which calls the MainWindow constructor to construct the window itself.
-This shows a frame, with the PROGRAM_NAME as its name.
-The main window - if there are no cards to be studied - contains a text describing the GUI shortcuts (provided by getUICommands) as well as the deck size provided by getDeckSizeMessage. The label containing this is called m_messageLabel.
-How do you decide whether there are cards to be studied? By looking at the deck. Unless otherwise specified, Eb loads the deck with the DEFAULT_DECKNAME (which is "default.deck") at the first call of a public Deck method (which calls deckExists(), which ensures that the deck indeed exists, or otherwise quits the program in a horrible way ;)). deckHasBeenLoaded is a nice utility function to encapsulate the low level ==null calls. This loading simply happens by looking for the deck file, which simply is the deck's name with the extension ".deck" (which is encoded in DECKFILE_EXTENSION). Anyway, Deck.loadDeckWithName loads the file.
-But what if the file does not exist yet? Then Deck.createDeckWithName is called.
-What these actually do: Deck is a kind of wrapper that is 'THE' deck of Eb, the target and anchor of all GUI elements. The contents are simply a static pointer in the Deck class (m_contents) pointing to a DeckContents object
-Then a deck is created, with Deck.m_name set to the name. getFileHandle / 
-getDeckFileHandle are used to transform a deck name to the name of the deck 
-file. The getCurrentDeck() of MainWindow gets this deck, sysexit with error if 
-it is unloadable.
-The decksize is found with getCardCount. This looks at the m_cards list of 
-cards, and returns their count.
+
+The program start shows Eb's main window. This window either shows a random card of the current deck to be studied, or, if there are no cards to be studied, a text indicating Eb's basic commands as well as some statistics on the current deck, like its size.
+
+*Doing things with Eb*
+
+There are some things you can always do with Eb, and other things that you can only do when there are cards to be studied.
+
+The 'general things':
+
+-Saving the current status & quitting Eb: Ctrl-Q, or, in the menu bar, File->Quit.
+
+-Adding a card: Ctrl-N, or, in the menu bar, Manage Deck->Add Card. More on adding cards in the section "*Adding cards*"
+
+-Displaying the study options menu: 
+
+*Adding Cards*
+
+Pressing "Ctrl-N" will open a card adding frame. This frame will be closed (without saving its data), by pressing 'escape' or clicking on the Cancel button. But most of the time, of course, you will want to use it to add cards. 
+
+Adding cards is easy: you type in text in the top field (this is the 'front' of the card, which will be shown@@@)
+
+
+
+%%% For programmers %%%
+
+% Starting Eb %
+
+Eb is started by invoking the main() method of the MainWindow() class.
+
+% Design %
+
+Most of Eb is rather straightforward: windows that pop up, listeners to UI elements, and so on.
+
+The things I'm currently struggling with with Eb involve two aspects:
+1) serialization/deserialization
+2) the architecture of the Deck-object.
+
+% Serialization %
+
+Serialization: having been involved in maintaining software that has 'backward compatibility challenges', and also because (if successful) Eb will grow, getting a proper format for serializing data will be very handy. The ideal serialization solution would be:
+a) very maintainable (so backward compatibility ensured without huge reams of "if (versionNumber<...)" statements)
+b) minimizes boilerplate code.
+
+Currently, Eb uses Java serialization which is very 'unboilerplaty' to program, but not maintainable (you can throw away each deserialized object as soon as you add a field somewhere - okay, that is not entirely true, you can add new fields, but you need to keep the serializion ID the same then, which may not be that good an idea).
+What should really happen with Eb's serialization:
+You have an object (or a collection of objects). Each object has a number of properties (say: key-value pairs).
+When reading an object from file, fill in the member variables based on the names. If there is no key corresponding to the member variable, try recreate its value as best you can (for example: has they key been renamed? Can it be deduced from other data? Or should it just be initialized to a default value?).
+Basically, you want to store and read a (nested) map, that you can update intelligently, or at least .
+While it is of course possible to homebrew your own format, using some standard notation/parsers can save lots of maintenance work, especially as I don't consider it my core business to invent improved data serialization formats. 
+
+The most common formats that are available for serialization/deserialization:
+XML
+JSON
+YAML
+Google Proto 
+BSON
+
+Any of these formats would be okay; they differ in human-readableness (YAML>JSON>XML | GProto and BSON not) and efficiency (GProto likely best, followed by BSON). My current decision is to first get Eb working decently, and if it is successful/changing enough to warrant a better serialization system, switch to Google proto. If debugging turns out to be the main problem, I'll link to a YAML library first.
+
+% The architecture of the Deck object %
+
+What is a Deck? Purely logically, a deck is a set of cards, each of which have their front and back and revision history. In practice, however, this is only true for an abstract (and fresh) deck. A deck, if things go right, becomes a tool to be shaped to the learner's mind, both by keeping records on each card of how well it has been remembered, as well as generic deck settings (the interval between the creation of the card and the first time it should be shown is likely different between a Java deck and a Russian deck). In principle, these data are separable; in practice, it's more convenient to store the deck settings and learning history of the deck together with the logical contents of the cards.
+
+At a certain time, Eb can only have a single active deck. This suggests some constraint on the number of Deck objects that one can create at a time; a singleton pattern or monostate pattern jump to mind, or even a static class. None of those options look particularly appealing at this time; monostate is misleading, suggesting that one can create multiple independent objects while in reality all data is shared; a static class is (at the moment) pragmatically impossible because that doesn't work with serialization, and a singleton pattern, while 'correct', introduces the boilerplate .getInstance() everywhere. Another problem is that the 'logical' deck should have some kind of interaction with the GUI - interactions that are not part of the logical contents of the deck (if a new deck is loaded, it should not need to learn about how to update the GUI). For this reason, I created a static "Deck" class that contains a pointer to the logical deck (a regular class called 'LogicalDeck'. The Deck is kind of like the office manager, forwarding content-related calls to the LogicalDeck, and handling the messy work of interacting with the GUI, so the GUI elements are all anchored in the Deck, and things don't have to change when the logical deck is swapped (say from Java to Japanese).
+
+This approach has some drawbacks, mainly that many Deck functions are kind of 'middleman' functions and most require checks to ensure the validity/existence of the logical deck, but, barring further insights, this seems the least bad solution at the moment. 
+
+
+
+
+ 
+
+
+
+
+
 Quitting calls MainWindow.saveAndQuit, which saves the deck (with Deck.save) 
 before exiting Eb.
 

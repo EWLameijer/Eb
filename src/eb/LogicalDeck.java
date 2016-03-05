@@ -6,13 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * [CC] Contains the properties belonging to the 'pure' deck itself, like its
- * name and contents [not the mess of dealing with the GUI, which is the
- * provenance of the Deck class]
+ * Contains the properties belonging to the 'pure' deck itself, like its name
+ * and contents [not the mess of dealing with the GUI, which is the provenance
+ * of the Deck class]
  * 
  * @author Eric-Wubbo Lameijer
  */
-public class DeckContents implements Serializable {
+public class LogicalDeck implements Serializable {
 
 	// Automatically generated ID for serialization.
 	private static final long serialVersionUID = 8271837223354295531L;
@@ -62,7 +62,7 @@ public class DeckContents implements Serializable {
 		// function can only be called if the deck already exists...
 
 		// code
-		File deckFileHandle = DeckContents.getDeckFileHandle(m_name);
+		File deckFileHandle = LogicalDeck.getDeckFileHandle(m_name);
 
 		// postconditions: the fileHandle should not be null, after all, that
 		// would mean an evil error has occurred
@@ -93,7 +93,7 @@ public class DeckContents implements Serializable {
 	 * @param name
 	 *          the name of the deck to be created
 	 */
-	public DeckContents(String name) {
+	public LogicalDeck(String name) {
 		// preconditions
 		Utilities.require(Utilities.isStringValidIdentifier(name),
 		    "Deck(name) error: deck has a bad name.");

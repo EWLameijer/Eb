@@ -27,7 +27,7 @@ import java.util.Set;
 public class Deck {
 
 	// The "singleton" pointer to the contents managed by this deck
-	private static DeckContents m_contents = null;
+	private static LogicalDeck m_contents = null;
 
 	// The name of the default deck
 	private static final String DEFAULT_DECKNAME = "default";
@@ -106,7 +106,7 @@ public class Deck {
 		        + "meaning that it exists and contains non-whitespace "
 		        + "characters.");
 
-		File deckFile = DeckContents.getDeckFileHandle(name);
+		File deckFile = LogicalDeck.getDeckFileHandle(name);
 
 		// case A: the file does not exist
 		if (!deckFile.isFile()) {
@@ -118,7 +118,7 @@ public class Deck {
 		save();
 		try (ObjectInputStream objInStream = new ObjectInputStream(
 		    new FileInputStream(deckFile))) {
-			m_contents = (DeckContents) objInStream.readObject();
+			m_contents = (LogicalDeck) objInStream.readObject();
 			return (m_contents != null);
 		} catch (Exception e) {
 			// something goes wrong with deserializing the deck; so
@@ -153,7 +153,7 @@ public class Deck {
 		if (deckHasBeenLoaded()) {
 			save();
 		}
-		m_contents = new DeckContents(name);
+		m_contents = new LogicalDeck(name);
 		save();
 
 		// postconditions: the deck should exist (deck.save handles any errors
