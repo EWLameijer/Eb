@@ -7,8 +7,8 @@ import java.util.List;
 
 /**
  * Contains the properties belonging to the 'pure' deck itself, like its name
- * and contents [not the mess of dealing with the GUI, which is the provenance
- * of the Deck class]
+ * and contents [not the mess of dealing with the GUI, which is the
+ * responsibility of the Deck class]
  * 
  * @author Eric-Wubbo Lameijer
  */
@@ -21,70 +21,13 @@ public class LogicalDeck implements Serializable {
 	private static final String DECKFILE_EXTENSION = ".deck";
 
 	// The name of the deck.
-	private String m_name = null;
+	private String m_name;
 
 	// The cards contained by this deck.
-	private List<Card> m_cards = null;
+	private List<Card> m_cards;
 
 	// The study options of this deck (interval increase between reviews etc.)
-	private StudyOptions m_studyOptions = null;
-
-	/**
-	 * Returns the File object representing a deck with name "deckName" on disk.
-	 * 
-	 * @param deckName
-	 *          the name of the deck
-	 * @return the File object belonging to this deck.
-	 */
-	protected static File getDeckFileHandle(String deckName) {
-		// preconditions: m_cards is a valid identifier
-		Utilities.require(Utilities.isStringValidIdentifier(deckName),
-		    "Deck.getDeckFileHandle error: deck name is invalid.");
-
-		// code
-		String deckFileName = deckName + DECKFILE_EXTENSION;
-		File deckFile = new File(deckFileName);
-
-		// postconditions: deckFile exists!
-		Utilities.require(deckFile != null,
-		    "Deck.getDeckFileHandle error: problem creating file handle for deck.");
-
-		return deckFile;
-	}
-
-	/**
-	 * Returns the handle (File object) to the file in which this deck is stored.
-	 * 
-	 * @return the handle (File object) to the file which stores this deck
-	 */
-	protected File getFileHandle() {
-		// preconditions: none (the deck should exist, of course, but since this
-		// function can only be called if the deck already exists...
-
-		// code
-		File deckFileHandle = LogicalDeck.getDeckFileHandle(m_name);
-
-		// postconditions: the fileHandle should not be null, after all, that
-		// would mean an evil error has occurred
-		Utilities.require(deckFileHandle != null, "Deck.getFileHandle error: "
-		    + "problem creating file handle for deck.");
-
-		return deckFileHandle;
-	}
-
-	/**
-	 * Returns the number of cards in this deck.
-	 * 
-	 * @return the number of cards in this deck
-	 */
-	public int getCardCount() {
-		// preconditions
-		Utilities.require(m_cards != null,
-		    "DeckContents.getCardCount error: Cards not initialized!");
-
-		// postconditions: none (assume standard method size works properly)
-		return m_cards.size();
-	}
+	private StudyOptions m_studyOptions;
 
 	/**
 	 * Constructs a deck with name "name". Note that by defining this constructor,
@@ -96,15 +39,71 @@ public class LogicalDeck implements Serializable {
 	public LogicalDeck(String name) {
 		// preconditions
 		Utilities.require(Utilities.isStringValidIdentifier(name),
-		    "Deck(name) error: deck has a bad name.");
+		    "LogicalDeck constructor error: deck has a bad name.");
 
 		// code
 		m_name = name;
-		m_cards = new ArrayList<Card>();
+		m_cards = new ArrayList<>();
 		m_studyOptions = StudyOptions.getDefault();
 
 		// postconditions: none. The deck should have been constructed,
 		// everything should work
+	}
+
+	/**
+	 * Returns the File object representing a deck with name "deckName".
+	 * 
+	 * @param deckName
+	 *          the name of the deck
+	 * @return the File object belonging to this deck.
+	 */
+	static File getDeckFileHandle(String deckName) {
+		// preconditions: m_cards is a valid identifier
+		Utilities.require(Utilities.isStringValidIdentifier(deckName),
+		    "LogicalDeck.getDeckFileHandle() error: deck name is invalid.");
+
+		// code
+		String deckFileName = deckName + DECKFILE_EXTENSION;
+		File deckFile = new File(deckFileName);
+
+		// postconditions: deckFile exists!
+		Utilities.require(deckFile != null, "LogicalDeck.getDeckFileHandle() "
+		    + "error: problem creating file handle for deck.");
+
+		return deckFile;
+	}
+
+	/**
+	 * Returns the handle (File object) to the file in which this deck is stored.
+	 * 
+	 * @return the handle (File object) to the file which stores this deck
+	 */
+	File getFileHandle() {
+		// preconditions: none (the deck should exist, of course, but since this
+		// function can only be called if the deck already exists...
+
+		// code
+		File deckFileHandle = LogicalDeck.getDeckFileHandle(m_name);
+
+		// postconditions: the fileHandle should not be null, after all, that
+		// would mean an evil error has occurred
+		Utilities.require(deckFileHandle != null, "LogicalDeck.getFileHandle() "
+		    + " error: problem creating file handle for deck.");
+
+		return deckFileHandle;
+	}
+
+	/**
+	 * Returns the number of cards in this deck.
+	 * 
+	 * @return the number of cards in this deck
+	 */
+	public int getCardCount() {
+		// preconditions: none, as we initialize the list of cards at construction.
+
+		// postconditions: none (I assume that the standard size() method works
+		// properly)
+		return m_cards.size();
 	}
 
 	/**
@@ -114,19 +113,17 @@ public class LogicalDeck implements Serializable {
 	 * 
 	 * @param front
 	 *          the front of the card to be checked for uniqueness in the deck
+	 * 
 	 * @return whether the card would be a valid addition to the deck (true) or
 	 *         whether the front would be a duplicate of a front already present
 	 *         (false)
 	 */
 	private boolean isNotYetPresentInDeck(String front) {
-		// Preconditions: front is a valid identifier
-		// Precondition: the deck has been initialized (so is not null)
+		// Preconditions: front is a valid identifier.
 		Utilities.require(Utilities.isStringValidIdentifier(front),
-		    "Deck.isNotYetPresentInDeck error: the text on the front of the "
+		    "LogicalDeck.isNotYetPresentInDeck() error: the text on the front of the "
 		        + "card needs to be a valid identifier, not null or a string with "
 		        + "only whitespace characters.");
-		Utilities.require(m_cards != null, "Deck.isNotYetPresentInDeck error: "
-		    + "the list of cards has not been properly initialized yet.");
 
 		for (Card card : m_cards) {
 			if (card.getFront().equals(front)) {
@@ -137,7 +134,7 @@ public class LogicalDeck implements Serializable {
 		// if you get here, no card with the checked-for front has been found
 		return true;
 
-		// Postconditions: none, really. Simple return of a boolean
+		// Postconditions: none, really. Simple return of a boolean.
 	}
 
 	/**
@@ -147,24 +144,31 @@ public class LogicalDeck implements Serializable {
 	 * 
 	 * @param card
 	 *          the candidate card to be added.
+	 * 
 	 * @return whether the card can legally be added to the deck.
 	 */
 	protected boolean canAddCard(Card card) {
 		// preconditions: the card should not be null. Otherwise, all cards,
 		// even invalid ones, should be able to be handled by this method.
-		Utilities.require(card != null,
-		    "Deck.canAddCard error: " + "the card to be tested cannot be null.");
+		Utilities.require(card != null, "LogicalDeck.canAddCard() error: "
+		    + "the card to be tested cannot be null.");
 
-		return ((Utilities.isStringValidIdentifier(card.getFront()))
-		    && (isNotYetPresentInDeck(card.getFront()))
-		    && (card.getBack() != null));
+		return Utilities.isStringValidIdentifier(card.getFront())
+		    && (isNotYetPresentInDeck(card.getFront())) && (card.getBack() != null);
 
 		// postconditions: none; a boolean will be returned.
 	}
 
+	/**
+	 * Adds a card to the deck. Note that one has to call canAddCard() beforehand.
+	 * 
+	 * @param card
+	 *          the card to add to the deck.
+	 */
 	protected void addCard(Card card) {
+		// preconditions: card must be 'addable'
 		Utilities.require(canAddCard(card),
-		    "DeckContents.addCard error: the card "
+		    "LogicalDeck.addCard() error: the card "
 		        + "that is intended to be added is invalid. The 'canAddCard' "
 		        + "method has to be invoked first to check the possibility of the "
 		        + "current method.");
@@ -172,7 +176,20 @@ public class LogicalDeck implements Serializable {
 		boolean cardAddSuccessful = m_cards.add(card);
 
 		// postconditions: the deck should have been grown by one.
-		Utilities.require(cardAddSuccessful, "Deck.addCard error: something "
-		    + "has gone wrong while adding the card to the deck.");
+		Utilities.require(cardAddSuccessful, "LogicalDeck.addCard() error: "
+		    + " something has gone wrong while adding the card to the deck.");
+	}
+
+	/**
+	 * Returns the interval that Eb waits after the user adds a card before
+	 * letting the user review the card.
+	 * 
+	 * @return the interval that Eb waits after the user adds a card before
+	 *         letting the user review the card.
+	 */
+	public TimeInterval getInitialInterval() {
+		// preconditions and postconditions: none. After all, m_studyOptions has
+		// already been initialized in LogicalDeck's constructor.
+		return m_studyOptions.getInitialInterval();
 	}
 }

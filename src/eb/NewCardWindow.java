@@ -14,8 +14,8 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextPane;
 
 /**
- * [CC] NewCardWindow allows the user to create a new card in the GUI, and to
- * send it for checking and storage to the Deck.
+ * NewCardWindow allows the user to create a new card in the GUI, and to send it
+ * for checking and storage to the Deck.
  * 
  * @author Eric-Wubbo Lameijer
  */
@@ -33,9 +33,47 @@ public class NewCardWindow extends JFrame {
 	private JButton m_cancelButton;
 
 	// The button to press that requests the current deck to check whether this
-	// card is a valid/useable card (so no duplicate of an existing card, for
+	// card is a valid/usable card (so no duplicate of an existing card, for
 	// example) and if so, to add it.
 	private JButton m_okButton;
+
+	/**
+	 * Creates a <code>NewCardWindow</code> to add cards to the current deck.
+	 */
+	NewCardWindow() {
+		// preconditions: none (we can assume the user clicked the appropriate
+		// button, and even otherwise there is not a big problem)
+
+		// Create the panel to edit the front of the card, and make enter
+		// and tab transfer focus to the panel for editing the back of the card.
+		// Escape should cancel the card-creating process and close the
+		// NewCardWindow
+		m_frontOfCard = new JTextPane();
+		Utilities.makeTabAndEnterTransferFocus(m_frontOfCard);
+		m_frontOfCard.addKeyListener(new EscapeKeyListener());
+
+		// Now create the panel to edit the back of the card; make tab transfer
+		// focus to the front (for editing the front again), escape should (like
+		// for the front panel) again cancel editing and close the NewCardWindow.
+		// Pressing the Enter key, however, should try save the card instead of
+		// transferring the focus back to the front-TextArea.
+		m_backOfCard = new JTextPane();
+		Utilities.makeTabTransferFocus(m_backOfCard);
+		m_backOfCard.addKeyListener(new EnterKeyListener());
+		m_backOfCard.addKeyListener(new EscapeKeyListener());
+
+		// Also add the two buttons (Cancel and OK).
+		m_cancelButton = new JButton("Cancel");
+		m_okButton = new JButton("Ok");
+
+		// we just want tab to cycle from the front to the back of the card,
+		// and vice versa, and not hit the buttons
+		m_cancelButton.setFocusable(false);
+		m_okButton.setFocusable(false);
+
+		// postconditions: none. The window exists and should henceforth handle
+		// its own business using the appropriate GUI elements.
+	}
 
 	/**
 	 * The <code>EnterKeyListener</code> object enables a text field to listen for
@@ -65,6 +103,8 @@ public class NewCardWindow extends JFrame {
 		 */
 		@Override
 		public void keyReleased(KeyEvent arg0) {
+			// Do nothing: only needs to respond to the pressing of the key, not to
+			// the release.
 		}
 
 		/**
@@ -72,11 +112,13 @@ public class NewCardWindow extends JFrame {
 		 */
 		@Override
 		public void keyTyped(KeyEvent arg0) {
+			// Do nothing: only needs to respond to the pressing of the key, not to
+			// typing it (or such)
 		}
 	}
 
 	/**
-	 * [CC] Listens for the escape key, closes the screen if it is pressed
+	 * Listens for the escape key, closes the screen if it is pressed.
 	 * 
 	 * @author Eric-Wubbo Lameijer
 	 */
@@ -102,6 +144,8 @@ public class NewCardWindow extends JFrame {
 		 */
 		@Override
 		public void keyReleased(KeyEvent arg0) {
+			// Do nothing: only needs to respond to the pressing of the key, not to
+			// the release.
 		}
 
 		/**
@@ -109,6 +153,8 @@ public class NewCardWindow extends JFrame {
 		 */
 		@Override
 		public void keyTyped(KeyEvent arg0) {
+			// Do nothing: only needs to respond to the pressing of the key, not to
+			// typing it (or such)
 		}
 	}
 
@@ -125,7 +171,8 @@ public class NewCardWindow extends JFrame {
 	 * Converts the current contents of the NewCardWindow into a card (with front
 	 * and back as defined by the contents of the front and back panels) and
 	 * submit it to the current deck. The card may or may not be accepted,
-	 * depending on the front being valid, and not a duplicate of another front.
+	 * depending on whether the front is valid, and not a duplicate of another
+	 * front.
 	 */
 	private void submitCandidateCardToDeck() {
 		// preconditions: none: this is a button-press-response function,
@@ -133,7 +180,7 @@ public class NewCardWindow extends JFrame {
 		// (in this case the OK button) is pressed.
 
 		// logging
-		System.out.printf("Front: %s, back %s\n", m_frontOfCard.getText(),
+		System.out.printf("Front: %s, back %s%n", m_frontOfCard.getText(),
 		    m_backOfCard.getText());
 
 		// create a new card
@@ -154,9 +201,12 @@ public class NewCardWindow extends JFrame {
 				errorMessage = "Cannot add card: there already is another card with "
 				    + "the same front";
 			}
-			JOptionPane.showMessageDialog(null, errorMessage, "Cannot add card",
+			JOptionPane.showMessageDialog(this, errorMessage, "Cannot add card",
 			    JOptionPane.ERROR_MESSAGE);
 		}
+
+		// Whatever happens, transfer the focus back to the TextArea representing
+		// the front of the card.
 		m_frontOfCard.requestFocusInWindow();
 		// postconditions: If adding succeeded, the front and back should
 		// be blank again, if it didn't, they should be the same as they were
@@ -166,37 +216,22 @@ public class NewCardWindow extends JFrame {
 	}
 
 	/**
-	 * Creates a <code>NewCardWindow</code> to add cards to the current deck.
+	 * Initializes the components of the NewCardWindow.
 	 */
-	NewCardWindow() {
-		// preconditions: none (we can assume the user clicked the appropriate
-		// button, and even otherwise there is not a big problem)
+	void init() {
+		m_cancelButton.addActionListener(e -> close());
+		m_okButton.addActionListener(e -> submitCandidateCardToDeck());
 
-		setLayout(new GridBagLayout());
+		// now add the buttons to the window
+		JPanel buttonPane = new JPanel();
+		buttonPane.add(m_cancelButton);
+		buttonPane.add(m_okButton);
 
-		// Create the panel to edit the front of the card, and make enter
-		// and tab transfer focus to the panel for editing the back of the card.
-		// Escape should cancel the card-creating process and close the
-		// NewCardWindow
-		m_frontOfCard = new JTextPane();
-		Utilities.makeTabAndEnterTransferFocus(m_frontOfCard);
-		m_frontOfCard.addKeyListener(new EscapeKeyListener());
-
-		// Now create the panel to edit the back of the card; make tab transfer
-		// focus to the front (for editing that), escape should (like for the
-		// front panel) again cancel editing and close the NewCardWindow.
-		// Pressing the Enter key, however, should try save the card, and i
-		m_backOfCard = new JTextPane();
-		Utilities.makeTabTransferFocus(m_backOfCard);
-		m_backOfCard.addKeyListener(new EnterKeyListener());
-		m_backOfCard.addKeyListener(new EscapeKeyListener());
-
-		// Now ensure that front and back of card are shown nicely in the
-		// window.
-		// Also add the two buttons (Cancel and OK).
+		// Now create a nice (or at least acceptable-looking) layout.
 		JSplitPane upperPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
 		    m_frontOfCard, m_backOfCard);
 		upperPanel.setResizeWeight(0.5);
+		setLayout(new GridBagLayout());
 		GridBagConstraints frontConstraints = new GridBagConstraints();
 		frontConstraints.gridx = 0;
 		frontConstraints.gridy = 0;
@@ -205,20 +240,7 @@ public class NewCardWindow extends JFrame {
 		frontConstraints.insets = new Insets(0, 0, 5, 0);
 		frontConstraints.fill = GridBagConstraints.BOTH;
 		add(upperPanel, frontConstraints);
-		m_cancelButton = new JButton("Cancel");
-		m_cancelButton.addActionListener(e -> close());
-		m_okButton = new JButton("Ok");
-		m_okButton.addActionListener(e -> submitCandidateCardToDeck());
 
-		// we just want tab to cycle from the front to the back of the card,
-		// and vice versa, and not hit the buttons
-		m_cancelButton.setFocusable(false);
-		m_okButton.setFocusable(false);
-
-		// add the buttons to the window
-		JPanel buttonPane = new JPanel();
-		buttonPane.add(m_cancelButton);
-		buttonPane.add(m_okButton);
 		GridBagConstraints buttonPaneConstraints = new GridBagConstraints();
 		buttonPaneConstraints.gridx = 0;
 		buttonPaneConstraints.gridy = 1;
@@ -231,8 +253,16 @@ public class NewCardWindow extends JFrame {
 		setSize(400, 400);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setVisible(true);
+	}
 
-		// postconditions: none. The window exists and should henceforth handle
-		// its own business using the appropriate GUI elements.
+	/**
+	 * Shows the NewCardWindow. Is necessary to accommodate the nullness checker,
+	 * which requires separation of the constructor and setting/manipulating its
+	 * fields (of course, warnings could be suppressed, but programming around it
+	 * seemed more elegant).
+	 */
+	static void display() {
+		NewCardWindow newCardWindow = new NewCardWindow();
+		newCardWindow.init();
 	}
 }

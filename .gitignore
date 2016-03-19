@@ -47,3 +47,11 @@ Temporary Items
 
 # Ignoring Java class files
 *.class
+/bin/*
+bin/*
+/bin/eb/*.class
+
+# Ignoring SonarQube blathering
+
+.sonar/*
+sonar*

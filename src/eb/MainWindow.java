@@ -23,16 +23,26 @@ public class MainWindow extends JFrame implements DeckChangeListener {
 	// The name of the program.
 	private static final String PROGRAM_NAME = "Eb";
 
-	// The label that is to be shown if there is no card that needs to be
+	// The label that has to be shown if there is no card that needs to be
 	// reviewed currently, or if there is an error. Is the alternative to
 	// the regular "reviewing" window, which should be active most of the
 	// time.
-	private JLabel m_messageLabel = null;
+	private JLabel m_messageLabel;
+
+	/**
+	 * MainWindow constructor.
+	 */
+	MainWindow() {
+		// preconditions: none
+		super(PROGRAM_NAME);
+		m_messageLabel = new JLabel();
+	}
 
 	/**
 	 * Implements the DeckChangeListener interface to respond to deck change
 	 * events
 	 */
+	@Override
 	public void respondToChangedDeck() {
 		// preconditions: none (the deck has changed, but basically, that would
 		// be the reason why this function is called in the first place
@@ -83,21 +93,19 @@ public class MainWindow extends JFrame implements DeckChangeListener {
 	 */
 	private void openStudyOptionsWindow() {
 		// preconditions: none (this method will simply be called when the user
-		// presses the correct button.
+		// presses the correct button).
 
-		new StudyOptionsWindow();
+		StudyOptionsWindow.display();
 
 		// postconditions: none (the user does not have to do anything with the
 		// settings)
 	}
 
 	/**
-	 * MainWindow constructor.
+	 * Performs the proper buildup of the window (after the construction has
+	 * initialized all components properly).
 	 */
-	MainWindow() {
-		// preconditions: none
-		super(PROGRAM_NAME);
-
+	private void init() {
 		// add menu
 		JMenu fileMenu = new JMenu("File");
 		JMenuItem quitItem = new JMenuItem("Quit");
@@ -109,7 +117,7 @@ public class MainWindow extends JFrame implements DeckChangeListener {
 		JMenuItem addCardItem = new JMenuItem("Add Card");
 		addCardItem.setAccelerator(
 		    KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
-		addCardItem.addActionListener(e -> openNewCardWindow());
+		addCardItem.addActionListener(e -> NewCardWindow.display());
 		deckManagementMenu.add(addCardItem);
 		JMenuItem studyOptionsItem = new JMenuItem("Study Options");
 		studyOptionsItem.setAccelerator(
@@ -121,15 +129,26 @@ public class MainWindow extends JFrame implements DeckChangeListener {
 		mainMenuBar.add(deckManagementMenu);
 		setJMenuBar(mainMenuBar);
 
-		m_messageLabel = new JLabel();
-		updateMessageLabel();
+		// add message label (or show cards-to-be-reviewed)
 
+		updateMessageLabel();
 		add(m_messageLabel);
+
+		// now show the window itself.
 		setSize(1000, 700);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setVisible(true);
 		Deck.addDeckChangeListener(this);
 		// postconditions: none
+	}
+
+	/**
+	 * Displays the main window. Necessary since the Checker framework dislikes
+	 * initializing values and doing things like 'add' in the same method.
+	 */
+	public static void display() {
+		MainWindow mainWindow = new MainWindow();
+		mainWindow.init();
 	}
 
 	/**
@@ -141,28 +160,4 @@ public class MainWindow extends JFrame implements DeckChangeListener {
 		System.exit(0);
 		// preconditions: none
 	}
-
-	/**
-	 * Opens a window in which the user can create a new card.
-	 */
-	private void openNewCardWindow() {
-		// preconditions: none (the button has been pressed, but okay, I assume
-		// this function is only called when that has happened, and otherwise
-		// it is not terrible either
-		new NewCardWindow();
-		// postconditions: none
-	}
-
-	/**
-	 * Shows the main window of Eb.
-	 * 
-	 * @param args
-	 *          the command-line arguments given to Eb (not used yet).
-	 */
-	public static void main(String[] args) {
-		// preconditions: none (args are ignored for the moment)
-		new MainWindow();
-		// postconditions: none
-	}
-
 }

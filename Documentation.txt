@@ -33,13 +33,23 @@ The 'general things':
 
 -Adding a card: Ctrl-N, or, in the menu bar, Manage Deck->Add Card. More on adding cards in the section "*Adding cards*"
 
--Displaying the study options menu: 
+-Displaying the study options menu: Ctrl-T. More on the study options menu in the section "The Study Options Menu"
+
 
 *Adding Cards*
 
 Pressing "Ctrl-N" will open a card adding frame. This frame will be closed (without saving its data), by pressing 'escape' or clicking on the Cancel button. But most of the time, of course, you will want to use it to add cards. 
 
-Adding cards is easy: you type in text in the top field (this is the 'front' of the card, which will be shown@@@)
+Adding cards is easy: you type in text in the top field (this is the 'front' of the card, which will be shown as the question/cue when you review the cards). Then you either click on the field below, or, more conveniently, press <Enter> if you are done filling in the text on the front. This will allow you to fill in the text for the back of the card, the 'answer'. When you are done, either press the "OK" button or simply press <Enter> again to add the new card to the collection.
+
+Note that if the front of the card is empty, or a duplicate of the front of another card, Eb will complain and refuse to add the card until the front has some contents and is unique. *@view duplicate-functionality?*
+
+
+*The Study Options Menu*
+
+Each learner is unique, and so is the structure and difficulty of each deck. For example, when learning the capitals of the American states, you can easily review them 10 hours later after first adding the card. For studying say Russian vocabulary, 5 or 10 minutes may be a more appropriate time for the first repetition. In the Study Options menu you can set such deck characteristics to values that fit the deck and your preferred style of study. It even allows you to experiment with different study methods!
+
+The first parameter you can set is the "Initial interval", which is the time Eb lets pass after you added the card before it presents the card to you for the first review. If the deck is hard, you may want to choose 10 minutes; for an easy deck, 3 hours or even one day would be appropriate. The rule of thumb is that you should be able to answer between 80% and 95% of cards correctly at a repetition. *@Eb gives feedback?*
 
 
 
@@ -94,24 +104,6 @@ This approach has some drawbacks, mainly that many Deck functions are kind of 'm
 
 
 
-
-
-Quitting calls MainWindow.saveAndQuit, which saves the deck (with Deck.save) 
-before exiting Eb.
-
-*Adding cards to the currently active deck*
-Creating a new card opens the NewCardWindow (using the function originally called "openNewCardWindow"). This window has panels (m_frontOfCard and m_backOfCard) to create the contents of the front and back.
-The NewCardWindow also has a cancel button (m_cancelButton) to cancel the creation of the card and get back to the main/calling window (this happens using the "close" function, and an OK button which the user can press to add the created card to the current deck - or at least try to, the card may be a duplicate or invalid for some reason. The NewCardWindow also has utility classes, like EscapeKeyListener with its keyPressed method, which checks of every keypress whether it presses 'escape', and if it does, closes the frame (works the same as pressing the cancel button). The EnterKeyListener is similar, but in this case it is attached to the back of the card and activates the OK-button (after all, if the user has completed the back of the card, he probably wants to press enter to save it).
-How to save a card? Well, the NewCardWindow creates a Card (using the Card constructor, which fills m_frontOfCard and m_backOfCard) and submits it to the current deck (getting access to the central deck point using DeckManager.getInstance(), which has of course the m_instance
-as the pointer to the sole instance of the class, as per the Singleton pattern). 
-Anyway, the 'submitCandidateCardToDeck' method is called, which checks the front and back of the card, retrieving them via the getFront() and getBack() methods. It checks, using the method canAddCard whether the front of the card is both valid and really new (isNotYetPresentInDeck) and whether the back of the card is also okay. If everything is okay, the "addCard" method is called and the card is inserted into the deck, and the textboxes are emptied to make room for new input for the new card. If not, a warning is displayed.
-Anyway, if a card is added, the DeckChangeListeners are activated (their respondToChangedDeck functions are called) by the notifyOfDeckChange method in Deck; in the MainWindow this causes the updateMessageLabel to be called (this has been enabled by registering the MainWindow to listen to changes in the deck with the Deck.addDeckChangeListener() method.
-
-*Checking/setting the study options of a deck*
-Pressing Ctrl+T opens the study options window via the openStudyOptionsWindow method in the MainWindow. In it are an option to set the length of the first study interval. This length can be edited in the UI at the place labeled by the label m_initialIntervalLabel, by providing the "3 hours" in the m_initialIntervalBox TimeIntervalElement, which stores the quantity (3 of 3 hours) in a textfield m_scalarField, and the unit (the hours in "3 hours") in the combobox m_unitComboBox, which gets its values from TimeUnit.getUserInterfaceName() [the full choice of values come from TimeUnit.getUnitNames).
-This window also has some buttons: the Cancel-button (m_cancelButton) which calls the close function, the button that load the default values of Eb (the m_loadEbDefaultsButton), the button that reloads the current deck settings (m_loadCurrentDeckSettingsButton, using the loadCurrentDeckSettings method ) and the button that sets the options of the this Deck (like Chinese) to the given values, m_setToTheseValuesButton.
-The close function is easy. Setting the values to Eb's defaults requires Eb's defaults to be stored somewhere. This requires a kind of standardStudyOptions, being an instance of the StudyOptions class.
-
 The Study Options window reads values from (and sets) StudyOptions objects. The StudyOptions class has a getDefault factory method, which calls the private constructor, setting all options to their default values. It also has data members like m_initialInterval which contain the length of the interval between creating the card and the first required review. Of course, Eb has default values for the initial interval (DEFAULT_INITIAL_INTERVAL). The TimeInterval values are assigned using constructors, copy constructor and init, getUnit() and getScalar() return the unit (like HOUR of "3 hours") and the scalar (the 3 of "3 hours") respectively. And StudyOptions adds the "getInitialInterval" to access its data.
 
 GUI-wise, the doubleToMaxPrecisionString is used to create the numbers in the right format (max 2 places of precision)
@@ -122,22 +114,23 @@ GUI-wise, the doubleToMaxPrecisionString is used to create the numbers in the ri
 
 Glossary
 
-Card: one of the cards that is studied. A card has contents (front and back, 'stimulus' and 'response', as well as a history (number of repetitions and failure rate and such).
-Deck: a collection cards that can be studied
-Study Options: the collection of options that determines how a SRS deck is to be studied, for example the interval before the first repetition, how much the study interval should increase upon success, whether there is a maximum time the student has before he or she may answer, and so on.
+-Card: one of the cards that is studied. A card has contents (front and back, 'stimulus' and 'response', as well as a history (number of repetitions and failure rate and such).
+-Deck: a collection cards that can be studied
+-Study Options: the collection of options that determines how a SRS deck is to be studied, for example the interval before the first repetition, how much the study interval should increase upon success, whether there is a maximum time the student has before he or she may answer, and so on.
 
 HowTo
 
-Check whether a string is null or empty: Utilities.isStringNullOrEmpty
-Check whether a string is a valid identifier/token: Utilities.isStringValidIdentifier
-Check whether anSS error has occurred which has to lead to program end (or a warning!) Utilities.require
-Check whether the user has pressed Escape and therefore the cancel button needs to be pressed: EscapeKeyListener (inner class in NewCardWindow)
-Check whether the user has pressed Enter and therefore (for example) the ok-button needs to be pressed: EnterKeyListener (inner class in NewCardWindow)
-Change a component (especially a text-containing component) so that tab and possibly enter won't influence the text, but will cause the focus to shift: Utilities.makeTabTransferFocus and Utilities.makeTabAndEnterTransferFocus  
+-Check whether a string is null or empty: Utilities.isStringNullOrEmpty
+-Check whether a string is a valid identifier/token: Utilities.isStringValidIdentifier
+-Check whether an error has occurred which has to lead to program end (or a warning!) Utilities.require
+-Check whether the user has pressed Escape and therefore the cancel button needs to be pressed: EscapeKeyListener (inner class in NewCardWindow)
+-Check whether the user has pressed Enter and therefore (for example) the ok-button needs to be pressed: EnterKeyListener (inner class in NewCardWindow)
+-Change a component (especially a text-containing component) so that tab and possibly enter won't influence the text, but will cause the focus to shift: Utilities.makeTabTransferFocus and Utilities.makeTabAndEnterTransferFocus  
+-Add a system-specific line break: Utilities.EOL
 
 Coding style: 
-	*exceptions: if you use Pokemon exception handling, add e.printStackTrace(); [ERROR 1]
-	*require: Class.methodName error: message. If constructor: Class() or Class(Type[,Type])
+	*exceptions: if you use "Pokemon exception handling" ('catch (Exception e)'), add e.printStackTrace(); [ERROR 1]
+	*require: Class.methodName() error: message. If constructor: Class() or Class(Type[,Type]). Example Utilities.require(Utilities.isStringValidIdentifier(deckName), "Deck.getDeckFileHandle() error: deck name is invalid.");
 
 Construct a class 
 
@@ -146,37 +139,26 @@ Construct a method [CPPCCC]
 			-parameters
 			-global settings?
 
-Add a system-specific line break: Utilities.EOL
+
 
 Map
-DeckChangeListener: an interface for objects that need to know when the contents of the current deck has been changed; it is a functional interface, containing only one method, respondToChangedDeck
-Deck: THE deck used by Eb, basically a wrapper for the current deck (like "Chinese.deck") which is represented by a DeckContents object. Has contents (m_contents) and contains the name of the deck that should be loaded by default (called "default")
-DeckContents: a (logical) deck, with a name and a list of cards
-Extension: the extension of a deck file (".deck") is called DECKFILE_EXTENSION found in the DECK class
-Utilities: contains all kinds of things that are not domain specific
-MainWindow: the main window of the application
-NewCardWindow: a window in which the user can create a new card, which is to be added to the deck.
-StudyOptions: the collection of options that determines how a SRS deck is to be studied, for example the interval before the first repetition, how much the study interval should increase upon success, whether there is a maximum time the student has before he or she may answer, and so on.
-StudyOptionsWindow: a window in which the user can set the study options, like the intervals to be used.
-TimeInputElement: a UI-element that allows users to see (or set) a time, like "0.1 seconds" or "3 day(s)"
-TimeInterval: stores a time interval, like 3 hours (the 3 can be a double) Contains a m_scalar (the 3.5 from 3.5 hours) and a m_unit (the hour from 3.5 hours), which are set by the constructor (which also requires time intervals to have length > 0)
-TimeUnit: enum of times, of SECOND, MINUTE. Stores both string names ("second(s)") [m_name] and time value (Durations) [m_duration]
+-DeckChangeListener: an interface for objects that need to know when the contents of the current deck has been changed; it is a functional interface, containing only one method, respondToChangedDeck
+-Deck: THE deck used by Eb, basically a wrapper for the current deck (like "Chinese.deck") which is a LogicalDeck object. Has contents (m_contents) and contains the name of the deck that should be loaded by default (called "default")
+-LogicalDeck: a (logical) deck, with a name and a list of cards
+-Extension: the extension of a deck file (".deck") is called DECKFILE_EXTENSION found in the DECK class
+-Utilities: contains all kinds of things that are not domain specific
+-MainWindow: the main window of the application
+-NewCardWindow: a window in which the user can create a new card, which is to be added to the deck.
+-StudyOptions: the collection of options that determines how a SRS deck is to be studied, for example the interval before the first repetition, how much the study interval should increase upon success, whether there is a maximum time the student has before he or she may answer, and so on.
+-StudyOptionsWindow: a window in which the user can set the study options, like the intervals to be used.
+-TimeInputElement: a UI-element that allows users to see (or set) a time, like "0.1 seconds" or "3 day(s)"
+-TimeInterval: stores a time interval, like 3 hours (the 3 can be a double) Contains a m_scalar (the 3.5 from 3.5 hours) and a m_unit (the hour from 3.5 hours), which are set by the constructor (which also requires time intervals to have length > 0)
+-TimeUnit: enum of times, of SECOND, MINUTE. Stores both string names ("second(s)") [m_name] and time value (Durations) [m_duration]
 
 Design
-1) Maak een scherm dat Eb heet
-2) Zorg dat Eb's status op het scherm verschijnt => hoeveel kaarten er in het huidige deck zijn, en wat de commando's zijn om dingen te veranderen.
-	-Cannot create deck. Waarom? => serialization error
-	=> Finished: Zaterdag 9 januari 2016
-3) Zorg dat er een menu is voor Ctrl+Q, OK 10 jan 2016
-	en dat dat werkt OK 10 jan 2016
-4) Zorg dat
-	a) er een item is voor Ctrl+N OK 10 jan 2016
-	 b) en dat dat werkt: dwz: windoowtje tonen 26 jan 2016
-	c) en zorgen dat het editbare top en bodem heeft 26 jan 2016
-	d) en zorgen voor OK en Cancel knoppen 26 jan 2016
-	e) en zorgen dat de OK-knop de kaart naar het deck savet! 26 jan 2016
-	d) en zorgen dat het de boodschap op het hoofdscherm updates 6 feb 2016
-	f) en zorgen dat de OK-knop de focus weer naar de front verschuift
+1) Create a window called "Eb", and display the commands as well as the number of cards in the currently loaded deck => Jan 9th, 2016
+2) Create a menu containing a Save and Quit-button, allow it to be activated by pressing 'Ctrl-Q', and make it work to quit Eb => Jan 10th, 2016
+3) Create a Ctrl-N item that produces a window that allows the user to add a new card to the current deck  => Feb 8th, 2016
 5) Allow reviewing cards [add option window to set interval]
 	a) Add a Ctrl+T option to the help label, that there is also an option window Feb 8 2016
 	b) Add a menu option, including Ctrl+T  Feb 8 2016
@@ -187,7 +169,7 @@ Design
 	g) Ensure the default button works Feb 16 2016
 	g2) check all code and documentation. (Feb round, +28 days RtM)
 	h) Ensure the save button works (implement a Study Settings object and data member in DeckContents)
-	
+	// timed? bool and timedinterval
 	5) Add the possibility to review cards
 	a) Add the mention of a third option (Ctrl-T) to the Main window // Ctrl-O for open, Ctrl-P 
 	b) Let Ctrl-T open an options window
@@ -204,6 +186,102 @@ Design
 7) Eb and git: make the Git-dir contain Eclipse-dir (so with root and class). Add executable JAR (and test it somewhere)
 
 
+
+Card	
+	Card(String, String)
+	getFront()
+	getBack()
+	
+Deck 
+	getCardCount()
+	deckHasBeenLoaded()
+	ensureDeckExists()
+	loadDeck()
+	createDeckWithName()
+	save()
+	notifyOfDeckChange()
+	addCard()
+	canAddCard()
+	addDeckChangeListener()
+	
+DeckChangeListener
+	[]respondToChangedDeck()
+	
+LogicalDeck
+	getDeckFileHandle()
+	getFileHandle()
+	getCardCount()
+	LogicalDeck()
+	isNotYetPresentInDeck()
+	canAddCard()
+	addCard()
+	
+MainWindow
+	.respondToChangedDeck()
+	getUICommands()
+	getDeckSizeMessage()
+	updateMessageLabel()
+	openStudyOptionsWindow()
+	MainWindow()
+	saveAndQuit()
+	openNewCardWindow()
+	#main()
+	
+NewCardWindow
+	EnterKeyListener
+		keyPressed()
+		keyReleased()
+		keyTyped()
+	EscapeKeyListener
+		keyPressed()
+		keyReleased()
+		keyTyped()
+	close()
+	submitCandidateCardToDeck()
+	NewCardWindow()
+	init()
+	display()
+	
+StudyOptions
+	getInitialInterval()
+	StudyOptions()
+	getDefault()
+	
+StudyOptionsWindow
+	close()
+	loadEbDefaults()
+	loadCurrentDeckSettings()
+	StudyOptionsWindow()
+	init()
+	showStudyOptionsWindow()
+
+TimeInputElement
+	setInterval()
+	TimeInputElement()
+	
+
+TimeInterval
+	getUnit()
+	getScalar()
+	init()
+	TimeInterval()
+	TimeInterval(TimeInterval)
+	
+TimeUnit
+	TimeUnit()
+	getUserInterfaceName()
+	getUnitNames()
+	
+Utilities
+	EOL
+	isStringValidIdentifier()
+	require()
+	makeTabTransferFocus()
+	makeTabAndEnterTransferFocus()
+	doubleToMaxPrecisionString()
+	
+	
+	
 
 
 Problems & Ideas

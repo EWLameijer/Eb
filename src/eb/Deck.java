@@ -8,35 +8,50 @@ import java.io.ObjectOutputStream;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
+import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 /**
- * A Deck is a collection of cards (usually all belonging to a specific subject,
- * like Spanish) that can be studied by the user. As there is only one deck
- * active in Eb, and it needs to be shared with all UI windows, a singleton
- * class may be better than having a Deck object that is passed everywhere.
- * Note: one could regard the situation as if "Deck" is the interface that the
- * rest of the program deals with (Deck.getCardCount(), Deck.addCard(card) etc.)
- * However, the contents of the Deck is a different story. Intuitively, there
- * could be a "Chinese" deck, a "Java" deck etc. Those all are 'bare' data,
- * which should not know anything about the UI, and should be changed without
- * resetting all UI links to the new deck. So one should probably split the Deck
- * as the global instance of the one and only deck in Eb from the 'deck', being
- * the contents of a normal SRS deck.
+ * Logically, a Deck is a collection of cards (usually all belonging to a
+ * specific subject, like Spanish) that can be studied by the user. Practically,
+ * as there are all kinds of ugly housekeeping aspects of any application that
+ * have nothing to do with the contents of a deck, the "Deck" class in Eb is
+ * actually more of a DeckManager or DeckHandler, which encapsulates the pure,
+ * data-oriented deck (the LogicalDeck) into an envelope that can successfully
+ * interact with the GUI, keeping its capabilities even when a deck is swapped.
+ * Basically, one could regard the situation as if "Deck" is the interface that
+ * the rest of the program deals with (Deck.getCardCount(), Deck.addCard(card)
+ * etc.) However, the contents of the Deck is a different story. Intuitively,
+ * there could be a "Chinese" deck, a "Java" deck etc. Those all are 'bare'
+ * data, which should not know anything about the UI, and should be changed
+ * without resetting all UI links to the new deck. So one should probably split
+ * the Deck as the global instance of the one and only deck in Eb from the
+ * 'deck'(='LogicalDeck'), that manages the contents of a normal SRS deck.
  * 
  * @author Eric-Wubbo Lameijer
  */
 public class Deck {
 
-	// The "singleton" pointer to the contents managed by this deck
-	private static LogicalDeck m_contents = null;
+	// The "singleton" pointer to the logical deck managed by the Deck.
+	@Nullable
+	private static LogicalDeck m_contents;
 
 	// The name of the default deck
 	private static final String DEFAULT_DECKNAME = "default";
 
 	// The objects which should be notified of any change in the deck
-	private static Set<DeckChangeListener> m_deckChangeListeners = new HashSet<DeckChangeListener>();
+	private static Set<DeckChangeListener> m_deckChangeListeners = new HashSet<>();
 
 	/**
-	 * [CPPRCCC] Returns the number of cards in this deck.
+	 * Private constructor: should not be called as this is more of a static
+	 * utility class, a wrapper around the LogicalDeck.
+	 */
+	private Deck() {
+	}
+
+	/**
+	 * Returns the number of cards in this deck.
 	 * 
 	 * @return the number of cards in the currently active deck
 	 */
@@ -53,10 +68,11 @@ public class Deck {
 	 * 
 	 * @return whether a deck has been loaded into this "deck-container"
 	 */
+	@EnsuresNonNullIf(expression = { "m_contents" }, result = true)
 	private static boolean deckHasBeenLoaded() {
 		// preconditions: none - this method is checking a condition
 		// postconditions: none: a normal boolean is returned.
-		return (m_contents != null);
+		return m_contents != null;
 	}
 
 	/**
@@ -66,9 +82,11 @@ public class Deck {
 	 * @return whether the deck has been initialized, meaning it can be used for
 	 *         things like counting the number of cards in it.
 	 */
+
+	@EnsuresNonNull({ "m_contents" })
 	private static void ensureDeckExists() {
-		// preconditions: none. After all, this is kind of a precondition-checking
-		// method.
+		// preconditions: none. After all, this is itself a kind of
+		// precondition-checking method.
 
 		if (!deckHasBeenLoaded()) {
 			// No deck has been loaded yet - try to load the default deck,
@@ -87,7 +105,11 @@ public class Deck {
 		// by the Deck.createDeckWithName call, which exits with an error if
 		// a deck cannot be created.
 		Utilities.require(deckHasBeenLoaded(),
-		    "Deck.deckExists error: " + "there is no valid deck.");
+		    "Deck.ensureDeckExists() error: there is no valid deck.");
+
+		// next line is necessary to satisfy the nullness checker; after all,
+		// if m_contents is really null, we would have exited the program by now.
+		assert m_contents != null : "@AssumeAssertion(nullness)";
 	}
 
 	/**
@@ -119,7 +141,8 @@ public class Deck {
 		try (ObjectInputStream objInStream = new ObjectInputStream(
 		    new FileInputStream(deckFile))) {
 			m_contents = (LogicalDeck) objInStream.readObject();
-			return (m_contents != null);
+			notifyOfDeckChange();
+			return m_contents != null;
 		} catch (Exception e) {
 			// something goes wrong with deserializing the deck; so
 			// you also can't read the file
@@ -137,15 +160,13 @@ public class Deck {
 	 * 
 	 * @param name
 	 *          the name of the deck to be created
-	 * @return an optional containing the newly created deck, or null if deck
-	 *         creation was not possible
 	 */
-	public static void createDeckWithName(String name)
-	    throws IllegalArgumentException {
+	public static void createDeckWithName(String name) {
 
 		// checking preconditions
 		Utilities.require(Utilities.isStringValidIdentifier(name),
-		    "Deck.createDeckWithName error: name cannot be null or empty.");
+		    "Deck.createDeckWithName() error: name cannot be null, and has to "
+		        + "contain non-whitespace characters.");
 
 		// code
 		// if there is already a deck loaded/constructed previously, save it to disk
@@ -158,20 +179,21 @@ public class Deck {
 
 		// postconditions: the deck should exist (deck.save handles any errors
 		// occurring during saving the deck).
-		Utilities.require(deckHasBeenLoaded(), "Deck.createDeckWithName error: "
+		Utilities.require(deckHasBeenLoaded(), "Deck.createDeckWithName() error: "
 		    + "problem creating and/or writing the new deck.");
+
+		// The deck has been changed. So ensure depending GUI-elements know that.
+		notifyOfDeckChange();
 	}
 
 	/**
 	 * Saves the deck to disk.
 	 */
 	public static void save() {
-		// preconditions: none (well, the deck should exist, but that's not a
-		// problem otherwise this function cannot be called anyway...
+		// Preconditions: none (well, if the deck does not exist, you don't have to
+		// do anything).
 
-		// code
-
-		// first: check if there is a deck to be saved in the first place.
+		// First: check if there is a deck to be saved in the first place.
 		if (!deckHasBeenLoaded()) {
 			// If there is no deck, there is no necessity to save it...
 			return;
@@ -180,11 +202,11 @@ public class Deck {
 		    new FileOutputStream(m_contents.getFileHandle()))) {
 			objOutStream.writeObject(m_contents);
 		} catch (Exception e) {
-			// something goes wrong with serializing the deck; so
-			// you also can't create the file
+			// Something goes wrong with serializing the deck; so
+			// you cannot create the file.
 			e.printStackTrace();
 			Utilities.require(false,
-			    "Deck.save error: cannot write the new deck to disk.");
+			    "Deck.save() error: cannot write the new deck to disk.");
 		}
 
 		// postconditions: the save has to be a success! Which it is if no
@@ -192,7 +214,7 @@ public class Deck {
 	}
 
 	/**
-	 * Notifies all listeners of the deck having changed.
+	 * Notifies all listeners that the deck has changed.
 	 */
 	private static void notifyOfDeckChange() {
 		// preconditions: none (I assume the deck has really changed)
@@ -223,8 +245,8 @@ public class Deck {
 	/**
 	 * Checks if a certain card can be added to the deck. In practice, this means
 	 * that the front is a valid identifier that is not already present in the
-	 * deck, and the back is not a null pointer. Note: delegates call to
-	 * DeckContents.
+	 * deck, and the back is not a null pointer. Note: this method delegates the
+	 * call to the logical deck.
 	 * 
 	 * @param card
 	 *          the candidate card to be added.
@@ -240,7 +262,7 @@ public class Deck {
 
 	/**
 	 * Adds a DeckChangeListener to the deck, to be notified of updates in the
-	 * status of deck.
+	 * status of the deck.
 	 * 
 	 * @param deckChangeListener
 	 *          the object that should be added to the set of objects to be
@@ -251,14 +273,43 @@ public class Deck {
 		// preconditions: deckChangeListener should not be null. It should also
 		// not already be present in the set; that would be bad programming.
 		Utilities.require(deckChangeListener != null,
-		    "Deck.addDeckChangeListener error: the candidate listener cannot "
+		    "Deck.addDeckChangeListener() error: the candidate listener cannot "
 		        + "be null.");
 		Utilities.require(!m_deckChangeListeners.contains(deckChangeListener),
-		    "Deck.addDeckChangeListener error: attempt to register the same "
+		    "Deck.addDeckChangeListener() error: attempt to register the same "
 		        + "DeckChangeListener object twice.");
 
 		m_deckChangeListeners.add(deckChangeListener);
-		// postconditions: none (I trust add to work, and out-of-memory or such
+		// postconditions: none (I trust add to work, and out-of-memory and such
 		// to be unlikely)
 	}
+
+	/**
+	 * Returns the interval that Eb waits after the user adds a card before
+	 * letting the user review the card.
+	 * 
+	 * @return the interval that Eb waits after the user adds a card before
+	 *         letting the user review the card.
+	 */
+	public static TimeInterval getInitialInterval() {
+		// preconditions and postconditions: handled by delegating the call to
+		// LogicalDeck.getInitialInterval()
+		ensureDeckExists();
+		return m_contents.getInitialInterval();
+	}
+
+	/**
+	 * Sets the interval for Eb to wait after the user adds a card before
+	 * presenting the card for review.
+	 * 
+	 */
+	/*
+	 * public static void setInitialInterval(TimeInterval newInterval) { //
+	 * precondition and postconditions: handled by the embedded LogicalDeck
+	 * ensureDeckExists(); if (m_contents.canSetInitialInterval(newInterval) {
+	 * m_contents.setInitialInterval(newInterval); } else {
+	 * 
+	 * }
+	 */
+	// }
 }
