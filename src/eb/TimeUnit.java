@@ -7,7 +7,7 @@ import java.util.Vector;
 /**
  * TimeUnit provides the time units, for use in for example combo boxes so that
  * users can select time intervals for reviewing.
- * 
+ *
  * @author Eric-Wubbo Lameijer
  */
 public enum TimeUnit {
@@ -30,7 +30,7 @@ public enum TimeUnit {
 
 	/**
 	 * Constructs a time unit enum value.
-	 * 
+	 *
 	 * @param name
 	 *          the name of the time unit (like "second(s)")
 	 * @param duration
@@ -48,7 +48,7 @@ public enum TimeUnit {
 	 * Returns the name for the unit in a form that is suitable for the user
 	 * interface (so not MINUTE, which the .toString() would produce, but
 	 * "minute(s)".
-	 * 
+	 *
 	 * @return the name of the unit in a user-interface-friendly form ("day(s")
 	 */
 	public String getUserInterfaceName() {
@@ -60,14 +60,14 @@ public enum TimeUnit {
 
 	/**
 	 * Returns the names of all time units (like "week(s)") as a String array.
-	 * 
+	 *
 	 * @return the names of all time units (like "week(s)") as a String array
 	 */
 	public static Vector<String> getUnitNames() {
 		// preconditions: none, this is an enum, so it should have correct initial
 		// values.
-		Vector<String> unitNames = new Vector<>();
-		for (TimeUnit timeUnit : TimeUnit.values()) {
+		final Vector<String> unitNames = new Vector<>();
+		for (final TimeUnit timeUnit : TimeUnit.values()) {
 			unitNames.add(timeUnit.m_name);
 		}
 		// postconditions: none; this is a getter, so should not have changed
@@ -77,13 +77,13 @@ public enum TimeUnit {
 
 	/**
 	 * C Converts the given string into the appropriate TimeUnit.
-	 * 
+	 *
 	 * @param unitAsString
 	 *          the unit as a string (like "second(s)") that needs to be converted
 	 *          to the proper unit, SECOND
 	 */
 	public static Optional<TimeUnit> parseUnit(String unitAsString) {
-		for (TimeUnit timeUnit : TimeUnit.values()) {
+		for (final TimeUnit timeUnit : TimeUnit.values()) {
 			if (timeUnit.m_name.equals(unitAsString)) {
 				return Optional.of(timeUnit);
 			}

@@ -28,7 +28,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * without resetting all UI links to the new deck. So one should probably split
  * the Deck as the global instance of the one and only deck in Eb from the
  * 'deck'(='LogicalDeck'), that manages the contents of a normal SRS deck.
- * 
+ *
  * @author Eric-Wubbo Lameijer
  */
 public class Deck {
@@ -52,7 +52,7 @@ public class Deck {
 
 	/**
 	 * Returns the number of cards in this deck.
-	 * 
+	 *
 	 * @return the number of cards in the currently active deck
 	 */
 	public static int getCardCount() {
@@ -65,7 +65,7 @@ public class Deck {
 
 	/**
 	 * Returns whether a deck / the contents of a deck have been loaded.
-	 * 
+	 *
 	 * @return whether a deck has been loaded into this "deck-container"
 	 */
 	@EnsuresNonNullIf(expression = { "m_contents" }, result = true)
@@ -78,7 +78,7 @@ public class Deck {
 	/**
 	 * Returns whether the deck has been initialized, even if it is only with the
 	 * default deck.
-	 * 
+	 *
 	 * @return whether the deck has been initialized, meaning it can be used for
 	 *         things like counting the number of cards in it.
 	 */
@@ -91,7 +91,7 @@ public class Deck {
 		if (!deckHasBeenLoaded()) {
 			// No deck has been loaded yet - try to load the default deck,
 			// or else create it.
-			boolean deckLoadedSuccessfully = loadDeck(DEFAULT_DECKNAME);
+			final boolean deckLoadedSuccessfully = loadDeck(DEFAULT_DECKNAME);
 
 			// If loading the deck failed, try to create it.
 			// Note that createDeckWithName cannot return null; it will exit
@@ -114,7 +114,7 @@ public class Deck {
 
 	/**
 	 * Loads a deck from file.
-	 * 
+	 *
 	 * @param name
 	 *          the name of the deck.
 	 * @return a boolean indicating whether the requested deck was successfully
@@ -128,7 +128,7 @@ public class Deck {
 		        + "meaning that it exists and contains non-whitespace "
 		        + "characters.");
 
-		File deckFile = LogicalDeck.getDeckFileHandle(name);
+		final File deckFile = LogicalDeck.getDeckFileHandle(name);
 
 		// case A: the file does not exist
 		if (!deckFile.isFile()) {
@@ -143,7 +143,7 @@ public class Deck {
 			m_contents = (LogicalDeck) objInStream.readObject();
 			notifyOfDeckChange();
 			return m_contents != null;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			// something goes wrong with deserializing the deck; so
 			// you also can't read the file
 			System.out
@@ -157,7 +157,7 @@ public class Deck {
 
 	/**
 	 * Creates a deck with name "name".
-	 * 
+	 *
 	 * @param name
 	 *          the name of the deck to be created
 	 */
@@ -201,7 +201,7 @@ public class Deck {
 		try (ObjectOutputStream objOutStream = new ObjectOutputStream(
 		    new FileOutputStream(m_contents.getFileHandle()))) {
 			objOutStream.writeObject(m_contents);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			// Something goes wrong with serializing the deck; so
 			// you cannot create the file.
 			e.printStackTrace();
@@ -218,7 +218,7 @@ public class Deck {
 	 */
 	private static void notifyOfDeckChange() {
 		// preconditions: none (I assume the deck has really changed)
-		for (DeckChangeListener deckChangeListener : m_deckChangeListeners) {
+		for (final DeckChangeListener deckChangeListener : m_deckChangeListeners) {
 			deckChangeListener.respondToChangedDeck();
 		}
 		// postconditions: none
@@ -229,7 +229,7 @@ public class Deck {
 	 * validity is ensured using 'canAddCard' - if that is erroneously forgotten,
 	 * this function will crash hard to prevent worse programming problems to crop
 	 * up later.
-	 * 
+	 *
 	 * @param card
 	 *          the card to be added to the deck
 	 */
@@ -247,7 +247,7 @@ public class Deck {
 	 * that the front is a valid identifier that is not already present in the
 	 * deck, and the back is not a null pointer. Note: this method delegates the
 	 * call to the logical deck.
-	 * 
+	 *
 	 * @param card
 	 *          the candidate card to be added.
 	 * @return whether the card can legally be added to the deck.
@@ -263,7 +263,7 @@ public class Deck {
 	/**
 	 * Adds a DeckChangeListener to the deck, to be notified of updates in the
 	 * status of the deck.
-	 * 
+	 *
 	 * @param deckChangeListener
 	 *          the object that should be added to the set of objects to be
 	 *          notified when the deck changes.
@@ -285,30 +285,43 @@ public class Deck {
 	}
 
 	/**
-	 * Returns the interval that Eb waits after the user adds a card before
-	 * letting the user review the card.
+	 * Returns the StudyOptions object of the current deck.
 	 * 
-	 * @return the interval that Eb waits after the user adds a card before
-	 *         letting the user review the card.
+	 * @return
 	 */
-	public static TimeInterval getInitialInterval() {
-		// preconditions and postconditions: handled by delegating the call to
-		// LogicalDeck.getInitialInterval()
+	public static StudyOptions getStudyOptions() {
+		// preconditions: outside ensuring that there is a deck, preconditions
+		// should be handled by the relevant method in the logical deck
 		ensureDeckExists();
-		return m_contents.getInitialInterval();
+		return m_contents.getStudyOptions();
+		// postconditions: handled by callee.
+	}
+
+	/**
+	 * Sets the study options of the current deck to a new value.
+	 * 
+	 * @param studyOptions
+	 *          the new study options
+	 */
+	public static void setStudyOptions(StudyOptions studyOptions) {
+		// preconditions: outside ensuring that there is a deck, preconditions
+		// should be handled by the relevant method in the logical deck
+		ensureDeckExists();
+		m_contents.setStudyOptions(studyOptions);
+		// postconditions: handled by callee.
 	}
 
 	/**
 	 * Sets the interval for Eb to wait after the user adds a card before
 	 * presenting the card for review.
-	 * 
+	 *
 	 */
 	/*
 	 * public static void setInitialInterval(TimeInterval newInterval) { //
 	 * precondition and postconditions: handled by the embedded LogicalDeck
 	 * ensureDeckExists(); if (m_contents.canSetInitialInterval(newInterval) {
 	 * m_contents.setInitialInterval(newInterval); } else {
-	 * 
+	 *
 	 * }
 	 */
 	// }

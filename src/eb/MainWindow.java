@@ -12,7 +12,7 @@ import javax.swing.KeyStroke;
 
 /**
  * The main window of Eb.
- * 
+ *
  * @author Eric-Wubbo Lameijer
  */
 public class MainWindow extends JFrame implements DeckChangeListener {
@@ -27,7 +27,7 @@ public class MainWindow extends JFrame implements DeckChangeListener {
 	// reviewed currently, or if there is an error. Is the alternative to
 	// the regular "reviewing" window, which should be active most of the
 	// time.
-	private JLabel m_messageLabel;
+	private final JLabel m_messageLabel;
 
 	/**
 	 * MainWindow constructor.
@@ -56,7 +56,7 @@ public class MainWindow extends JFrame implements DeckChangeListener {
 	/**
 	 * Returns the commands of the user interface as a string, which can be used
 	 * for example to instruct the user on Eb's use.
-	 * 
+	 *
 	 * @return the commands of the user interface
 	 */
 	private String getUICommands() {
@@ -68,7 +68,7 @@ public class MainWindow extends JFrame implements DeckChangeListener {
 
 	/**
 	 * Returns a message about the size of the current deck.
-	 * 
+	 *
 	 * @return a message about the size of the current deck.
 	 */
 	private String getDeckSizeMessage() {
@@ -107,24 +107,24 @@ public class MainWindow extends JFrame implements DeckChangeListener {
 	 */
 	private void init() {
 		// add menu
-		JMenu fileMenu = new JMenu("File");
-		JMenuItem quitItem = new JMenuItem("Quit");
+		final JMenu fileMenu = new JMenu("File");
+		final JMenuItem quitItem = new JMenuItem("Quit");
 		quitItem.setAccelerator(
 		    KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.CTRL_MASK));
 		quitItem.addActionListener(e -> saveAndQuit());
 		fileMenu.add(quitItem);
-		JMenu deckManagementMenu = new JMenu("Manage Deck");
-		JMenuItem addCardItem = new JMenuItem("Add Card");
+		final JMenu deckManagementMenu = new JMenu("Manage Deck");
+		final JMenuItem addCardItem = new JMenuItem("Add Card");
 		addCardItem.setAccelerator(
 		    KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
 		addCardItem.addActionListener(e -> NewCardWindow.display());
 		deckManagementMenu.add(addCardItem);
-		JMenuItem studyOptionsItem = new JMenuItem("Study Options");
+		final JMenuItem studyOptionsItem = new JMenuItem("Study Options");
 		studyOptionsItem.setAccelerator(
 		    KeyStroke.getKeyStroke(KeyEvent.VK_T, ActionEvent.CTRL_MASK));
 		studyOptionsItem.addActionListener(e -> openStudyOptionsWindow());
 		deckManagementMenu.add(studyOptionsItem);
-		JMenuBar mainMenuBar = new JMenuBar();
+		final JMenuBar mainMenuBar = new JMenuBar();
 		mainMenuBar.add(fileMenu);
 		mainMenuBar.add(deckManagementMenu);
 		setJMenuBar(mainMenuBar);
@@ -147,7 +147,7 @@ public class MainWindow extends JFrame implements DeckChangeListener {
 	 * initializing values and doing things like 'add' in the same method.
 	 */
 	public static void display() {
-		MainWindow mainWindow = new MainWindow();
+		final MainWindow mainWindow = new MainWindow();
 		mainWindow.init();
 	}
 

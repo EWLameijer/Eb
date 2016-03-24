@@ -3,7 +3,7 @@ package eb;
 /**
  * Interface to be implemented by objects (like GUI elements) that need to
  * change their status or display in response to a change in the current deck.
- * 
+ *
  * @author EricWubbo Lameijer
  *
  */

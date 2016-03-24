@@ -16,7 +16,7 @@ import javax.swing.JTextPane;
 /**
  * NewCardWindow allows the user to create a new card in the GUI, and to send it
  * for checking and storage to the Deck.
- * 
+ *
  * @author Eric-Wubbo Lameijer
  */
 public class NewCardWindow extends JFrame {
@@ -24,18 +24,18 @@ public class NewCardWindow extends JFrame {
 	private static final long serialVersionUID = 3419171802910744055L;
 
 	// Allows the creation/editing of the content on the front of the card.
-	private JTextPane m_frontOfCard;
+	private final JTextPane m_frontOfCard;
 
 	// Allows the creation/editing of the contents of the back of the card.
-	private JTextPane m_backOfCard;
+	private final JTextPane m_backOfCard;
 
 	// The button to cancel creating this card, and return to the calling window.
-	private JButton m_cancelButton;
+	private final JButton m_cancelButton;
 
 	// The button to press that requests the current deck to check whether this
 	// card is a valid/usable card (so no duplicate of an existing card, for
 	// example) and if so, to add it.
-	private JButton m_okButton;
+	private final JButton m_okButton;
 
 	/**
 	 * Creates a <code>NewCardWindow</code> to add cards to the current deck.
@@ -79,7 +79,7 @@ public class NewCardWindow extends JFrame {
 	 * The <code>EnterKeyListener</code> object enables a text field to listen for
 	 * the enter key, in this case initializing the card storage procedure when it
 	 * is pressed.
-	 * 
+	 *
 	 * @author Eric-Wubbo Lameijer
 	 */
 	class EnterKeyListener implements KeyListener {
@@ -119,7 +119,7 @@ public class NewCardWindow extends JFrame {
 
 	/**
 	 * Listens for the escape key, closes the screen if it is pressed.
-	 * 
+	 *
 	 * @author Eric-Wubbo Lameijer
 	 */
 	class EscapeKeyListener implements KeyListener {
@@ -184,7 +184,7 @@ public class NewCardWindow extends JFrame {
 		    m_backOfCard.getText());
 
 		// create a new card
-		Card candidateCard = new Card(m_frontOfCard.getText(),
+		final Card candidateCard = new Card(m_frontOfCard.getText(),
 		    m_backOfCard.getText());
 		if (Deck.canAddCard(candidateCard)) {
 			Deck.addCard(candidateCard);
@@ -223,16 +223,16 @@ public class NewCardWindow extends JFrame {
 		m_okButton.addActionListener(e -> submitCandidateCardToDeck());
 
 		// now add the buttons to the window
-		JPanel buttonPane = new JPanel();
+		final JPanel buttonPane = new JPanel();
 		buttonPane.add(m_cancelButton);
 		buttonPane.add(m_okButton);
 
 		// Now create a nice (or at least acceptable-looking) layout.
-		JSplitPane upperPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+		final JSplitPane upperPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
 		    m_frontOfCard, m_backOfCard);
 		upperPanel.setResizeWeight(0.5);
 		setLayout(new GridBagLayout());
-		GridBagConstraints frontConstraints = new GridBagConstraints();
+		final GridBagConstraints frontConstraints = new GridBagConstraints();
 		frontConstraints.gridx = 0;
 		frontConstraints.gridy = 0;
 		frontConstraints.weightx = 1;
@@ -241,7 +241,7 @@ public class NewCardWindow extends JFrame {
 		frontConstraints.fill = GridBagConstraints.BOTH;
 		add(upperPanel, frontConstraints);
 
-		GridBagConstraints buttonPaneConstraints = new GridBagConstraints();
+		final GridBagConstraints buttonPaneConstraints = new GridBagConstraints();
 		buttonPaneConstraints.gridx = 0;
 		buttonPaneConstraints.gridy = 1;
 		buttonPaneConstraints.weightx = 0;
@@ -262,7 +262,7 @@ public class NewCardWindow extends JFrame {
 	 * seemed more elegant).
 	 */
 	static void display() {
-		NewCardWindow newCardWindow = new NewCardWindow();
+		final NewCardWindow newCardWindow = new NewCardWindow();
 		newCardWindow.init();
 	}
 }

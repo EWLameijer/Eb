@@ -8,24 +8,28 @@ import javax.swing.text.PlainDocument;
 /**
  * Helps create text fields that only accept numbers and have a certain maximum
  * size.
- * 
+ *
  * from:
  * http://stackoverflow.com/questions/1313390/is-there-any-way-to-accept-only-
  * numeric-values-in-a-jtextfield
- * 
+ *
  * @author Terraego
  * @author Eric-Wubbo Lameijer
  *
  */
 @SuppressWarnings("serial")
 public class FixedSizeNumberDocument extends PlainDocument {
-	private JTextComponent m_owner;
-	private int m_fixedSize;
-	private int m_sizeOfFractionalPart;
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 7355097701705745079L;
+	private final JTextComponent m_owner;
+	private final int m_fixedSize;
+	private final int m_sizeOfFractionalPart;
 
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param owner
 	 *          the JTextComponent that owns this instance.
 	 * @param fixedSize
@@ -56,16 +60,16 @@ public class FixedSizeNumberDocument extends PlainDocument {
 	/**
 	 * Returns whether a string contains non-numerical characters (decimal
 	 * separators are allowed, by the way).
-	 * 
+	 *
 	 * @param string
 	 *          the string to be checked for whether it contains characters that
 	 *          would make this an invalid number.
-	 * 
+	 *
 	 * @return whether the string contains non-digit or non-punctuation
 	 *         characters.
 	 */
 	boolean containsOtherThanDigitsOrSeparators(String string) {
-		for (char ch : string.toCharArray()) {
+		for (final char ch : string.toCharArray()) {
 			if (!Character.isDigit(ch) && ch != '.' && ch != ',') {
 				return true;
 			}
@@ -96,7 +100,7 @@ public class FixedSizeNumberDocument extends PlainDocument {
 			} else {
 				Integer.parseInt(str);
 			}
-		} catch (NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 			// inserted text is not a number
 			m_owner.getToolkit().beep();
 			return;

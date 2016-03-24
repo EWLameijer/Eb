@@ -6,7 +6,7 @@ import java.io.Serializable;
  * The Card class represents a card, which has contents (front and back, or
  * 'stimulus' and 'response', as well as a history (number of repetitions and
  * such).
- * 
+ *
  * @author Eric-Wubbo Lameijer
  */
 public class Card implements Serializable {
@@ -15,17 +15,17 @@ public class Card implements Serializable {
 	private static final long serialVersionUID = -2746012998758766327L;
 
 	// The text/contents of the front of the card.
-	private String m_textOnFront;
+	private final String m_textOnFront;
 
 	// The text/contents of the back of the card.
-	private String m_textOnBack;
+	private final String m_textOnBack;
 
 	/**
 	 * Creates a new card; ensures that the input is valid. Note that empty cards
 	 * are allowed (after all, a card will be empty before it is filled), however,
 	 * an empty card may not be added to a Deck - but that's a matter of the
 	 * Deck's policy, of course.
-	 * 
+	 *
 	 * @param textOnFront
 	 *          the text for the front of the card. May be a blank string, but may
 	 *          not be null.
@@ -51,7 +51,7 @@ public class Card implements Serializable {
 
 	/**
 	 * Returns the contents of the front of the card.
-	 * 
+	 *
 	 * @return the contents of the front of the card
 	 */
 	public String getFront() {
@@ -66,7 +66,7 @@ public class Card implements Serializable {
 
 	/**
 	 * Returns the contents of the back of the card.
-	 * 
+	 *
 	 * @return the contents of the back of the card
 	 */
 	public String getBack() {

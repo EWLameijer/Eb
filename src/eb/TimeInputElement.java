@@ -14,28 +14,33 @@ import org.checkerframework.checker.initialization.qual.UnknownInitialization;
 /**
  * A TimeInputElement contains a textfield and combobox that allow the user to
  * input say "5.5 minutes" or "3 hours".
- * 
+ *
  * @author Eric-Wubbo Lameijer
  */
 @SuppressWarnings("serial")
 public class TimeInputElement extends JPanel {
 
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 4711963487097757055L;
+
 	// Label indicating the identity of the interval (for example "interval
 	// before new card is first shown)
-	private JLabel m_label;
+	private final JLabel m_label;
 
 	// Text field that sets the quantity (the '3' in 3 hours), the combo box
 	// selects the unit (the hours in "3 hours").
-	private JTextField m_scalarField;
+	private final JTextField m_scalarField;
 
 	// Combo box used (in combination with a text field) to set the value for the
 	// initial study interval. Contains the hours of "3 hours".
-	private JComboBox<String> m_unitComboBox;
+	private final JComboBox<String> m_unitComboBox;
 
 	/**
 	 * Constructs the TimeInputElement, given a name and a TimeInterval (which can
 	 * contain something like "3 hour(s)".
-	 * 
+	 *
 	 * @param name
 	 *          the name of the interval, which is shown on the label
 	 * @param timeInterval
@@ -78,7 +83,7 @@ public class TimeInputElement extends JPanel {
 	 * JPanel that can be used to display a time. Factory method needed to handle
 	 * the separation between object construction and initialization 'stimulated'
 	 * by the nullness checker.
-	 * 
+	 *
 	 * @param name
 	 *          the name of the interval, which is shown on the label
 	 * @param timeInterval
@@ -86,7 +91,7 @@ public class TimeInputElement extends JPanel {
 	 */
 	public static TimeInputElement createInstance(String name,
 	    TimeInterval timeInterval) {
-		TimeInputElement timeInputElement = new TimeInputElement(name,
+		final TimeInputElement timeInputElement = new TimeInputElement(name,
 		    timeInterval);
 		timeInputElement.init();
 		return timeInputElement;
@@ -95,7 +100,7 @@ public class TimeInputElement extends JPanel {
 	/**
 	 * Sets the interval (displayed in the text field and combo box) to the given
 	 * time interval.
-	 * 
+	 *
 	 * @param timeInterval
 	 *          the time interval that should be displayed by this
 	 *          TimeInputElement (text field and combo box).
@@ -116,15 +121,16 @@ public class TimeInputElement extends JPanel {
 
 	/**
 	 * Returns the time interval encapsulated by this TimeInputElement.
-	 * 
+	 *
 	 * @return the time interval encapsulated by this TimeInputElement
 	 */
-public TimeInterval getInterval() { 
-	Optional<TimeUnit> timeUnit = TimeUnit.parseUnit(m_unitComboBox.getSelectedItem().toString());
-	
-	return TimeInterval(
-			Double.parseDouble(m_scalarField.getText()),
-			TimeUnit(); 
-}
+	public TimeInterval getInterval() {
+		final Optional<TimeUnit> timeUnit = TimeUnit
+		    .parseUnit(m_unitComboBox.getSelectedItem().toString());
+		Utilities.require(timeUnit.isPresent(), "TimeInterval.getInterval() error: "
+		    + " the time unit is wrong for some reason.");
+		return new TimeInterval(Double.parseDouble(m_scalarField.getText()),
+		    timeUnit.get());
+	}
 
 }

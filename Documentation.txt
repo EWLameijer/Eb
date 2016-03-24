@@ -193,28 +193,30 @@ Card
 	getBack()
 	
 Deck 
-	getCardCount()
+	addCard()
+	addDeckChangeListener()
+	canAddCard()
+	createDeckWithName()
 	deckHasBeenLoaded()
 	ensureDeckExists()
+	getCardCount()
+	getStudyOptions()
 	loadDeck()
-	createDeckWithName()
-	save()
 	notifyOfDeckChange()
-	addCard()
-	canAddCard()
-	addDeckChangeListener()
+	save()
 	
 DeckChangeListener
 	[]respondToChangedDeck()
 	
 LogicalDeck
+	addCard()
+	canAddCard()
+	getCardCount()
 	getDeckFileHandle()
 	getFileHandle()
-	getCardCount()
-	LogicalDeck()
+	getStudyOptions
 	isNotYetPresentInDeck()
-	canAddCard()
-	addCard()
+	LogicalDeck()
 	
 MainWindow
 	.respondToChangedDeck()
@@ -256,9 +258,9 @@ StudyOptionsWindow
 	showStudyOptionsWindow()
 
 TimeInputElement
+	getInterval()
 	setInterval()
 	TimeInputElement()
-	
 
 TimeInterval
 	getUnit()

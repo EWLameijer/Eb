@@ -9,7 +9,7 @@ import java.util.List;
  * Contains the properties belonging to the 'pure' deck itself, like its name
  * and contents [not the mess of dealing with the GUI, which is the
  * responsibility of the Deck class]
- * 
+ *
  * @author Eric-Wubbo Lameijer
  */
 public class LogicalDeck implements Serializable {
@@ -21,10 +21,10 @@ public class LogicalDeck implements Serializable {
 	private static final String DECKFILE_EXTENSION = ".deck";
 
 	// The name of the deck.
-	private String m_name;
+	private final String m_name;
 
 	// The cards contained by this deck.
-	private List<Card> m_cards;
+	private final List<Card> m_cards;
 
 	// The study options of this deck (interval increase between reviews etc.)
 	private StudyOptions m_studyOptions;
@@ -32,7 +32,7 @@ public class LogicalDeck implements Serializable {
 	/**
 	 * Constructs a deck with name "name". Note that by defining this constructor,
 	 * it is not needed to define a 'forbidden' default constructor anymore.
-	 * 
+	 *
 	 * @param name
 	 *          the name of the deck to be created
 	 */
@@ -52,7 +52,7 @@ public class LogicalDeck implements Serializable {
 
 	/**
 	 * Returns the File object representing a deck with name "deckName".
-	 * 
+	 *
 	 * @param deckName
 	 *          the name of the deck
 	 * @return the File object belonging to this deck.
@@ -63,8 +63,8 @@ public class LogicalDeck implements Serializable {
 		    "LogicalDeck.getDeckFileHandle() error: deck name is invalid.");
 
 		// code
-		String deckFileName = deckName + DECKFILE_EXTENSION;
-		File deckFile = new File(deckFileName);
+		final String deckFileName = deckName + DECKFILE_EXTENSION;
+		final File deckFile = new File(deckFileName);
 
 		// postconditions: deckFile exists!
 		Utilities.require(deckFile != null, "LogicalDeck.getDeckFileHandle() "
@@ -75,7 +75,7 @@ public class LogicalDeck implements Serializable {
 
 	/**
 	 * Returns the handle (File object) to the file in which this deck is stored.
-	 * 
+	 *
 	 * @return the handle (File object) to the file which stores this deck
 	 */
 	File getFileHandle() {
@@ -83,7 +83,7 @@ public class LogicalDeck implements Serializable {
 		// function can only be called if the deck already exists...
 
 		// code
-		File deckFileHandle = LogicalDeck.getDeckFileHandle(m_name);
+		final File deckFileHandle = LogicalDeck.getDeckFileHandle(m_name);
 
 		// postconditions: the fileHandle should not be null, after all, that
 		// would mean an evil error has occurred
@@ -95,7 +95,7 @@ public class LogicalDeck implements Serializable {
 
 	/**
 	 * Returns the number of cards in this deck.
-	 * 
+	 *
 	 * @return the number of cards in this deck
 	 */
 	public int getCardCount() {
@@ -110,10 +110,10 @@ public class LogicalDeck implements Serializable {
 	 * Returns whether this new front (text) does not already occur in the deck -
 	 * after all, the deck is a kind of map, with a stimulus (front) leading to
 	 * only one response (back).
-	 * 
+	 *
 	 * @param front
 	 *          the front of the card to be checked for uniqueness in the deck
-	 * 
+	 *
 	 * @return whether the card would be a valid addition to the deck (true) or
 	 *         whether the front would be a duplicate of a front already present
 	 *         (false)
@@ -125,7 +125,7 @@ public class LogicalDeck implements Serializable {
 		        + "card needs to be a valid identifier, not null or a string with "
 		        + "only whitespace characters.");
 
-		for (Card card : m_cards) {
+		for (final Card card : m_cards) {
 			if (card.getFront().equals(front)) {
 				return false; // a card with the same front IS present in the deck.
 			}
@@ -141,10 +141,10 @@ public class LogicalDeck implements Serializable {
 	 * Checks if a certain card can be added to the deck. In practice, this means
 	 * that the front is a valid identifier that is not already present in the
 	 * deck, and the back is not a null pointer.
-	 * 
+	 *
 	 * @param card
 	 *          the candidate card to be added.
-	 * 
+	 *
 	 * @return whether the card can legally be added to the deck.
 	 */
 	protected boolean canAddCard(Card card) {
@@ -161,7 +161,7 @@ public class LogicalDeck implements Serializable {
 
 	/**
 	 * Adds a card to the deck. Note that one has to call canAddCard() beforehand.
-	 * 
+	 *
 	 * @param card
 	 *          the card to add to the deck.
 	 */
@@ -173,7 +173,7 @@ public class LogicalDeck implements Serializable {
 		        + "method has to be invoked first to check the possibility of the "
 		        + "current method.");
 
-		boolean cardAddSuccessful = m_cards.add(card);
+		final boolean cardAddSuccessful = m_cards.add(card);
 
 		// postconditions: the deck should have been grown by one.
 		Utilities.require(cardAddSuccessful, "LogicalDeck.addCard() error: "
@@ -181,15 +181,23 @@ public class LogicalDeck implements Serializable {
 	}
 
 	/**
-	 * Returns the interval that Eb waits after the user adds a card before
-	 * letting the user review the card.
-	 * 
-	 * @return the interval that Eb waits after the user adds a card before
-	 *         letting the user review the card.
+	 * Returns the study settings of this deck.
+	 *
+	 * @return the study settings of this deck.
 	 */
-	public TimeInterval getInitialInterval() {
+	public StudyOptions getStudyOptions() {
 		// preconditions and postconditions: none. After all, m_studyOptions has
 		// already been initialized in LogicalDeck's constructor.
-		return m_studyOptions.getInitialInterval();
+		return m_studyOptions;
+	}
+
+	/**
+	 * Sets the study options to a new value.
+	 * 
+	 * @param studyOptions
+	 *          the new study options
+	 */
+	public void setStudyOptions(StudyOptions studyOptions) {
+		m_studyOptions = studyOptions;
 	}
 }

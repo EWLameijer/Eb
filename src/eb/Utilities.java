@@ -33,10 +33,10 @@ public class Utilities {
 	/**
 	 * Returns whether a certain string is a valid identifier - meaning that it is
 	 * not null, and contains things other than whitespace.
-	 * 
+	 *
 	 * @param string
 	 *          the string to be checked
-	 * 
+	 *
 	 * @return whether the string is a valid identifier
 	 */
 	public static boolean isStringValidIdentifier(String string) {
@@ -47,7 +47,7 @@ public class Utilities {
 		if (string == null) {
 			return false;
 		} else {
-			String trimmedString = string.trim();
+			final String trimmedString = string.trim();
 			return trimmedString.length() > 0;
 		}
 
@@ -58,7 +58,7 @@ public class Utilities {
 	/**
 	 * If condition is false, exit the program while writing the specified error
 	 * message to standard error output.
-	 * 
+	 *
 	 * @param condition
 	 *          the condition which needs to be true if the program is to be
 	 *          allowed to continue.
@@ -80,7 +80,7 @@ public class Utilities {
 	 * behavior in components where tab adds a tab to the contents. After applying
 	 * this function to a component, TAB transfers focus to the next focusable
 	 * component, SHIFT+TAB transfers focus to the previous focusable component.
-	 * 
+	 *
 	 * @param component
 	 *          the component to be patched
 	 */
@@ -101,7 +101,7 @@ public class Utilities {
 	 * Transfers focus when the user presses the tab or enter keys, overriding
 	 * default behavior in components where pressing the tab key adds a tab and
 	 * pressing the enter key adds a newline to the contents.
-	 * 
+	 *
 	 * @param component
 	 *          the component to be patched.
 	 */
@@ -123,13 +123,13 @@ public class Utilities {
 	 * Converts a floating point number to a string with a maximum precision, but
 	 * does so in a display-friendly way, so that, if the precision is 2, for
 	 * example, not 10.00 is displayed, but 10.
-	 * 
+	 *
 	 * @param number
 	 *          the number that is to be converted to a string.
 	 * @param maxPrecision
 	 *          the maximum number of digits after the period, fewer may be
 	 *          displayed if the last digits would be 0.
-	 * 
+	 *
 	 * @return the number, with given maximum precision, in String format.
 	 */
 	public static String doubleToMaxPrecisionString(double number,
@@ -140,7 +140,7 @@ public class Utilities {
 		        + "should be 0 or positive.");
 
 		// 1. Build the format String
-		DecimalFormat numberFormatter = new DecimalFormat();
+		final DecimalFormat numberFormatter = new DecimalFormat();
 		numberFormatter.setMaximumFractionDigits(maxPrecision);
 		numberFormatter.setRoundingMode(RoundingMode.HALF_UP);
 		return numberFormatter.format(number);

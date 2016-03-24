@@ -10,7 +10,7 @@ import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
  * stores the scalar ("3.5") and the unit ("hours") separately. (note that
  * "3.5 hours" is a quantity, "hours" is the unit. Not sure how 3.5 would be
  * called here, calling it a scalar is the best I can think of right now).
- * 
+ *
  * @author Eric-Wubbo Lameijer
  */
 public class TimeInterval implements Serializable {
@@ -29,7 +29,7 @@ public class TimeInterval implements Serializable {
 	/**
 	 * TimeInterval constructor, creates the TimeInterval object as being of
 	 * length 'scalar units' (like 2.5 minutes).
-	 * 
+	 *
 	 * @param scalar
 	 *          the scalar indicating how many of the units fit in the duration of
 	 *          this time interval. The "2.5" from "2.5 minutes"
@@ -45,7 +45,7 @@ public class TimeInterval implements Serializable {
 	/**
 	 * Copy constructor, useful for initializing a new TimeInterval object with an
 	 * old one, without being dependent of the original object staying the same.
-	 * 
+	 *
 	 * @param intervalToBeCopied
 	 *          the interval of which the values must be copied to the new
 	 *          instance of TimeInterval
@@ -62,7 +62,7 @@ public class TimeInterval implements Serializable {
 	/**
 	 * Returns the time unit of this time interval (for example the enumeration
 	 * corresponding to "HOUR").
-	 * 
+	 *
 	 * @return the unit (like DAY) of this time interval object
 	 */
 	TimeUnit getUnit() {
@@ -74,7 +74,7 @@ public class TimeInterval implements Serializable {
 
 	/**
 	 * Returns the scalar value of the time interval (the "3.5" in "3.5 days").
-	 * 
+	 *
 	 * @return the scalar value of the TimeInterval object (the "3.5" in
 	 *         "3.5 days")
 	 */
@@ -87,7 +87,7 @@ public class TimeInterval implements Serializable {
 
 	/**
 	 * Initializes the TimeInterval object using the given values.
-	 * 
+	 *
 	 * @param scalar
 	 *          the scalar indicating how many of the units fit in the duration of
 	 *          this time interval. The "2.5" from "2.5 minutes"

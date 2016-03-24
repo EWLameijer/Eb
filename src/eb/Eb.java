@@ -2,7 +2,7 @@ package eb;
 
 /**
  * Runs Eb.
- * 
+ *
  * @author Eric-Wubbo Lameijer
  */
 public class Eb {
@@ -15,7 +15,7 @@ public class Eb {
 
 	/**
 	 * Runs Eb.
-	 * 
+	 *
 	 * @param args
 	 *          not used
 	 */
