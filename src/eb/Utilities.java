@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.KeyboardFocusManager;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -147,6 +148,12 @@ public class Utilities {
 
 		// postconditions: none. Should simply return the String, and I trust that
 		// that works.
+	}
+
+	public static boolean isDecimalSeparator(char ch) {
+		DecimalFormat currentNumberFormat = new DecimalFormat();
+		char decimalSeparator = currentNumberFormat.getDecimalFormatSymbols().getDecimalSeparator();
+		return (ch == decimalSeparator);
 	}
 
 }

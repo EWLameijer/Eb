@@ -168,15 +168,13 @@ Design
 	f) Ensure the cancel button works Feb 9 2016
 	g) Ensure the default button works Feb 16 2016
 	g2) check all code and documentation. (Feb round, +28 days RtM)
-	h) Ensure the save button works (implement a Study Settings object and data member in DeckContents)
+	h) Add the mention of a third option (Ctrl-T) to the Main window March 28 2016
+	h) Ensure the save button works (implement a Study Settings object and data member in DeckContents) March 28 2016
+	i) Ensure that the cancel button reads 'discard unsaved changes' March 28 2016 
+	j) Make 'changes saved'- 'changes unsaved' part of the StudyOptions window
+	
 	// timed? bool and timedinterval
 	5) Add the possibility to review cards
-	a) Add the mention of a third option (Ctrl-T) to the Main window // Ctrl-O for open, Ctrl-P 
-	b) Let Ctrl-T open an options window
-	c) Create an Options class, which becomes a member/property of DeckContents
-	d) Add an "time before first review" label + textbox + timebox (min/hrs/days/weeks/months/years)
-	e) Initialize it (programmatically) to 10 minutes
-	f) Add a button 'load default settings of Eb' which resets it to 10 minutes.
 	g) make the main window show the time till review of the first card (in seconds [clock])
 	h) Ensure that the main window, upon loading and in a cycle of 1 minute checks whether there are reviewable cards, loads these into a 'batch'
 	i) Make main-window in review mode (know - don't know)

@@ -1,6 +1,8 @@
 package eb;
 
 import java.awt.Dimension;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.Optional;
 
 import javax.swing.DefaultComboBoxModel;
@@ -114,6 +116,7 @@ public class TimeInputElement extends JPanel {
 		        + "may not be null.");
 		m_scalarField.setText(
 		    Utilities.doubleToMaxPrecisionString(timeInterval.getScalar(), 2));
+		System.out.println(Utilities.doubleToMaxPrecisionString(timeInterval.getScalar(), 2));
 		m_unitComboBox
 		    .setSelectedItem(timeInterval.getUnit().getUserInterfaceName());
 		// postconditions: none. I assume that all goes well.
@@ -129,8 +132,16 @@ public class TimeInputElement extends JPanel {
 		    .parseUnit(m_unitComboBox.getSelectedItem().toString());
 		Utilities.require(timeUnit.isPresent(), "TimeInterval.getInterval() error: "
 		    + " the time unit is wrong for some reason.");
-		return new TimeInterval(Double.parseDouble(m_scalarField.getText()),
-		    timeUnit.get());
+		NumberFormat floatingPointFormat = NumberFormat.getNumberInstance();
+		double timeIntervalScalar;
+	try {
+		timeIntervalScalar = (double)floatingPointFormat.parse(m_scalarField.getText());
+		return new TimeInterval(timeIntervalScalar, timeUnit.get());
+	} catch (ParseException e) {
+		e.printStackTrace();
+		System.exit(0);
+		return null;
+	}
 	}
 
 }

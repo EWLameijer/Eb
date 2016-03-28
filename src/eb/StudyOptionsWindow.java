@@ -3,11 +3,16 @@ package eb;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
+import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 
 /**
  * The window in which the user can set how he/she wants to study; like which
@@ -48,7 +53,7 @@ public class StudyOptionsWindow extends JFrame {
 		StudyOptions studyOptions = Deck.getStudyOptions();
 		m_initialIntervalBox = TimeInputElement.createInstance(
 		    "Initial review after", studyOptions.getInitialInterval());
-		m_cancelButton = new JButton("Discard changes and close");
+		m_cancelButton = new JButton("Discard unsaved changes and close");
 		m_loadEbDefaultsButton = new JButton("Load Eb's default values");
 		m_loadCurrentDeckSettingsButton = new JButton(
 		    "Load settings of current deck");
@@ -118,6 +123,14 @@ public class StudyOptionsWindow extends JFrame {
 
 		// first: make the buttons do something
 		m_cancelButton.addActionListener(e -> close());
+    getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+        KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "Cancel"); //$NON-NLS-1$
+    getRootPane().getActionMap().put("Cancel", new AbstractAction(){ //$NON-NLS-1$
+        public void actionPerformed(ActionEvent e)
+        {
+            close();
+        }
+    });
 		m_loadCurrentDeckSettingsButton
 		    .addActionListener(e -> loadCurrentDeckSettings());
 		m_loadEbDefaultsButton.addActionListener(e -> loadEbDefaults());

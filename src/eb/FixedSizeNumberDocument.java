@@ -1,5 +1,8 @@
 package eb;
 
+import java.text.NumberFormat;
+import java.text.ParseException;
+
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
@@ -70,7 +73,7 @@ public class FixedSizeNumberDocument extends PlainDocument {
 	 */
 	boolean containsOtherThanDigitsOrSeparators(String string) {
 		for (final char ch : string.toCharArray()) {
-			if (!Character.isDigit(ch) && ch != '.' && ch != ',') {
+			if (!Character.isDigit(ch) && !Utilities.isDecimalSeparator(ch)) {
 				return true;
 			}
 		}
@@ -85,7 +88,7 @@ public class FixedSizeNumberDocument extends PlainDocument {
 	public void insertString(int offs, String str, AttributeSet a)
 	    throws BadLocationException {
 
-		if (containsOtherThanDigitsOrSeparators(str)) {
+    if (containsOtherThanDigitsOrSeparators(str)) {
 			m_owner.getToolkit().beep();
 			return;
 		}
@@ -94,17 +97,25 @@ public class FixedSizeNumberDocument extends PlainDocument {
 			m_owner.getToolkit().beep();
 		}
 
+		//@@@: use NumberFormat instead of parseDouble.
+		// see http://www.ibm.com/developerworks/library/j-numberformat/
+		NumberFormat floatingPointFormat = NumberFormat.getNumberInstance();
+		NumberFormat integerFormat = NumberFormat.getIntegerInstance();
+		
+		String candidateText = m_owner.getText() + str;
 		try {
 			if (m_sizeOfFractionalPart > 0) {
-				Double.parseDouble(m_owner.getText() + str);
+				floatingPointFormat.parse(candidateText);
 			} else {
-				Integer.parseInt(str);
+				integerFormat.parse(candidateText);
 			}
-		} catch (final NumberFormatException e) {
+		} catch (ParseException e) {
 			// inserted text is not a number
 			m_owner.getToolkit().beep();
+			e.printStackTrace();
 			return;
-		}
+		
+	}
 		super.insertString(offs, str, a);
 	}
 }

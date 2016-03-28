@@ -1,6 +1,7 @@
 package eb;
 
 import java.io.Serializable;
+import java.time.Duration;
 
 /**
  * The Card class represents a card, which has contents (front and back, or
@@ -77,6 +78,15 @@ public class Card implements Serializable {
 
 		// postconditions: same as preconditions
 		return m_textOnBack;
+	}
+	
+	/** @@@
+	 * Returns the time till the next review of this card. The time can be negative, as that information can help de-prioritize 'overripe' cards which likely have to be learned anew anyway.
+	 * 
+	 * @return
+	 */
+	public Duration getTimeTillNextReview() {
+		
 	}
 
 }
