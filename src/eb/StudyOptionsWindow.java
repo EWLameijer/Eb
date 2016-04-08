@@ -123,14 +123,15 @@ public class StudyOptionsWindow extends JFrame {
 
 		// first: make the buttons do something
 		m_cancelButton.addActionListener(e -> close());
-    getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-        KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "Cancel"); //$NON-NLS-1$
-    getRootPane().getActionMap().put("Cancel", new AbstractAction(){ //$NON-NLS-1$
-        public void actionPerformed(ActionEvent e)
-        {
-            close();
-        }
-    });
+		getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+		    .put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "Cancel"); //$NON-NLS-1$
+		getRootPane().getActionMap().put("Cancel", new AbstractAction() { //$NON-NLS-1$
+			private static final long serialVersionUID = 5281385300708334272L;
+
+			public void actionPerformed(ActionEvent e) {
+				close();
+			}
+		});
 		m_loadCurrentDeckSettingsButton
 		    .addActionListener(e -> loadCurrentDeckSettings());
 		m_loadEbDefaultsButton.addActionListener(e -> loadEbDefaults());

@@ -19,12 +19,8 @@ import org.checkerframework.checker.initialization.qual.UnknownInitialization;
  *
  * @author Eric-Wubbo Lameijer
  */
-@SuppressWarnings("serial")
 public class TimeInputElement extends JPanel {
 
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = 4711963487097757055L;
 
 	// Label indicating the identity of the interval (for example "interval
@@ -116,7 +112,8 @@ public class TimeInputElement extends JPanel {
 		        + "may not be null.");
 		m_scalarField.setText(
 		    Utilities.doubleToMaxPrecisionString(timeInterval.getScalar(), 2));
-		System.out.println(Utilities.doubleToMaxPrecisionString(timeInterval.getScalar(), 2));
+		System.out.println(
+		    Utilities.doubleToMaxPrecisionString(timeInterval.getScalar(), 2));
 		m_unitComboBox
 		    .setSelectedItem(timeInterval.getUnit().getUserInterfaceName());
 		// postconditions: none. I assume that all goes well.
@@ -134,14 +131,15 @@ public class TimeInputElement extends JPanel {
 		    + " the time unit is wrong for some reason.");
 		NumberFormat floatingPointFormat = NumberFormat.getNumberInstance();
 		double timeIntervalScalar;
-	try {
-		timeIntervalScalar = (double)floatingPointFormat.parse(m_scalarField.getText());
-		return new TimeInterval(timeIntervalScalar, timeUnit.get());
-	} catch (ParseException e) {
-		e.printStackTrace();
-		System.exit(0);
-		return null;
-	}
+		try {
+			timeIntervalScalar = (double) floatingPointFormat
+			    .parse(m_scalarField.getText());
+			return new TimeInterval(timeIntervalScalar, timeUnit.get());
+		} catch (ParseException e) {
+			e.printStackTrace();
+			System.exit(0);
+			return null;
+		}
 	}
 
 }

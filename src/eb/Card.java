@@ -2,6 +2,9 @@ package eb;
 
 import java.io.Serializable;
 import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The Card class represents a card, which has contents (front and back, or
@@ -20,6 +23,9 @@ public class Card implements Serializable {
 
 	// The text/contents of the back of the card.
 	private final String m_textOnBack;
+
+	private final Instant m_creationInstant;
+	private final List<Review> m_reviews;
 
 	/**
 	 * Creates a new card; ensures that the input is valid. Note that empty cards
@@ -45,6 +51,8 @@ public class Card implements Serializable {
 
 		m_textOnFront = textOnFront;
 		m_textOnBack = textOnBack;
+		m_creationInstant = Instant.now();
+		m_reviews = new ArrayList<>();
 
 		// postconditions: none. Given valid input (the preconditions have been
 		// met), the card will be created successfully.
@@ -79,14 +87,49 @@ public class Card implements Serializable {
 		// postconditions: same as preconditions
 		return m_textOnBack;
 	}
-	
-	/** @@@
-	 * Returns the time till the next review of this card. The time can be negative, as that information can help de-prioritize 'overripe' cards which likely have to be learned anew anyway.
+
+	/**
+	 * @@@ Returns the time till the next review of this card. The time can be
+	 * negative, as that information can help de-prioritize 'overripe' cards which
+	 * likely have to be learned anew anyway.
 	 * 
 	 * @return
 	 */
 	public Duration getTimeTillNextReview() {
-		
+		return Duration.between(m_creationInstant, Instant.now());
+	}
+
+	/**
+	 * Checks whether the card has been reviewed at least once.
+	 * 
+	 * @return true if the card has been reviewed at least once, false if the card
+	 *         has just been created.
+	 */
+	boolean hasBeenReviewed() {
+		// preconditions: none. Object exists
+		return m_reviews.size() > 0;
+		// postconditions: none. Returns simple boolean.
+	}
+
+	/**
+	 * Returns when the last review took place. Requires a call to
+	 * 'hasBeenReviewed' to ensure that the card actually has been reviewed
+	 * before.
+	 * 
+	 * @return the instant when the last review took place.
+	 */
+	Instant getLastReviewInstant() {
+		// preconditions: a review must have taken place, one should not call this
+		// on a freshly created card.
+		Utilities.require(m_reviews.size() > 0, "History.getLastReviewInstant() "
+		    + "error: no review has taken place yet. Please only call this method "
+		    + "after checking the existence of a review with 'hasBeenReviewed'.");
+
+		int indexOfLastReview = m_reviews.size() - 1;
+		return m_reviews.get(indexOfLastReview).getInstant();
+
+		// postconditions: none. Will give a proper instant if the preconditions
+		// have been met.
 	}
 
 }

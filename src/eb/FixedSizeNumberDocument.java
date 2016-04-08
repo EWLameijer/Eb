@@ -2,6 +2,7 @@ package eb;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.text.ParsePosition;
 
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -20,11 +21,7 @@ import javax.swing.text.PlainDocument;
  * @author Eric-Wubbo Lameijer
  *
  */
-@SuppressWarnings("serial")
 public class FixedSizeNumberDocument extends PlainDocument {
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = 7355097701705745079L;
 	private final JTextComponent m_owner;
 	private final int m_fixedSize;
@@ -88,21 +85,25 @@ public class FixedSizeNumberDocument extends PlainDocument {
 	public void insertString(int offs, String str, AttributeSet a)
 	    throws BadLocationException {
 
-    if (containsOtherThanDigitsOrSeparators(str)) {
-			m_owner.getToolkit().beep();
-			return;
-		}
-		if (getLength() + str.length() > m_fixedSize) {
-			str = str.substring(0, m_fixedSize - getLength());
+		String candidateText = m_owner.getText() + str;
+		// cut off extraneous characters
+		if (candidateText.length() > m_fixedSize) {
+			candidateText = str.substring(0, m_fixedSize);
 			m_owner.getToolkit().beep();
 		}
 
-		//@@@: use NumberFormat instead of parseDouble.
+		ParsePosition pp;
+
+		if (containsOtherThanDigitsOrSeparators(str)) {
+			m_owner.getToolkit().beep();
+			return;
+		}
+
+		// @@@: use NumberFormat instead of parseDouble.
 		// see http://www.ibm.com/developerworks/library/j-numberformat/
 		NumberFormat floatingPointFormat = NumberFormat.getNumberInstance();
 		NumberFormat integerFormat = NumberFormat.getIntegerInstance();
-		
-		String candidateText = m_owner.getText() + str;
+
 		try {
 			if (m_sizeOfFractionalPart > 0) {
 				floatingPointFormat.parse(candidateText);
@@ -114,8 +115,7 @@ public class FixedSizeNumberDocument extends PlainDocument {
 			m_owner.getToolkit().beep();
 			e.printStackTrace();
 			return;
-		
-	}
+		}
 		super.insertString(offs, str, a);
 	}
 }

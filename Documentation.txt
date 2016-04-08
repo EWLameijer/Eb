@@ -116,6 +116,8 @@ Glossary
 
 -Card: one of the cards that is studied. A card has contents (front and back, 'stimulus' and 'response', as well as a history (number of repetitions and failure rate and such).
 -Deck: a collection cards that can be studied
+-Instant: (Java-term) a certain point in time (so time+data). Like December 9th, 2011, 11:05 GMT. This was a specific timepoint in history, even if it would have been say 12:05 in Amsterdam at that time - but December 9th, 2011, 12:05 CET refers to the same instant. Using instant as it is more appropriate than date (which is too rough) or time (which is not unique, as the hours, minutes and seconds repeat every day)
+-Review: an individual review (with data like how long it took etc.)
 -Study Options: the collection of options that determines how a SRS deck is to be studied, for example the interval before the first repetition, how much the study interval should increase upon success, whether there is a maximum time the student has before he or she may answer, and so on.
 
 HowTo
@@ -171,6 +173,10 @@ Design
 	h) Add the mention of a third option (Ctrl-T) to the Main window March 28 2016
 	h) Ensure the save button works (implement a Study Settings object and data member in DeckContents) March 28 2016
 	i) Ensure that the cancel button reads 'discard unsaved changes' March 28 2016 
+	
+	j) check what happens when a timebox is filled with 3..6 or whatever => FAILS! 3..6 is permitted. Fix this.
+	
+	
 	j) Make 'changes saved'- 'changes unsaved' part of the StudyOptions window
 	
 	// timed? bool and timedinterval
@@ -189,6 +195,8 @@ Card
 	Card(String, String)
 	getFront()
 	getBack()
+	getLastReviewInstant()
+	hasBeenReviewed()
 	
 Deck 
 	addCard()
@@ -242,6 +250,10 @@ NewCardWindow
 	init()
 	display()
 	
+Review
+	getInstant()
+	wasSuccess()
+	
 StudyOptions
 	getInitialInterval()
 	StudyOptions()
@@ -274,7 +286,12 @@ TimeUnit
 	
 Utilities
 	EOL
+	getDecimalSeparator()
+	isDecimalSeparator()
 	isStringValidIdentifier()
+	representsFractionalNumber()
+	representsInteger()
+	
 	require()
 	makeTabTransferFocus()
 	makeTabAndEnterTransferFocus()
