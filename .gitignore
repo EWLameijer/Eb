@@ -49,7 +49,7 @@ Temporary Items
 *.class
 /bin/*
 bin/*
-/bin/eb/*.class
+bin/eb/*.class
 
 # Ignoring SonarQube blathering
 
