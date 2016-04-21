@@ -45,3 +45,5 @@ Temporary Items
 # Eb deck files (used for testing)
 *.deck
 
+# SonarQube files 
+
