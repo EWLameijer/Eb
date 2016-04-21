@@ -42,7 +42,7 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-# Local .deck-files I create for testing
+# Eb deck files (used for testing)
 *.deck
 
 # Ignoring Java class files
