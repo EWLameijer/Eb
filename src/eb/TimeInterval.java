@@ -1,6 +1,8 @@
 package eb;
 
 import java.io.Serializable;
+import java.time.Duration;
+import java.util.Objects;
 
 import org.checkerframework.checker.initialization.qual.UnknownInitialization;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
@@ -110,6 +112,34 @@ public class TimeInterval implements Serializable {
 		m_scalar = scalar;
 		m_unit = unit;
 		// postconditions: none. Should have worked.
+	}
+
+	public boolean equals(Object otherObject) {
+		if (this == otherObject) {
+			return true;
+		} else if (otherObject == null) {
+			return false;
+		} else if (getClass() != otherObject.getClass()) {
+			return false;
+		} else {
+			TimeInterval otherInterval = (TimeInterval) otherObject;
+			return (m_scalar == otherInterval.m_scalar)
+			    && (m_unit == otherInterval.m_unit);
+		}
+	}
+
+	public int hash() {
+		return Objects.hash(m_scalar, m_unit);
+	}
+
+	public Duration asDuration() {
+		Duration unitDuration = m_unit.getDuration();
+		// we work with things like 0.01 s. So two decimal places. Unfortunately,
+		// we can only multiply by longs, not doubles.
+		Duration hundredthUnitDuration = unitDuration.dividedBy(100);
+		long scalarTimesHundred = (long) (m_scalar * 100.0);
+
+		return hundredthUnitDuration.multipliedBy(scalarTimesHundred);
 	}
 
 }

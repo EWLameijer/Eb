@@ -1,8 +1,8 @@
 package eb;
 
 import java.awt.Dimension;
-import java.text.NumberFormat;
-import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javax.swing.DefaultComboBoxModel;
@@ -10,6 +10,8 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import org.checkerframework.checker.initialization.qual.UnknownInitialization;
 
@@ -35,6 +37,8 @@ public class TimeInputElement extends JPanel {
 	// initial study interval. Contains the hours of "3 hours".
 	private final JComboBox<String> m_unitComboBox;
 
+	private List<DataFieldChangeListener> m_dataFieldChangeListeners = new ArrayList<>();
+
 	/**
 	 * Constructs the TimeInputElement, given a name and a TimeInterval (which can
 	 * contain something like "3 hour(s)".
@@ -44,9 +48,7 @@ public class TimeInputElement extends JPanel {
 	 * @param timeInterval
 	 *          the time interval to be displayed, like "3 hour(s)".
 	 */
-	private TimeInputElement(
-
-	    String name, TimeInterval timeInterval) {
+	private TimeInputElement(String name, TimeInterval timeInterval) {
 		// preconditions: name should be valid; the timeInterval will be checked
 		// by setInterval.
 		super();
@@ -57,11 +59,32 @@ public class TimeInputElement extends JPanel {
 
 		m_label = new JLabel(name);
 		m_scalarField = new JTextField();
+
 		m_scalarField.setDocument(new FixedSizeNumberDocument(m_scalarField, 5, 2));
+		m_scalarField.getDocument().addDocumentListener(new DocumentListener() {
+
+			@Override
+			public void changedUpdate(DocumentEvent arg0) {
+				notifyDataFieldChangeListeners();
+			}
+
+			@Override
+			public void insertUpdate(DocumentEvent arg0) {
+				notifyDataFieldChangeListeners();
+
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent arg0) {
+				notifyDataFieldChangeListeners();
+			}
+
+		});
 		m_scalarField.setPreferredSize(new Dimension(40, 20));
 		m_unitComboBox = new JComboBox<>();
 		m_unitComboBox
 		    .setModel(new DefaultComboBoxModel<String>(TimeUnit.getUnitNames()));
+		m_unitComboBox.addActionListener(e -> notifyDataFieldChangeListeners());
 		setInterval(timeInterval);
 		// postconditions: none. Ordinary constructor.
 	}
@@ -116,7 +139,14 @@ public class TimeInputElement extends JPanel {
 		    Utilities.doubleToMaxPrecisionString(timeInterval.getScalar(), 2));
 		m_unitComboBox
 		    .setSelectedItem(timeInterval.getUnit().getUserInterfaceName());
+		notifyDataFieldChangeListeners();
 		// postconditions: none. I assume that all goes well.
+	}
+
+	private void notifyDataFieldChangeListeners() {
+		for (DataFieldChangeListener dataFieldChangeListener : m_dataFieldChangeListeners) {
+			dataFieldChangeListener.respondToChangedDataField();
+		}
 	}
 
 	/**
@@ -129,17 +159,24 @@ public class TimeInputElement extends JPanel {
 		    .parseUnit(m_unitComboBox.getSelectedItem().toString());
 		Utilities.require(timeUnit.isPresent(), "TimeInterval.getInterval() error: "
 		    + " the time unit is wrong for some reason.");
-		NumberFormat floatingPointFormat = NumberFormat.getNumberInstance();
-		double timeIntervalScalar;
-		try {
-			timeIntervalScalar = (double) floatingPointFormat
-			    .parse(m_scalarField.getText());
-			return new TimeInterval(timeIntervalScalar, timeUnit.get());
-		} catch (ParseException e) {
-			e.printStackTrace();
-			System.exit(0);
-			return null;
-		}
+
+		Optional<Double> parsedNumber = Utilities
+		    .stringToDouble(m_scalarField.getText());
+		double timeIntervalScalar = parsedNumber.orElse(0.01);
+		return new TimeInterval(timeIntervalScalar, timeUnit.get());
+	}
+
+	public void addDataFieldChangeListener(
+	    DataFieldChangeListener dataFieldChangeListener) {
+		// preconditions: should not already be in the list
+		Utilities.require(
+		    !m_dataFieldChangeListeners.contains(dataFieldChangeListener),
+		    "TimeInputElement.addDataFieldChangeListener() error: "
+		        + "you should not register the same object twice.");
+
+		m_dataFieldChangeListeners.add(dataFieldChangeListener);
+
+		// postconditions: none. Simple addition
 	}
 
 }

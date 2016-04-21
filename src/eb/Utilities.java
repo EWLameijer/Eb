@@ -4,8 +4,12 @@ import java.awt.Component;
 import java.awt.KeyboardFocusManager;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParsePosition;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -161,10 +165,7 @@ public class Utilities {
 	 */
 	public static boolean isDecimalSeparator(char ch) {
 		// preconditions: none. 'ch' can't be null, for example.
-		DecimalFormat currentNumberFormat = new DecimalFormat();
-		char decimalSeparator = currentNumberFormat.getDecimalFormatSymbols()
-		    .getDecimalSeparator();
-		return (ch == decimalSeparator);
+		return (ch == getDecimalSeparator());
 		// postconditions: none. Simple return of boolean.
 	}
 
@@ -210,56 +211,98 @@ public class Utilities {
 	 */
 	public static boolean representsFractionalNumber(String string,
 	    int maxPrecision) {
-		// preconditions: string should not be null or empty.
+		// preconditions: string should not be null or empty, and maxPrecision
+		// should be positive
+		require(maxPrecision >= 0, "Utilities.representsFractionalNumber() "
+		    + "error: the maximum precision should be a positive number.");
 		if (!isStringValidIdentifier(string)) {
 			return false;
 		}
-		String fractionalNumberRegex = 
-		
-		// @@@Replace by Regex!
-		int pos = 0;
-		if (string.charAt(pos) == '-') {
-			pos++;
-		}
-		boolean digitSeparatorFound = false;
-		int digitsInFractionalPart = 0;
-		boolean digitFound = false;
-		while (pos < string.length()) {
-			char currentChar = string.charAt(pos);
-			if (Character.isDigit(currentChar)) {
-				digitFound = true;
-				if (digitSeparatorFound) {
-					digitsInFractionalPart++;
-				} // else: do nothing - only invoke this for the fractional part
-				if (digitsInFractionalPart > maxPrecision) {
-					return false;
-				} // else: still below max precision; number is acceptable.
-			} else if (isDecimalSeparator(currentChar)) {
-				if (!digitSeparatorFound) {
-					digitSeparatorFound = true;
-				} else {
-					return false; // you can't have two decimal separators in a number!
-				}
-			} else {
-				// neither a digit or a separator
-				return false;
-			}
-		}
-		return digitFound;
+		String decimalSeparatorAsRegex = (getDecimalSeparator() == '.' ? "\\."
+		    : "" + getDecimalSeparator());
+
+		String fractionalNumberRegex = "-?\\d*" + decimalSeparatorAsRegex
+		    + "?\\d{0," + maxPrecision + "}";
+		return Pattern.matches(fractionalNumberRegex, string);
 		// postconditions: none: simple return of boolean.
 	}
 
 	/**
-	 * @@@ Whether a given string represents a positive fractional number.
+	 * Whether a given string represents a positive fractional number.
 	 * 
 	 * @param string
+	 *          the string to be checked for being a positive fractional number
 	 * @param maxPrecision
-	 * @return
+	 *          the maximum number of digits after the decimal separator
+	 * @return whether this is a positive fractional/rational number (or a
+	 *         positive integer, that is also formally a rational number)
 	 */
-	/*
-	 * public static boolean representsPositiveFractionalNumber(String string, int
-	 * maxPrecision) {
+	public static boolean representsPositiveFractionalNumber(String string,
+	    int maxPrecision) {
+		// preconditions handled by wrapped representsFractionalNumber
+		if (string.startsWith("-")) {
+			return false;
+		}
+		return representsFractionalNumber(string, maxPrecision);
+		// postconditions: none; simple return of boolean
+	}
+
+	/**
+	 * Parses a string to a double. Returns Optional.empty() if the number cannot
+	 * be parsed.
 	 * 
-	 * }
+	 * @param string
+	 *          the string to be parsed to a double.
+	 * 
+	 * @return an Optional<Double> that contains a double value, if the string
+	 *         could be parsed to one.
 	 */
+	public static Optional<Double> stringToDouble(String string) {
+		// preconditions
+		require(string != null, "Utilities.stringToDouble() error: "
+		    + "the string to analyze should not be null.");
+
+		// Get a numberFormat object. Note that the number it returns will be Long
+		// if possible, otherwise a Double.
+		NumberFormat numberFormat = NumberFormat.getNumberInstance();
+		ParsePosition parsePosition = new ParsePosition(0);
+		Number number = numberFormat.parse(string, parsePosition);
+		if (parsePosition.getIndex() == 0) {
+			return Optional.empty();
+		} else {
+			return Optional.of(number.doubleValue());
+		}
+
+		// postconditions: none. All possible cases should have been handled by the
+		// Optional.
+	}
+
+	public static String durationToString(Duration duration) {
+		long durationAsSeconds = duration.getSeconds();
+		String finalPrefix = "";
+		if (durationAsSeconds < 0) {
+			durationAsSeconds *= -1;
+			finalPrefix = "minus ";
+		}
+		long seconds = durationAsSeconds % 60;
+		StringBuilder output = new StringBuilder(" seconds");
+		output.insert(0, seconds);
+		long durationAsMinutes = durationAsSeconds / 60;
+		if (durationAsMinutes > 0) {
+			long minutes = durationAsMinutes % 60;
+			output.insert(0, minutes + " minutes and ");
+			long durationAsHours = durationAsMinutes / 60;
+			if (durationAsHours > 0) {
+				long hours = durationAsHours % 24;
+				output.insert(0, hours + " hours, ");
+				long days = durationAsHours / 24;
+				if (days > 0) {
+					output.insert(0, days + " days, ");
+				}
+			}
+		}
+		output.insert(0, finalPrefix);
+		return output.toString();
+	}
+
 }

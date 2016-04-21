@@ -1,7 +1,11 @@
 package eb;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.time.Duration;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -9,6 +13,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
+import javax.swing.Timer;
 
 /**
  * The main window of Eb.
@@ -28,6 +33,7 @@ public class MainWindow extends JFrame implements DeckChangeListener {
 	// the regular "reviewing" window, which should be active most of the
 	// time.
 	private final JLabel m_messageLabel;
+	private final Color DEFAULT_BACKGROUND;
 
 	/**
 	 * MainWindow constructor.
@@ -36,6 +42,7 @@ public class MainWindow extends JFrame implements DeckChangeListener {
 		// preconditions: none
 		super(PROGRAM_NAME);
 		m_messageLabel = new JLabel();
+		DEFAULT_BACKGROUND = this.getContentPane().getBackground();
 	}
 
 	/**
@@ -46,7 +53,7 @@ public class MainWindow extends JFrame implements DeckChangeListener {
 	public void respondToChangedDeck() {
 		// preconditions: none (the deck has changed, but basically, that would
 		// be the reason why this function is called in the first place
-		updateMessageLabel();
+		updateWindow();
 		// postconditions: none (well, I suppose the message label may have
 		// changed,
 		// but possibly in future card edits will also call this function which
@@ -82,9 +89,47 @@ public class MainWindow extends JFrame implements DeckChangeListener {
 	 */
 	void updateMessageLabel() {
 		// preconditions: none
-		m_messageLabel.setText(getDeckSizeMessage() + " " + getUICommands());
+		StringBuilder message = new StringBuilder("");
+		message.append("<html>");
+		message.append(getDeckSizeMessage());
+		message.append("<br>");
+		if (Deck.getCardCount() > 0) {
+			message.append("Time till next review: ");
+			Duration timeUntilNextReviewAsDuration = Deck.getTimeTillNextReview();
+			String timeUntilNextReviewAsText = Utilities
+			    .durationToString(timeUntilNextReviewAsDuration);
+			message.append(timeUntilNextReviewAsText);
+			message.append("<br>");
+		}
+		message.append(getUICommands());
+		message.append("</html>");
+		m_messageLabel.setText(message.toString());
 		// postconditions: none (well, the label should have some text, but I'm
 		// willing to trust that that happens.
+	}
+
+	void updateWindow() {
+		if (!mustReviewNow()) {
+			this.getContentPane().setBackground(DEFAULT_BACKGROUND);
+			m_messageLabel.setVisible(true);
+			updateMessageLabel();
+		} else {
+			// now is the time for reviewing
+			// 1. Paint the frame white.
+			m_messageLabel.setVisible(false);
+			this.getContentPane().setBackground(Color.WHITE);
+			// draw a horizontal line
+		}
+	}
+
+	private boolean mustReviewNow() {
+		// case 1: there are no cards in the deck - so nothing to review either
+		if (Deck.getCardCount() == 0) {
+			return false;
+		} else {
+			Duration timeUntilNextReviewAsDuration = Deck.getTimeTillNextReview();
+			return timeUntilNextReviewAsDuration.isNegative();
+		}
 	}
 
 	/**
@@ -131,14 +176,23 @@ public class MainWindow extends JFrame implements DeckChangeListener {
 
 		// add message label (or show cards-to-be-reviewed)
 
-		updateMessageLabel();
+		updateWindow();
 		add(m_messageLabel);
 
 		// now show the window itself.
 		setSize(1000, 700);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				Deck.save();
+				e.getWindow().dispose();
+			}
+		});
 		setVisible(true);
 		Deck.addDeckChangeListener(this);
+		Timer messageUpdater = new Timer(100, e -> updateWindow());
+		messageUpdater.start();
 		// postconditions: none
 	}
 
@@ -160,4 +214,5 @@ public class MainWindow extends JFrame implements DeckChangeListener {
 		System.exit(0);
 		// preconditions: none
 	}
+
 }

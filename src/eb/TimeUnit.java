@@ -91,4 +91,8 @@ public enum TimeUnit {
 		// no correct parsing possible
 		return Optional.empty();
 	}
+
+	public Duration getDuration() {
+		return m_duration;
+	}
 }

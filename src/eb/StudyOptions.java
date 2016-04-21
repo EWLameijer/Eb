@@ -1,6 +1,7 @@
 package eb;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * The StudyOptions class can store the learning settings that we want to use
@@ -61,5 +62,33 @@ public class StudyOptions implements Serializable {
 		// preconditions: none
 		return new StudyOptions(DEFAULT_INITIAL_INTERVAL);
 		// postconditions: none. Should have worked.
+	}
+
+	/**
+	 * Whether the contents of this StudyOptions object equal those of another
+	 * (StudyOptions) object.
+	 * 
+	 * @param otherObject
+	 *          the object to compare this StudyOptions object with
+	 * 
+	 * @return whether the contents of the other object equal the contents of this
+	 *         particular object
+	 */
+	@Override
+	public boolean equals(Object otherObject) {
+		if (this == otherObject) {
+			return true;
+		} else if (otherObject == null) {
+			return false;
+		} else if (getClass() != otherObject.getClass()) {
+			return false;
+		} else {
+			StudyOptions otherOptions = (StudyOptions) otherObject;
+			return m_initialInterval.equals(otherOptions.m_initialInterval);
+		}
+	}
+
+	public int hashCode() {
+		return Objects.hash(m_initialInterval);
 	}
 }

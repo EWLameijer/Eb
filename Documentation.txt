@@ -1,3 +1,10 @@
+g) make the main window show the time till review of the first card (in seconds [clock])
+	First: allow Deck to get the time till first review (if there are more than 0 cards)
+	update 1: make this dynamic YES!
+	update 2: make the time correct (so work on the formula!) OK
+	
+	
+
 -Flow
 -Glossary (domain knowledge, and what means what)
 -HowTo (bepaalde veranderingen doorvoeren)
@@ -50,6 +57,8 @@ Note that if the front of the card is empty, or a duplicate of the front of anot
 Each learner is unique, and so is the structure and difficulty of each deck. For example, when learning the capitals of the American states, you can easily review them 10 hours later after first adding the card. For studying say Russian vocabulary, 5 or 10 minutes may be a more appropriate time for the first repetition. In the Study Options menu you can set such deck characteristics to values that fit the deck and your preferred style of study. It even allows you to experiment with different study methods!
 
 The first parameter you can set is the "Initial interval", which is the time Eb lets pass after you added the card before it presents the card to you for the first review. If the deck is hard, you may want to choose 10 minutes; for an easy deck, 3 hours or even one day would be appropriate. The rule of thumb is that you should be able to answer between 80% and 95% of cards correctly at a repetition. *@Eb gives feedback?*
+
+General note about filling in fields: please use the 'normal' typing of your locale. So 3.6 would work for the US, and 3,6 for the Netherlands, for example.
 
 
 
@@ -172,16 +181,15 @@ Design
 	g2) check all code and documentation. (Feb round, +28 days RtM)
 	h) Add the mention of a third option (Ctrl-T) to the Main window March 28 2016
 	h) Ensure the save button works (implement a Study Settings object and data member in DeckContents) March 28 2016
-	i) Ensure that the cancel button reads 'discard unsaved changes' March 28 2016 
-	
-	j) check what happens when a timebox is filled with 3..6 or whatever => FAILS! 3..6 is permitted. Fix this.
-	
-	
-	j) Make 'changes saved'- 'changes unsaved' part of the StudyOptions window
+	i) Ensure that the cancel button reads 'discard unsaved changes' March 28 2016
+	j) check what happens when a timebox is filled with 3..6 or whatever => FAILS! 3..6 is permitted. Fix this. => April 19 2016
+	k) Make 'changes saved'- 'changes unsaved' part of the StudyOptions window => April 21 2016
+	l) make the main window show the time till review of the first card (in seconds [clock]) => April 21 2016
 	
 	// timed? bool and timedinterval
 	5) Add the possibility to review cards
-	g) make the main window show the time till review of the first card (in seconds [clock])
+	
+		
 	h) Ensure that the main window, upon loading and in a cycle of 1 minute checks whether there are reviewable cards, loads these into a 'batch'
 	i) Make main-window in review mode (know - don't know)
 	j) after reviewing the batch, checking again whether there are new cards to review, calling that the next batch.
@@ -213,6 +221,10 @@ Deck
 	
 DeckChangeListener
 	[]respondToChangedDeck()
+	
+FixedSizeNumberDocument
+	contentsShouldRepresentInteger()
+	representsValidContents()
 	
 LogicalDeck
 	addCard()
@@ -266,6 +278,7 @@ StudyOptionsWindow
 	StudyOptionsWindow()
 	init()
 	showStudyOptionsWindow()
+	updateTitle()
 
 TimeInputElement
 	getInterval()
@@ -285,17 +298,18 @@ TimeUnit
 	getUnitNames()
 	
 Utilities
+	doubleToMaxPrecisionString()
 	EOL
 	getDecimalSeparator()
 	isDecimalSeparator()
 	isStringValidIdentifier()
-	representsFractionalNumber()
-	representsInteger()
-	
-	require()
 	makeTabTransferFocus()
 	makeTabAndEnterTransferFocus()
-	doubleToMaxPrecisionString()
+	representsFractionalNumber()
+	representsInteger()
+	representsPositiveFractionalNumber()
+	require()
+	stringToDouble()
 	
 	
 	

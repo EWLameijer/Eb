@@ -2,6 +2,7 @@ package eb;
 
 import java.io.File;
 import java.io.Serializable;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -199,5 +200,30 @@ public class LogicalDeck implements Serializable {
 	 */
 	public void setStudyOptions(StudyOptions studyOptions) {
 		m_studyOptions = studyOptions;
+	}
+
+	/**
+	 * Returns the time that the user has to wait to the next review.
+	 * 
+	 * @return how long it will be until the next review.
+	 */
+	public Duration getTimeUntilNextReview() {
+		Utilities.require(m_cards.size() > 0,
+		    "LogicalDeck.getTimeUntilNextReview()) error: the time till next "
+		        + "review is undefined for an empty deck.");
+		Duration minimumTimeUntilNextReview = m_cards.get(0)
+		    .getTimeUntilNextReview();
+		for (Card card : m_cards) {
+			if (card.getTimeUntilNextReview()
+			    .compareTo(minimumTimeUntilNextReview) < 0) {
+				minimumTimeUntilNextReview = card.getTimeUntilNextReview();
+			}
+		}
+		return minimumTimeUntilNextReview;
+	}
+
+	public Duration getInitialInterval() {
+		TimeInterval initialInterval = m_studyOptions.getInitialInterval();
+		return initialInterval.asDuration();
 	}
 }

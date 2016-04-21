@@ -21,7 +21,12 @@ import javax.swing.KeyStroke;
  *
  * @author Eric-Wubbo Lameijer
  */
-public class StudyOptionsWindow extends JFrame {
+/**
+ * @author Eric-Wubbo Lameijer
+ *
+ */
+public class StudyOptionsWindow extends JFrame
+    implements DataFieldChangeListener {
 
 	// Automatically generated serialVersionUID.
 	private static final long serialVersionUID = -907266672997684012L;
@@ -45,11 +50,31 @@ public class StudyOptionsWindow extends JFrame {
 	private final TimeInputElement m_initialIntervalBox;
 
 	/**
+	 * Updates the title of the frame in response to changes to indicate to the
+	 * user whether there are unsaved changes.
+	 */
+	private void updateTitle() {
+		// preconditions: none. Is by definition only called when the object
+		// has been constructed already.
+		StudyOptions guiStudyOptions = gatherUIDataIntoStudyOptionsObject();
+		String title = "Study Options";
+		StudyOptions deckStudyOptions = Deck.getStudyOptions();
+		if (guiStudyOptions.equals(deckStudyOptions)) {
+			// if (guiStudyOptions.equals(Deck.getStudyOptions())) {
+			title += " - no unsaved changes";
+		} else {
+			title += " - UNSAVED CHANGES";
+		}
+		setTitle(title);
+		// postconditions: none. Simply changes the frame's title.
+	}
+
+	/**
 	 * Creates a new Study Options window.
 	 */
 	private StudyOptionsWindow() {
 		// preconditions: none (default constructor...)
-		super("Study Options");
+		super();
 		StudyOptions studyOptions = Deck.getStudyOptions();
 		m_initialIntervalBox = TimeInputElement.createInstance(
 		    "Initial review after", studyOptions.getInitialInterval());
@@ -110,6 +135,7 @@ public class StudyOptionsWindow extends JFrame {
 	private void saveSettingsToDeck() {
 		StudyOptions guiStudyOptions = gatherUIDataIntoStudyOptionsObject();
 		Deck.setStudyOptions(guiStudyOptions);
+		updateTitle(); // Should be set to 'no unsaved changes' again.
 	}
 
 	/**
@@ -136,6 +162,7 @@ public class StudyOptionsWindow extends JFrame {
 		    .addActionListener(e -> loadCurrentDeckSettings());
 		m_loadEbDefaultsButton.addActionListener(e -> loadEbDefaults());
 		m_setToTheseValuesButton.addActionListener(e -> saveSettingsToDeck());
+		m_initialIntervalBox.addDataFieldChangeListener(this);
 
 		// Then create two panels: one for setting the correct values for the study
 		// options, and one to contain the reset/confirm/reload etc. buttons.
@@ -162,6 +189,7 @@ public class StudyOptionsWindow extends JFrame {
 
 		setSize(700, 400);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		updateTitle();
 		setVisible(true);
 	}
 
@@ -173,5 +201,9 @@ public class StudyOptionsWindow extends JFrame {
 		final StudyOptionsWindow studyOptionsWindow = new StudyOptionsWindow();
 		studyOptionsWindow.init();
 		// postconditions: none
+	}
+
+	public void respondToChangedDataField() {
+		updateTitle();
 	}
 }

@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -110,6 +111,19 @@ public class Deck {
 		// next line is necessary to satisfy the nullness checker; after all,
 		// if m_contents is really null, we would have exited the program by now.
 		assert m_contents != null : "@AssumeAssertion(nullness)";
+	}
+
+	/**
+	 * Returns the time until the next review
+	 *
+	 * @return the time until the next card is to be reviewed
+	 */
+	public static Duration getTimeTillNextReview() {
+		// preconditions: the deck should have been initialized
+		ensureDeckExists();
+
+		// postconditions: none (further checks are done by the LogicalDeck object)
+		return m_contents.getTimeUntilNextReview();
 	}
 
 	/**
@@ -309,6 +323,11 @@ public class Deck {
 		ensureDeckExists();
 		m_contents.setStudyOptions(studyOptions);
 		// postconditions: handled by callee.
+	}
+
+	public static Duration getInitialInterval() {
+		ensureDeckExists();
+		return m_contents.getInitialInterval();
 	}
 
 	/**

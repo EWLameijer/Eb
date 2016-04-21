@@ -95,8 +95,10 @@ public class Card implements Serializable {
 	 * 
 	 * @return
 	 */
-	public Duration getTimeTillNextReview() {
-		return Duration.between(m_creationInstant, Instant.now());
+	public Duration getTimeUntilNextReview() {
+
+		return Duration.between(Instant.now(),
+		    Deck.getInitialInterval().addTo(m_creationInstant));
 	}
 
 	/**

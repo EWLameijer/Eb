@@ -1,9 +1,5 @@
 package eb;
 
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.text.ParsePosition;
-
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
@@ -85,37 +81,75 @@ public class FixedSizeNumberDocument extends PlainDocument {
 	public void insertString(int offs, String str, AttributeSet a)
 	    throws BadLocationException {
 
-		String candidateText = m_owner.getText() + str;
-		// cut off extraneous characters
-		if (candidateText.length() > m_fixedSize) {
-			candidateText = str.substring(0, m_fixedSize);
-			m_owner.getToolkit().beep();
-		}
+		String originalText = m_owner.getText();
 
-		ParsePosition pp;
-
-		if (containsOtherThanDigitsOrSeparators(str)) {
+		// first test: if the original string is long enough, you cannot insert.
+		if (originalText.length() >= m_fixedSize) {
 			m_owner.getToolkit().beep();
 			return;
 		}
 
-		// @@@: use NumberFormat instead of parseDouble.
-		// see http://www.ibm.com/developerworks/library/j-numberformat/
-		NumberFormat floatingPointFormat = NumberFormat.getNumberInstance();
-		NumberFormat integerFormat = NumberFormat.getIntegerInstance();
-
-		try {
-			if (m_sizeOfFractionalPart > 0) {
-				floatingPointFormat.parse(candidateText);
-			} else {
-				integerFormat.parse(candidateText);
-			}
-		} catch (ParseException e) {
-			// inserted text is not a number
+		// what would the new text look like?
+		// Note that (to my knowledge) we need to work with the
+		// PlainDocument.insertString() function. This means that extra characters
+		// must be removed from the inserted string itself, not from the end of the
+		// original.
+		StringBuilder textToBeInserted = new StringBuilder(str);
+		int candidateLength = originalText.length() + textToBeInserted.length();
+		if (candidateLength > m_fixedSize) {
+			int numberOfCharactersToRemove = candidateLength - m_fixedSize;
+			int newInsertionLength = textToBeInserted.length()
+			    - numberOfCharactersToRemove;
+			textToBeInserted.setLength(newInsertionLength);
 			m_owner.getToolkit().beep();
-			e.printStackTrace();
-			return;
 		}
-		super.insertString(offs, str, a);
+		StringBuilder candidateText = new StringBuilder(originalText);
+		candidateText.insert(offs, textToBeInserted);
+
+		if (representsValidContents(candidateText.toString())) {
+			super.insertString(offs, textToBeInserted.toString(), a);
+		} else {
+			m_owner.getToolkit().beep();
+			System.out.println("problems inserting " + str);
+		}
+	}
+
+	/**
+	 * Returns whether the contents of this FixedSizeNumberDocument should
+	 * represent an integer, as opposed to a fractional number.
+	 * 
+	 * @return whether the contents of this FixedSizeNumberDocument should
+	 *         represent an integer.
+	 */
+	private boolean contentsShouldRepresentInteger() {
+		// preconditions: none. Should work when the object exists.
+		return (m_sizeOfFractionalPart == 0);
+		// postconditions: none. Simple return of boolean.
+	}
+
+	/**
+	 * Returns whether this string would return valid text box contents, so either
+	 * the empty string (users must be able to clear the text box), or an integer
+	 * or fractional number.
+	 * 
+	 * @param candidateText
+	 *          the string to be checked for being a valid state of the text box.
+	 * 
+	 * @return whether the candidate text would be valid contents for this text
+	 *         box
+	 */
+	private boolean representsValidContents(String candidateText) {
+		// preconditions: candidateText should not be null
+		Utilities.require(candidateText != null, "FixedSizeNumberDocument."
+		    + "representsValidContents() error: candidateText should not be null.");
+		if (candidateText == "") {
+			return true; // after all, "" is a valid state for a text box.
+		} else if (contentsShouldRepresentInteger()) {
+			return Utilities.representsInteger(candidateText);
+		} else {
+			return Utilities.representsPositiveFractionalNumber(candidateText,
+			    m_sizeOfFractionalPart);
+		}
+		// postconditions: none. Simple return of boolean.
 	}
 }
