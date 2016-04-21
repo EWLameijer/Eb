@@ -102,10 +102,8 @@ public class TimeInterval implements Serializable {
 	    double scalar, TimeUnit unit) {
 		// preconditions: the scalar should be greater than 0, and the TimeUnit
 		// should have been properly initialized (so not be null).
-		Utilities.require(scalar > 0,
-		    "TimeInterval.init() error: "
-		        + "negative time intervals or intervals of length zero are not "
-		        + "permitted.");
+		Utilities.require(scalar >= 0, "TimeInterval.setTo() error: "
+		    + "negative time intervals are not permitted.");
 		Utilities.require(unit != null, "TimeInterval.init() error: "
 		    + "the unit of time has not been properly initialized yet.");
 
