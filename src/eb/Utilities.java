@@ -146,6 +146,7 @@ public class Utilities {
 
 		// 1. Build the format String
 		final DecimalFormat numberFormatter = new DecimalFormat();
+		numberFormatter.setGroupingUsed(false);
 		numberFormatter.setMaximumFractionDigits(maxPrecision);
 		numberFormatter.setRoundingMode(RoundingMode.HALF_UP);
 		return numberFormatter.format(number);
