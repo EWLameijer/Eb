@@ -1,5 +1,7 @@
 package eb;
 
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -12,6 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
 
@@ -20,7 +23,7 @@ import javax.swing.Timer;
  *
  * @author Eric-Wubbo Lameijer
  */
-public class MainWindow extends JFrame implements DeckChangeListener {
+public class MainWindow extends JFrame implements ModelChangeListener {
 
 	// Automatically generated ID for serialization (not used).
 	private static final long serialVersionUID = 5327238918756780751L;
@@ -34,6 +37,11 @@ public class MainWindow extends JFrame implements DeckChangeListener {
 	// time.
 	private final JLabel m_messageLabel;
 	private final Color DEFAULT_BACKGROUND;
+	private final String REVIEW_PANEL_ID = "REVIEWING_PANEL";
+	private final String INFORMATION_PANEL_ID = "INFORMATION_PANEL";
+
+	// Contains the REVIEWING_PANEL and the INFORMATION_PANEL, using a CardLayout.
+	private final JPanel m_modesContainer;
 
 	/**
 	 * MainWindow constructor.
@@ -42,6 +50,8 @@ public class MainWindow extends JFrame implements DeckChangeListener {
 		// preconditions: none
 		super(PROGRAM_NAME);
 		m_messageLabel = new JLabel();
+		m_modesContainer = new JPanel();
+		m_modesContainer.setLayout(new CardLayout());
 		DEFAULT_BACKGROUND = this.getContentPane().getBackground();
 	}
 
@@ -109,15 +119,15 @@ public class MainWindow extends JFrame implements DeckChangeListener {
 	}
 
 	void updateWindow() {
+		CardLayout cl = (CardLayout) (m_modesContainer.getLayout());
 		if (!mustReviewNow()) {
-			this.getContentPane().setBackground(DEFAULT_BACKGROUND);
-			m_messageLabel.setVisible(true);
+			cl.show(m_modesContainer, INFORMATION_PANEL_ID);
 			updateMessageLabel();
 		} else {
 			// now is the time for reviewing
 			// 1. Paint the frame white.
-			m_messageLabel.setVisible(false);
-			this.getContentPane().setBackground(Color.WHITE);
+			cl.show(m_modesContainer, REVIEW_PANEL_ID);
+
 			// draw a horizontal line
 		}
 	}
@@ -176,8 +186,13 @@ public class MainWindow extends JFrame implements DeckChangeListener {
 
 		// add message label (or show cards-to-be-reviewed)
 
+		JPanel informationPanel = createInformationPanel();
+		m_modesContainer.add(informationPanel, INFORMATION_PANEL_ID);
+		JPanel reviewPanel = new ReviewPanel();
+		m_modesContainer.add(reviewPanel, REVIEW_PANEL_ID);
+		add(m_modesContainer);
+
 		updateWindow();
-		add(m_messageLabel);
 
 		// now show the window itself.
 		setSize(1000, 700);
@@ -194,6 +209,13 @@ public class MainWindow extends JFrame implements DeckChangeListener {
 		Timer messageUpdater = new Timer(100, e -> updateWindow());
 		messageUpdater.start();
 		// postconditions: none
+	}
+
+	private JPanel createInformationPanel() {
+		JPanel informationPanel = new JPanel();
+		informationPanel.setLayout(new BorderLayout());
+		informationPanel.add(m_messageLabel, BorderLayout.CENTER);
+		return informationPanel;
 	}
 
 	/**

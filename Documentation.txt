@@ -1,7 +1,61 @@
+***Emergency: how to handle getting 2000 (so 2,000) from 
+
 g) make the main window show the time till review of the first card (in seconds [clock])
 	First: allow Deck to get the time till first review (if there are more than 0 cards)
 	update 1: make this dynamic YES!
 	update 2: make the time correct (so work on the formula!) OK
+	Okay. I can now show the layout.
+	
+	Subparts:
+	a) be able to show text in the two panes
+	a2) get the text from the reviewable card.
+	b) be able to hide the red pane 
+	c) make shortcut alt-H to show the red pane (history)
+	d) make bottom pane also a card layout 
+	e) 
+	
+	
+Third screen:
+-All cards answered BTN[Return to information window]
+-Still @cards left to study. Want to do another round? BTN[YES] BTN[NO]
+
+information window: 
+
+Hmm... the challenge is 
+The program has a few statuses
+1) reactive (normal mode, switches to review when it is time)
+2) reviewing
+3) informational (fixed information, but will review). Has button for review 
+4) summary: shows the summary window
+	
+	
+	
+15:20 How to show the text? Well, g to g2 may be needed.
+Well, needed super.paintComponent(g) first
+15:37
+15:58 Wel, ik kan nu redelijk centreren; alleen de breedte - hoe zie ik de breedte van de string?
+16:05 Voor de volgende stap moet ik een kaart laden. Nu hebben het front en het back panel andere behoeften. Hoe is het in pseudotaal?
+
+Wel, het review panel wordt alleen geladen als er een actuele kaart is.
+Dus het ReviewPanel moet dus van het ReviewObject de 'currentCard' trekken. Dat wil zeggen: de front en de back tekst.
+Het reviewpanel geeft de front tekst door aan het front panel, en wacht tot "Show answer" ingedrukt wordt.
+Grr... moet dus eerst weer een kleine CardLayout maken. Hoe dan ook, gedaan.
+Hmm... En nu dus een setText voor de CardPanels.
+Okee, dat werkt als ik tenminste repaint.
+
+Okee. wat moet er nu gebeuren?
+Wel, het is het handigste als er een 'reviewer' is.
+De reviewer heeft een set van kaarten [max number van X].
+Access: 
+	-getCurrentFront()
+	-getCurrentBack()
+	-wasRemembered(boolean)
+	
+Okee. Hoe moet de reviewer intern werken?
+Wel, hij wordt geinitialiseerd met een lijst van kaarten (max X, wat ergens te specificeren moet zijn)
+
+
+
 	
 	
 
