@@ -1,6 +1,6 @@
 package eb;
 
-public enum ProgramStatus {
+public enum ProgramState {
 	REACTIVE, REVIEWING, SUMMARIZING, INFORMATIONAL;
 
 }

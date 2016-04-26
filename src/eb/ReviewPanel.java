@@ -42,7 +42,7 @@ public class ReviewPanel extends JPanel {
 		frontOfCardConstraints.fill = GridBagConstraints.BOTH;
 		m_frontOfCardPanel = new CardPanel();
 		m_frontOfCardPanel.setBackground(Color.PINK);
-		m_frontOfCardPanel.setText(Reviewer.getCurrentFront());
+
 		add(m_frontOfCardPanel, frontOfCardConstraints);
 		GridBagConstraints backOfCardConstraints = new GridBagConstraints();
 		backOfCardConstraints.gridx = 0;
@@ -100,9 +100,11 @@ public class ReviewPanel extends JPanel {
 		CardLayout cardLayout = (CardLayout) (m_buttonPanel.getLayout());
 		cardLayout.show(m_buttonPanel, HIDDEN_ANSWER);
 		Reviewer.wasRemembered(wasRemembered);
-		m_frontOfCardPanel.setText(Reviewer.getCurrentFront());
-		m_backOfCardPanel.setText("");
-		repaint();
+		if (Reviewer.hasNextCard()) {
+			m_frontOfCardPanel.setText(Reviewer.getCurrentFront());
+			m_backOfCardPanel.setText("");
+			repaint();
+		}
 	}
 
 	private void showAnswer() {
@@ -115,6 +117,7 @@ public class ReviewPanel extends JPanel {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g;
+		m_frontOfCardPanel.setText(Reviewer.getCurrentFront());
 		g2.drawString("Waterfall", 100, 200);
 		// m_frontOfCardPanel.setVisible(true);
 	}

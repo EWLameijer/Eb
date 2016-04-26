@@ -226,4 +226,14 @@ public class LogicalDeck implements Serializable {
 		TimeInterval initialInterval = m_studyOptions.getInitialInterval();
 		return initialInterval.asDuration();
 	}
+
+	public List<Card> getReviewableCardList() {
+		List<Card> reviewableCards = new ArrayList<>();
+		for (Card card : m_cards) {
+			if (card.getTimeUntilNextReview().isNegative()) {
+				reviewableCards.add(card);
+			}
+		}
+		return reviewableCards;
+	}
 }

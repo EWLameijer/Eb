@@ -52,4 +52,8 @@ public class Review {
 		// postconditions: none. Simple return of Instant
 	}
 
+	public double getThinkingTime() {
+		return m_thinkingTime;
+	}
+
 }

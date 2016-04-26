@@ -23,7 +23,8 @@ import javax.swing.Timer;
  *
  * @author Eric-Wubbo Lameijer
  */
-public class MainWindow extends JFrame implements ModelChangeListener {
+public class MainWindow extends JFrame
+    implements DeckChangeListener, ProgramStateChangeListener {
 
 	// Automatically generated ID for serialization (not used).
 	private static final long serialVersionUID = 5327238918756780751L;
@@ -39,6 +40,7 @@ public class MainWindow extends JFrame implements ModelChangeListener {
 	private final Color DEFAULT_BACKGROUND;
 	private final String REVIEW_PANEL_ID = "REVIEWING_PANEL";
 	private final String INFORMATION_PANEL_ID = "INFORMATION_PANEL";
+	private final String SUMMARIZING_PANEL_ID = "SUMMARIZING_PANEL";
 
 	// Contains the REVIEWING_PANEL and the INFORMATION_PANEL, using a CardLayout.
 	private final JPanel m_modesContainer;
@@ -119,16 +121,11 @@ public class MainWindow extends JFrame implements ModelChangeListener {
 	}
 
 	void updateWindow() {
-		CardLayout cl = (CardLayout) (m_modesContainer.getLayout());
-		if (!mustReviewNow()) {
-			cl.show(m_modesContainer, INFORMATION_PANEL_ID);
-			updateMessageLabel();
-		} else {
-			// now is the time for reviewing
-			// 1. Paint the frame white.
-			cl.show(m_modesContainer, REVIEW_PANEL_ID);
-
-			// draw a horizontal line
+		ProgramState programState = ProgramController.getProgramState();
+		if (programState == ProgramState.REACTIVE) {
+			showReactivePanel();
+		} else if (programState == ProgramState.INFORMATIONAL) {
+			showInformationPanel();
 		}
 	}
 
@@ -190,6 +187,8 @@ public class MainWindow extends JFrame implements ModelChangeListener {
 		m_modesContainer.add(informationPanel, INFORMATION_PANEL_ID);
 		JPanel reviewPanel = new ReviewPanel();
 		m_modesContainer.add(reviewPanel, REVIEW_PANEL_ID);
+		JPanel summarizingPanel = new SummarizingPanel();
+		m_modesContainer.add(summarizingPanel, SUMMARIZING_PANEL_ID);
 		add(m_modesContainer);
 
 		updateWindow();
@@ -206,6 +205,7 @@ public class MainWindow extends JFrame implements ModelChangeListener {
 		});
 		setVisible(true);
 		Deck.addDeckChangeListener(this);
+		ProgramController.addProgramStateChangeListener(this);
 		Timer messageUpdater = new Timer(100, e -> updateWindow());
 		messageUpdater.start();
 		// postconditions: none
@@ -235,6 +235,58 @@ public class MainWindow extends JFrame implements ModelChangeListener {
 		Deck.save();
 		System.exit(0);
 		// preconditions: none
+	}
+
+	private void switchToPanel(String panelId) {
+		CardLayout cardLayout = (CardLayout) m_modesContainer.getLayout();
+		cardLayout.show(m_modesContainer, panelId);
+	}
+
+	private void showInformationPanel() {
+		switchToPanel(INFORMATION_PANEL_ID);
+		updateMessageLabel();
+	}
+
+	private void showReviewingPanel() {
+		Reviewer.activate();
+		switchToPanel(REVIEW_PANEL_ID);
+	}
+
+	/**
+	 * Shows the 'reactive' panel, which means the informational panel if no
+	 * reviews need to be conducted, and the reviewing panel when cards need to be
+	 * reviewed.
+	 */
+	private void showReactivePanel() {
+		if (mustReviewNow()) {
+			ProgramController.setProgramState(ProgramState.REVIEWING);
+			showReviewingPanel();
+		} else {
+			showInformationPanel();
+		}
+	}
+
+	@Override
+	public void respondToProgramStateChange() {
+		ProgramState newProgramState = ProgramController.getProgramState();
+		switch (newProgramState) {
+		case INFORMATIONAL:
+			showInformationPanel();
+			break;
+		case REACTIVE:
+			showReactivePanel();
+			break;
+		case REVIEWING:
+			showReviewingPanel();
+			break;
+		case SUMMARIZING:
+			showSummarizingPanel();
+			break;
+		}
+	}
+
+	private void showSummarizingPanel() {
+		switchToPanel(SUMMARIZING_PANEL_ID);
 	}
 
 }

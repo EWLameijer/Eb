@@ -145,7 +145,7 @@ public class FixedSizeNumberDocument extends PlainDocument {
 		if (candidateText == "") {
 			return true; // after all, "" is a valid state for a text box.
 		} else if (contentsShouldRepresentInteger()) {
-			return Utilities.representsInteger(candidateText);
+			return Utilities.representsInteger(candidateText, m_fixedSize);
 		} else {
 			return Utilities.representsPositiveFractionalNumber(candidateText,
 			    m_sizeOfFractionalPart);

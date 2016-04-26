@@ -7,6 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.time.Duration;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
@@ -42,7 +43,7 @@ public class Deck {
 	private static final String DEFAULT_DECKNAME = "default";
 
 	// The objects which should be notified of any change in the deck
-	private static Set<ModelChangeListener> m_deckChangeListeners = new HashSet<>();
+	private static Set<DeckChangeListener> m_deckChangeListeners = new HashSet<>();
 
 	/**
 	 * Private constructor: should not be called as this is more of a static
@@ -232,7 +233,7 @@ public class Deck {
 	 */
 	private static void notifyOfDeckChange() {
 		// preconditions: none (I assume the deck has really changed)
-		for (final ModelChangeListener deckChangeListener : m_deckChangeListeners) {
+		for (final DeckChangeListener deckChangeListener : m_deckChangeListeners) {
 			deckChangeListener.respondToChangedDeck();
 		}
 		// postconditions: none
@@ -283,7 +284,7 @@ public class Deck {
 	 *          notified when the deck changes.
 	 */
 	public static void addDeckChangeListener(
-	    ModelChangeListener deckChangeListener) {
+	    DeckChangeListener deckChangeListener) {
 		// preconditions: deckChangeListener should not be null. It should also
 		// not already be present in the set; that would be bad programming.
 		Utilities.require(deckChangeListener != null,
@@ -328,6 +329,11 @@ public class Deck {
 	public static Duration getInitialInterval() {
 		ensureDeckExists();
 		return m_contents.getInitialInterval();
+	}
+
+	public static List<Card> getReviewableCardList() {
+		ensureDeckExists();
+		return m_contents.getReviewableCardList();
 	}
 
 	/**

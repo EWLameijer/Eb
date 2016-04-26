@@ -9,11 +9,11 @@ package eb;
  *
  */
 @FunctionalInterface
-public interface ModelChangeListener {
+public interface DeckChangeListener {
 
 	/**
 	 * Executes the actions necessary to update the object's status or display
 	 * after the deck has been changed.
 	 */
-	abstract void respondToChangedModel();
+	abstract void respondToChangedDeck();
 }

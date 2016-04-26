@@ -26,7 +26,7 @@ import javax.swing.KeyStroke;
  *
  */
 public class StudyOptionsWindow extends JFrame
-    implements DataFieldChangeListener {
+    implements DataFieldChangeListener, TextFieldChangeListener {
 
 	// Automatically generated serialVersionUID.
 	private static final long serialVersionUID = -907266672997684012L;
@@ -48,6 +48,8 @@ public class StudyOptionsWindow extends JFrame
 	// Input element that allows users to view and set the interval between the
 	// creation of the card and the first time it is put up for review.
 	private final TimeInputElement m_initialIntervalBox;
+
+	private final LabelledTextField m_sizeOfReview;
 
 	/**
 	 * Updates the title of the frame in response to changes to indicate to the
@@ -78,6 +80,9 @@ public class StudyOptionsWindow extends JFrame
 		StudyOptions studyOptions = Deck.getStudyOptions();
 		m_initialIntervalBox = TimeInputElement.createInstance(
 		    "Initial review after", studyOptions.getInitialInterval());
+		m_sizeOfReview = new LabelledTextField(
+		    "number of cards per " + "reviewing session",
+		    String.valueOf(studyOptions.getReviewSessionSize()));
 		m_cancelButton = new JButton("Discard unsaved changes and close");
 		m_loadEbDefaultsButton = new JButton("Load Eb's default values");
 		m_loadCurrentDeckSettingsButton = new JButton(
@@ -96,15 +101,17 @@ public class StudyOptionsWindow extends JFrame
 		// postconditions: none
 	}
 
+	private void loadSettings(StudyOptions settings) {
+		m_initialIntervalBox.setInterval(settings.getInitialInterval());
+		m_sizeOfReview.setContents(settings.getReviewSessionSize());
+	}
+
 	/**
 	 * Loads Eb's default values.
 	 */
 	private void loadEbDefaults() {
 		// preconditions: none
-		final StudyOptions defaultOptions = StudyOptions.getDefault();
-		final TimeInterval defaultInitialInterval = defaultOptions
-		    .getInitialInterval();
-		m_initialIntervalBox.setInterval(defaultInitialInterval);
+		loadSettings(StudyOptions.getDefault());
 		// postconditions: none (should have worked)
 	}
 
@@ -113,8 +120,7 @@ public class StudyOptionsWindow extends JFrame
 	 */
 	private void loadCurrentDeckSettings() {
 		// preconditions: none
-		StudyOptions studyOptions = Deck.getStudyOptions();
-		m_initialIntervalBox.setInterval(studyOptions.getInitialInterval());
+		loadSettings(Deck.getStudyOptions());
 		// postconditions: none
 	}
 
@@ -126,7 +132,8 @@ public class StudyOptionsWindow extends JFrame
 	 *         window's GUI.
 	 */
 	private StudyOptions gatherUIDataIntoStudyOptionsObject() {
-		return new StudyOptions(m_initialIntervalBox.getInterval());
+		return new StudyOptions(m_initialIntervalBox.getInterval(),
+		    Utilities.stringToInt(m_sizeOfReview.getContents()));
 	}
 
 	/**
@@ -163,6 +170,7 @@ public class StudyOptionsWindow extends JFrame
 		m_loadEbDefaultsButton.addActionListener(e -> loadEbDefaults());
 		m_setToTheseValuesButton.addActionListener(e -> saveSettingsToDeck());
 		m_initialIntervalBox.addDataFieldChangeListener(this);
+		m_sizeOfReview.addListener(this, TextFieldChangeListener.ID);
 
 		// Then create two panels: one for setting the correct values for the study
 		// options, and one to contain the reset/confirm/reload etc. buttons.
@@ -177,6 +185,7 @@ public class StudyOptionsWindow extends JFrame
 		// now fill the panes
 		final Container settingsBox = Box.createVerticalBox();
 		settingsBox.add(m_initialIntervalBox);
+		settingsBox.add(m_sizeOfReview);
 		settingsPane.add(settingsBox, BorderLayout.NORTH);
 
 		buttonsPane.add(m_cancelButton);
@@ -205,5 +214,13 @@ public class StudyOptionsWindow extends JFrame
 
 	public void respondToChangedDataField() {
 		updateTitle();
+	}
+
+	@Override
+	public void respondToEventType(String eventId) {
+		if (eventId.equals(TextFieldChangeListener.ID)) {
+			updateTitle();
+		}
+
 	}
 }

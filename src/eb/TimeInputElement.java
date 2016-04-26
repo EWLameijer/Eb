@@ -10,8 +10,6 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
 import org.checkerframework.checker.initialization.qual.UnknownInitialization;
 
@@ -61,30 +59,16 @@ public class TimeInputElement extends JPanel {
 		m_scalarField = new JTextField();
 
 		m_scalarField.setDocument(new FixedSizeNumberDocument(m_scalarField, 5, 2));
-		m_scalarField.getDocument().addDocumentListener(new DocumentListener() {
+		m_scalarField.getDocument().addDocumentListener(
+		    new DelegatingDocumentListener(() -> notifyDataFieldChangeListeners()));
 
-			@Override
-			public void changedUpdate(DocumentEvent arg0) {
-				notifyDataFieldChangeListeners();
-			}
-
-			@Override
-			public void insertUpdate(DocumentEvent arg0) {
-				notifyDataFieldChangeListeners();
-
-			}
-
-			@Override
-			public void removeUpdate(DocumentEvent arg0) {
-				notifyDataFieldChangeListeners();
-			}
-
-		});
 		m_scalarField.setPreferredSize(new Dimension(40, 20));
 		m_unitComboBox = new JComboBox<>();
 		m_unitComboBox
 		    .setModel(new DefaultComboBoxModel<String>(TimeUnit.getUnitNames()));
-		m_unitComboBox.addActionListener(e -> notifyDataFieldChangeListeners());
+		m_unitComboBox.addActionListener(e ->
+
+		notifyDataFieldChangeListeners());
 		setInterval(timeInterval);
 		// postconditions: none. Ordinary constructor.
 	}

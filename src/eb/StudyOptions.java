@@ -2,6 +2,7 @@ package eb;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * The StudyOptions class can store the learning settings that we want to use
@@ -23,6 +24,12 @@ public class StudyOptions implements Serializable {
 	private static final TimeInterval DEFAULT_INITIAL_INTERVAL = new TimeInterval(
 	    10.0, TimeUnit.MINUTE);
 
+	// the default number of cards to be reviewed in a single reviewing session
+	private static final int DEFAULT_REVIEW_SESSION_SIZE = 20;
+
+	// the number of cards to be reviewed in a single reviewing session (like 20)
+	private int m_reviewSessionSize;
+
 	/**
 	 * StudyOptions constructor; sets all elements to proper initial values.
 	 *
@@ -30,10 +37,12 @@ public class StudyOptions implements Serializable {
 	 *          the interval that Eb waits after creation of a card before showing
 	 *          it to the user.
 	 */
-	StudyOptions(TimeInterval initialInterval) {
+	StudyOptions(TimeInterval initialInterval,
+	    Optional<Integer> reviewSessionSize) {
 		// preconditions: none. Is private constructor, should be fed valid values
 		// internally
 		m_initialInterval = new TimeInterval(initialInterval);
+		m_reviewSessionSize = reviewSessionSize.orElse(DEFAULT_REVIEW_SESSION_SIZE);
 		// postconditions: none. Should work.
 	}
 
@@ -60,7 +69,8 @@ public class StudyOptions implements Serializable {
 	 */
 	public static StudyOptions getDefault() {
 		// preconditions: none
-		return new StudyOptions(DEFAULT_INITIAL_INTERVAL);
+		return new StudyOptions(DEFAULT_INITIAL_INTERVAL,
+		    Optional.of(DEFAULT_REVIEW_SESSION_SIZE));
 		// postconditions: none. Should have worked.
 	}
 
@@ -84,11 +94,16 @@ public class StudyOptions implements Serializable {
 			return false;
 		} else {
 			StudyOptions otherOptions = (StudyOptions) otherObject;
-			return m_initialInterval.equals(otherOptions.m_initialInterval);
+			return m_initialInterval.equals(otherOptions.m_initialInterval)
+			    && m_reviewSessionSize == otherOptions.m_reviewSessionSize;
 		}
 	}
 
 	public int hashCode() {
-		return Objects.hash(m_initialInterval);
+		return Objects.hash(m_initialInterval, m_reviewSessionSize);
+	}
+
+	public int getReviewSessionSize() {
+		return m_reviewSessionSize;
 	}
 }

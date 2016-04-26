@@ -29,7 +29,6 @@ public class CardPanel extends JPanel {
 		g2.setFont(font);
 		int panelHeight = getHeight();
 		int panelWidth = getWidth();
-		System.out.println("PanelWidth: " + panelWidth);
 		FontMetrics fontMetrics = g.getFontMetrics(font);
 		int stringWidth = fontMetrics.stringWidth(m_contents);
 		int stringHeight = fontMetrics.getHeight();

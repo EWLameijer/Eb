@@ -196,6 +196,25 @@ public class Utilities {
 	}
 
 	/**
+	 * Whether the given string is fully filled with a valid integer
+	 * (...-2,-1,0,1,2,...). Note that this method does not accept leading or
+	 * trailing whitespace, nor a '+' sign.
+	 * 
+	 * @param string
+	 *          the string to be tested
+	 * @return whether the string is a string representation of an integer.
+	 */
+	public static boolean representsInteger(String string, int maxSize) {
+		// preconditions: string should not be null or empty.
+		if (string.length() > maxSize) {
+			return false;
+		} else {
+			return representsInteger(string);
+		}
+		// postconditions: none: simple return of boolean.
+	}
+
+	/**
 	 * @@@CPPRC Whether the given string is fully filled with a valid fractional
 	 *          number of a given maximum precision (like -2.1, or 5.17 or 10, or
 	 *          .12). Note that this method does not accept leading or trailing
@@ -272,6 +291,36 @@ public class Utilities {
 			return Optional.empty();
 		} else {
 			return Optional.of(number.doubleValue());
+		}
+
+		// postconditions: none. All possible cases should have been handled by the
+		// Optional.
+	}
+
+	/**
+	 * Parses a string to a double. Returns Optional.empty() if the number cannot
+	 * be parsed.
+	 * 
+	 * @param string
+	 *          the string to be parsed to a double.
+	 * 
+	 * @return an Optional<Double> that contains a double value, if the string
+	 *         could be parsed to one.
+	 */
+	public static Optional<Integer> stringToInt(String string) {
+		// preconditions
+		require(string != null, "Utilities.stringToInt() error: "
+		    + "the string to analyze should not be null.");
+
+		// Get a numberFormat object. Note that the number it returns will be Long
+		// if possible, otherwise a Double.
+		NumberFormat numberFormat = NumberFormat.getNumberInstance();
+		ParsePosition parsePosition = new ParsePosition(0);
+		Number number = numberFormat.parse(string, parsePosition);
+		if (parsePosition.getIndex() == 0) {
+			return Optional.empty();
+		} else {
+			return Optional.of(number.intValue());
 		}
 
 		// postconditions: none. All possible cases should have been handled by the

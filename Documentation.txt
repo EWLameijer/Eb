@@ -1,5 +1,28 @@
 ***Emergency: how to handle getting 2000 (so 2,000) from 
 
+Project: enable reviews.
+What still needs to happen:
+0) Create a parameter in StudyOptions that sets the review size.
+Okay. Parameter set. Now what needs to happen?
+1) do not allow negative values or values with width greater than 3 to be entered. Or fractional values. OK :)
+2) really also make the value remembered!
+	Weird kind of error: Window is displayed, StudyOptionsWindow.display
+	
+Okay. New problem. 
+Also solved. Now.
+Now: make a good summary screen
+
+Summary looks okay. Just needing two buttons; one to go back to the information screen...
+Well, we can get back to the information screen. Problem is that the label doesn't update...
+Solved.
+But problem if something is not 
+OK. This seems quite okay. 
+
+
+1) Let review panel initialize itself with the proper cards.
+2) 
+
+
 g) make the main window show the time till review of the first card (in seconds [clock])
 	First: allow Deck to get the time till first review (if there are more than 0 cards)
 	update 1: make this dynamic YES!
