@@ -2,7 +2,6 @@ package eb;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -37,7 +36,7 @@ public class MainWindow extends JFrame
 	// the regular "reviewing" window, which should be active most of the
 	// time.
 	private final JLabel m_messageLabel;
-	private final Color DEFAULT_BACKGROUND;
+	// private final Color DEFAULT_BACKGROUND;
 	private final String REVIEW_PANEL_ID = "REVIEWING_PANEL";
 	private final String INFORMATION_PANEL_ID = "INFORMATION_PANEL";
 	private final String SUMMARIZING_PANEL_ID = "SUMMARIZING_PANEL";
@@ -54,7 +53,7 @@ public class MainWindow extends JFrame
 		m_messageLabel = new JLabel();
 		m_modesContainer = new JPanel();
 		m_modesContainer.setLayout(new CardLayout());
-		DEFAULT_BACKGROUND = this.getContentPane().getBackground();
+		// DEFAULT_BACKGROUND = this.getContentPane().getBackground();
 	}
 
 	/**
@@ -288,5 +287,4 @@ public class MainWindow extends JFrame
 	private void showSummarizingPanel() {
 		switchToPanel(SUMMARIZING_PANEL_ID);
 	}
-
 }

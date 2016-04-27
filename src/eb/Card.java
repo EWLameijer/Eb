@@ -3,6 +3,7 @@ package eb;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,9 +97,34 @@ public class Card implements Serializable {
 	 * @return
 	 */
 	public Duration getTimeUntilNextReview() {
+		// case 1: the card has never been reviewed yet.
+		if (!hasBeenReviewed()) {
+			return Duration.between(Instant.now(),
+			    Deck.getInitialInterval().addTo(m_creationInstant));
+		} else {
+			Review lastReview = getLastReview();
+			Instant lastReviewInstant = lastReview.getInstant();
+			Duration waitTime;
+			if (lastReview.wasSuccess()) {
+				waitTime = Deck.getStudyOptions().getRememberedCardInterval()
+				    .asDuration();
+			} else {
+				waitTime = Deck.getStudyOptions().getForgottenCardInterval()
+				    .asDuration();
+			}
+			Temporal officialReview = waitTime.addTo(lastReviewInstant);
+			return Duration.between(Instant.now(), officialReview);
+		}
+	}
 
-		return Duration.between(Instant.now(),
-		    Deck.getInitialInterval().addTo(m_creationInstant));
+	private Review getLastReview() {
+		// preconditions: a review must have taken place, one should not call this
+		// on a freshly created card.
+		Utilities.require(m_reviews.size() > 0, "History.getLastReviewInstant() "
+		    + "error: no review has taken place yet. Please only call this method "
+		    + "after checking the existence of a review with 'hasBeenReviewed'.");
+		int indexOfLastReview = m_reviews.size() - 1;
+		return m_reviews.get(indexOfLastReview);
 	}
 
 	/**
@@ -121,17 +147,16 @@ public class Card implements Serializable {
 	 * @return the instant when the last review took place.
 	 */
 	Instant getLastReviewInstant() {
-		// preconditions: a review must have taken place, one should not call this
-		// on a freshly created card.
-		Utilities.require(m_reviews.size() > 0, "History.getLastReviewInstant() "
-		    + "error: no review has taken place yet. Please only call this method "
-		    + "after checking the existence of a review with 'hasBeenReviewed'.");
-
-		int indexOfLastReview = m_reviews.size() - 1;
-		return m_reviews.get(indexOfLastReview).getInstant();
+		return getLastReview().getInstant();
 
 		// postconditions: none. Will give a proper instant if the preconditions
 		// have been met.
 	}
 
+	public void addReview(Review review) {
+		Utilities.require(review != null,
+		    "Card.addReview error: " + "review cannot be null.");
+		m_reviews.add(review);
+
+	}
 }

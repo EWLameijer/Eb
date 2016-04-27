@@ -355,4 +355,10 @@ public class Utilities {
 		return output.toString();
 	}
 
+	public static double durationToSeconds(Duration duration) {
+		double nanoPart = duration.getNano() / 1_000_000_000.0;
+		double secondsPart = duration.getSeconds();
+		return secondsPart + nanoPart;
+	}
+
 }

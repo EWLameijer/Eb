@@ -34,7 +34,7 @@ public class SummarizingPanel extends JPanel {
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		List<ReviewResult> results = Reviewer.getReviewResults();
+		List<Review> results = Reviewer.getReviewResults();
 		StringBuilder text = new StringBuilder();
 		text.append("<html>");
 		text.append("<b>Summary</b><br><br>");
@@ -48,16 +48,16 @@ public class SummarizingPanel extends JPanel {
 		text.append("<br><br>");
 		text.append("time needed for answering<br>");
 		OptionalDouble averageTime = results.stream()
-		    .mapToDouble(r -> r.getDuration()).average();
+		    .mapToDouble(r -> r.getThinkingTime()).average();
 		text.append(
 		    "average time: " + optionalDoubleToString(averageTime) + "<br>");
 		OptionalDouble averageCorrectTime = results.stream()
-		    .filter(r -> r.wasSuccess()).mapToDouble(r -> r.getDuration())
+		    .filter(r -> r.wasSuccess()).mapToDouble(r -> r.getThinkingTime())
 		    .average();
 		text.append("average time per correct card: "
 		    + optionalDoubleToString(averageCorrectTime) + "<br>");
 		OptionalDouble averageIncorrectTime = results.stream()
-		    .filter(r -> !r.wasSuccess()).mapToDouble(r -> r.getDuration())
+		    .filter(r -> !r.wasSuccess()).mapToDouble(r -> r.getThinkingTime())
 		    .average();
 		text.append("average time per incorrect card: "
 		    + optionalDoubleToString(averageIncorrectTime) + "<br>");

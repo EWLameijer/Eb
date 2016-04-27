@@ -24,6 +24,13 @@ public class StudyOptions implements Serializable {
 	private static final TimeInterval DEFAULT_INITIAL_INTERVAL = new TimeInterval(
 	    10.0, TimeUnit.MINUTE);
 
+	private final TimeInterval m_rememberedCardInterval;
+	private static final TimeInterval DEFAULT_REMEMBERED_INTERVAL = new TimeInterval(
+	    1.0, TimeUnit.DAY);
+	private final TimeInterval m_forgottenCardInterval;
+	private static final TimeInterval DEFAULT_FORGOTTEN_INTERVAL = new TimeInterval(
+	    1.0, TimeUnit.HOUR);
+
 	// the default number of cards to be reviewed in a single reviewing session
 	private static final int DEFAULT_REVIEW_SESSION_SIZE = 20;
 
@@ -38,11 +45,14 @@ public class StudyOptions implements Serializable {
 	 *          it to the user.
 	 */
 	StudyOptions(TimeInterval initialInterval,
-	    Optional<Integer> reviewSessionSize) {
+	    Optional<Integer> reviewSessionSize, TimeInterval rememberedInterval,
+	    TimeInterval forgottenInterval) {
 		// preconditions: none. Is private constructor, should be fed valid values
 		// internally
 		m_initialInterval = new TimeInterval(initialInterval);
 		m_reviewSessionSize = reviewSessionSize.orElse(DEFAULT_REVIEW_SESSION_SIZE);
+		m_rememberedCardInterval = new TimeInterval(rememberedInterval);
+		m_forgottenCardInterval = new TimeInterval(forgottenInterval);
 		// postconditions: none. Should work.
 	}
 
@@ -70,7 +80,8 @@ public class StudyOptions implements Serializable {
 	public static StudyOptions getDefault() {
 		// preconditions: none
 		return new StudyOptions(DEFAULT_INITIAL_INTERVAL,
-		    Optional.of(DEFAULT_REVIEW_SESSION_SIZE));
+		    Optional.of(DEFAULT_REVIEW_SESSION_SIZE), DEFAULT_REMEMBERED_INTERVAL,
+		    DEFAULT_FORGOTTEN_INTERVAL);
 		// postconditions: none. Should have worked.
 	}
 
@@ -95,15 +106,28 @@ public class StudyOptions implements Serializable {
 		} else {
 			StudyOptions otherOptions = (StudyOptions) otherObject;
 			return m_initialInterval.equals(otherOptions.m_initialInterval)
-			    && m_reviewSessionSize == otherOptions.m_reviewSessionSize;
+			    && m_reviewSessionSize == otherOptions.m_reviewSessionSize
+			    && m_rememberedCardInterval
+			        .equals(otherOptions.m_rememberedCardInterval)
+			    && m_forgottenCardInterval
+			        .equals(otherOptions.m_forgottenCardInterval);
 		}
 	}
 
 	public int hashCode() {
-		return Objects.hash(m_initialInterval, m_reviewSessionSize);
+		return Objects.hash(m_initialInterval, m_reviewSessionSize,
+		    m_rememberedCardInterval, m_forgottenCardInterval);
 	}
 
 	public int getReviewSessionSize() {
 		return m_reviewSessionSize;
+	}
+
+	public TimeInterval getRememberedCardInterval() {
+		return m_rememberedCardInterval;
+	}
+
+	public TimeInterval getForgottenCardInterval() {
+		return m_forgottenCardInterval;
 	}
 }

@@ -47,14 +47,18 @@ public class Reviewer {
 	private static FirstTimer c_stopTimer = new FirstTimer();
 	private static List<Review> c_reviewResults = new ArrayList<>();
 
+	private static Card getCurrentCard() {
+		return c_cardCollection.get(c_counter - 1);
+	}
+
 	public static String getCurrentFront() {
 		c_startTimer.press();
-		return c_cardCollection.get(c_counter - 1).getFront();
+		return getCurrentCard().getFront();
 	}
 
 	public static String getCurrentBack() {
 		c_stopTimer.press();
-		return c_cardCollection.get(c_counter - 1).getBack();
+		return getCurrentCard().getBack();
 	}
 
 	public static void wasRemembered(boolean remembered) {
@@ -64,7 +68,9 @@ public class Reviewer {
 		double duration_in_s = duration.getNano() / 1000_000_000.0
 		    + duration.getSeconds();
 		System.out.println(c_counter + " " + duration_in_s);
-		c_reviewResults.add(new Review(duration, remembered));
+		Review review = new Review(duration, remembered);
+		c_reviewResults.add(review);
+		getCurrentCard().addReview(review);
 		c_startTimer.reset();
 		c_stopTimer.reset();
 		if (c_counter <= 0) {

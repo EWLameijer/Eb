@@ -53,7 +53,7 @@ public class Review {
 	}
 
 	public double getThinkingTime() {
-		return m_thinkingTime;
+		return Utilities.durationToSeconds(m_thinkingTime);
 	}
 
 }

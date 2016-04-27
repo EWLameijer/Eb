@@ -51,6 +51,10 @@ public class StudyOptionsWindow extends JFrame
 
 	private final LabelledTextField m_sizeOfReview;
 
+	private final TimeInputElement m_timeToWaitAfterCorrectReview;
+
+	private final TimeInputElement m_timeToWaitAfterIncorrectReview;
+
 	/**
 	 * Updates the title of the frame in response to changes to indicate to the
 	 * user whether there are unsaved changes.
@@ -83,6 +87,12 @@ public class StudyOptionsWindow extends JFrame
 		m_sizeOfReview = new LabelledTextField(
 		    "number of cards per " + "reviewing session",
 		    String.valueOf(studyOptions.getReviewSessionSize()));
+		m_timeToWaitAfterCorrectReview = TimeInputElement.createInstance(
+		    "Time to wait for re-reviewing remembered card:",
+		    studyOptions.getRememberedCardInterval());
+		m_timeToWaitAfterIncorrectReview = TimeInputElement.createInstance(
+		    "Time to wait for re-reviewing forgotten card:",
+		    studyOptions.getForgottenCardInterval());
 		m_cancelButton = new JButton("Discard unsaved changes and close");
 		m_loadEbDefaultsButton = new JButton("Load Eb's default values");
 		m_loadCurrentDeckSettingsButton = new JButton(
@@ -104,6 +114,10 @@ public class StudyOptionsWindow extends JFrame
 	private void loadSettings(StudyOptions settings) {
 		m_initialIntervalBox.setInterval(settings.getInitialInterval());
 		m_sizeOfReview.setContents(settings.getReviewSessionSize());
+		m_timeToWaitAfterCorrectReview
+		    .setInterval(settings.getRememberedCardInterval());
+		m_timeToWaitAfterIncorrectReview
+		    .setInterval(settings.getForgottenCardInterval());
 	}
 
 	/**
@@ -133,7 +147,9 @@ public class StudyOptionsWindow extends JFrame
 	 */
 	private StudyOptions gatherUIDataIntoStudyOptionsObject() {
 		return new StudyOptions(m_initialIntervalBox.getInterval(),
-		    Utilities.stringToInt(m_sizeOfReview.getContents()));
+		    Utilities.stringToInt(m_sizeOfReview.getContents()),
+		    m_timeToWaitAfterCorrectReview.getInterval(),
+		    m_timeToWaitAfterIncorrectReview.getInterval());
 	}
 
 	/**
@@ -171,6 +187,8 @@ public class StudyOptionsWindow extends JFrame
 		m_setToTheseValuesButton.addActionListener(e -> saveSettingsToDeck());
 		m_initialIntervalBox.addDataFieldChangeListener(this);
 		m_sizeOfReview.addListener(this, TextFieldChangeListener.ID);
+		m_timeToWaitAfterCorrectReview.addDataFieldChangeListener(this);
+		m_timeToWaitAfterIncorrectReview.addDataFieldChangeListener(this);
 
 		// Then create two panels: one for setting the correct values for the study
 		// options, and one to contain the reset/confirm/reload etc. buttons.
@@ -186,6 +204,8 @@ public class StudyOptionsWindow extends JFrame
 		final Container settingsBox = Box.createVerticalBox();
 		settingsBox.add(m_initialIntervalBox);
 		settingsBox.add(m_sizeOfReview);
+		settingsBox.add(m_timeToWaitAfterCorrectReview);
+		settingsBox.add(m_timeToWaitAfterIncorrectReview);
 		settingsPane.add(settingsBox, BorderLayout.NORTH);
 
 		buttonsPane.add(m_cancelButton);
