@@ -53,6 +53,8 @@ public class StudyOptionsWindow extends JFrame
 
 	private final TimeInputElement m_timeToWaitAfterCorrectReview;
 
+	private final LabelledTextField m_lengtheningFactor;
+
 	private final TimeInputElement m_timeToWaitAfterIncorrectReview;
 
 	/**
@@ -86,10 +88,13 @@ public class StudyOptionsWindow extends JFrame
 		    "Initial review after", studyOptions.getInitialInterval());
 		m_sizeOfReview = new LabelledTextField(
 		    "number of cards per " + "reviewing session",
-		    String.valueOf(studyOptions.getReviewSessionSize()));
+		    String.valueOf(studyOptions.getReviewSessionSize()), 3, 0);
 		m_timeToWaitAfterCorrectReview = TimeInputElement.createInstance(
 		    "Time to wait for re-reviewing remembered card:",
 		    studyOptions.getRememberedCardInterval());
+		m_lengtheningFactor = new LabelledTextField(
+		    "after each successful review, increase review time by a factor",
+		    String.valueOf(studyOptions.getLengtheningFactor()), 5, 2);
 		m_timeToWaitAfterIncorrectReview = TimeInputElement.createInstance(
 		    "Time to wait for re-reviewing forgotten card:",
 		    studyOptions.getForgottenCardInterval());
@@ -116,6 +121,7 @@ public class StudyOptionsWindow extends JFrame
 		m_sizeOfReview.setContents(settings.getReviewSessionSize());
 		m_timeToWaitAfterCorrectReview
 		    .setInterval(settings.getRememberedCardInterval());
+		m_lengtheningFactor.setContents(settings.getLengtheningFactor());
 		m_timeToWaitAfterIncorrectReview
 		    .setInterval(settings.getForgottenCardInterval());
 	}
@@ -149,7 +155,8 @@ public class StudyOptionsWindow extends JFrame
 		return new StudyOptions(m_initialIntervalBox.getInterval(),
 		    Utilities.stringToInt(m_sizeOfReview.getContents()),
 		    m_timeToWaitAfterCorrectReview.getInterval(),
-		    m_timeToWaitAfterIncorrectReview.getInterval());
+		    m_timeToWaitAfterIncorrectReview.getInterval(),
+		    Utilities.stringToDouble(m_lengtheningFactor.getContents()));
 	}
 
 	/**
@@ -188,6 +195,7 @@ public class StudyOptionsWindow extends JFrame
 		m_initialIntervalBox.addDataFieldChangeListener(this);
 		m_sizeOfReview.addListener(this, TextFieldChangeListener.ID);
 		m_timeToWaitAfterCorrectReview.addDataFieldChangeListener(this);
+		m_lengtheningFactor.addListener(this, TextFieldChangeListener.ID);
 		m_timeToWaitAfterIncorrectReview.addDataFieldChangeListener(this);
 
 		// Then create two panels: one for setting the correct values for the study
@@ -205,6 +213,7 @@ public class StudyOptionsWindow extends JFrame
 		settingsBox.add(m_initialIntervalBox);
 		settingsBox.add(m_sizeOfReview);
 		settingsBox.add(m_timeToWaitAfterCorrectReview);
+		settingsBox.add(m_lengtheningFactor);
 		settingsBox.add(m_timeToWaitAfterIncorrectReview);
 		settingsPane.add(settingsBox, BorderLayout.NORTH);
 

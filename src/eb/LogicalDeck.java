@@ -236,4 +236,8 @@ public class LogicalDeck implements Serializable {
 		}
 		return reviewableCards;
 	}
+
+	public String getName() {
+		return m_name;
+	}
 }

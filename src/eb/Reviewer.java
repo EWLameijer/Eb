@@ -62,7 +62,7 @@ public class Reviewer {
 	}
 
 	public static void wasRemembered(boolean remembered) {
-		c_counter--;
+
 		Duration duration = Duration.between(c_startTimer.getInstant(),
 		    c_stopTimer.getInstant());
 		double duration_in_s = duration.getNano() / 1000_000_000.0
@@ -73,6 +73,7 @@ public class Reviewer {
 		getCurrentCard().addReview(review);
 		c_startTimer.reset();
 		c_stopTimer.reset();
+		c_counter--;
 		if (c_counter <= 0) {
 			ProgramController.setProgramState(ProgramState.SUMMARIZING);
 		}

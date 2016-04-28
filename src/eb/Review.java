@@ -1,5 +1,6 @@
 package eb;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
 
@@ -10,7 +11,8 @@ import java.time.Instant;
  * 
  * @author Eric-Wubbo Lameijer
  */
-public class Review {
+public class Review implements Serializable {
+	private static final long serialVersionUID = -3475131013697503513L;
 	private final Instant m_instant;
 	private final Duration m_thinkingTime;
 	private final boolean m_success;

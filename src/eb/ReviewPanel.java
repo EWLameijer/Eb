@@ -6,9 +6,25 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
 
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
+
+class ButtonAction extends AbstractAction {
+	private Runnable m_action;
+
+	public ButtonAction(Runnable action) {
+		m_action = action;
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent ae) {
+		m_action.run();
+	}
+}
 
 /**
  * The panel used to review cards (shows front, on clicking "Show Answer" the
@@ -58,14 +74,27 @@ public class ReviewPanel extends JPanel {
 
 		JPanel buttonPanelForHiddenBack = new JPanel();
 		JButton showAnswerButton = new JButton("Show Answer");
+		showAnswerButton.getInputMap(WHEN_IN_FOCUSED_WINDOW)
+		    .put(KeyStroke.getKeyStroke('s'), "show answer");
+		showAnswerButton.getActionMap().put("show answer",
+		    new ButtonAction(() -> showAnswer()));
 		showAnswerButton.addActionListener(e -> showAnswer());
 		buttonPanelForHiddenBack.add(showAnswerButton);
 
 		JPanel buttonPanelForShownBack = new JPanel();
 		JButton rememberedButton = new JButton("Remembered");
+		rememberedButton.getInputMap(WHEN_IN_FOCUSED_WINDOW)
+		    .put(KeyStroke.getKeyStroke('r'), "remembered");
+		rememberedButton.getActionMap().put("remembered",
+		    new ButtonAction(() -> remembered(true)));
 		rememberedButton.addActionListener(e -> remembered(true));
 		buttonPanelForShownBack.add(rememberedButton);
 		JButton forgottenButton = new JButton("Forgotten");
+		forgottenButton.getInputMap(WHEN_IN_FOCUSED_WINDOW)
+		    .put(KeyStroke.getKeyStroke('f'), "forgotten");
+		forgottenButton.getActionMap().put("forgotten",
+		    new ButtonAction(() -> remembered(false)));
+
 		forgottenButton.addActionListener(e -> remembered(false));
 		buttonPanelForShownBack.add(forgottenButton);
 
@@ -100,9 +129,9 @@ public class ReviewPanel extends JPanel {
 		CardLayout cardLayout = (CardLayout) (m_buttonPanel.getLayout());
 		cardLayout.show(m_buttonPanel, HIDDEN_ANSWER);
 		Reviewer.wasRemembered(wasRemembered);
+		m_backOfCardPanel.setText("");
 		if (Reviewer.hasNextCard()) {
 			m_frontOfCardPanel.setText(Reviewer.getCurrentFront());
-			m_backOfCardPanel.setText("");
 			repaint();
 		}
 	}
@@ -118,7 +147,6 @@ public class ReviewPanel extends JPanel {
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g;
 		m_frontOfCardPanel.setText(Reviewer.getCurrentFront());
-		g2.drawString("Waterfall", 100, 200);
 		// m_frontOfCardPanel.setVisible(true);
 	}
 

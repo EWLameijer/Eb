@@ -8,11 +8,13 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.time.Duration;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
@@ -40,6 +42,8 @@ public class MainWindow extends JFrame
 	private final String REVIEW_PANEL_ID = "REVIEWING_PANEL";
 	private final String INFORMATION_PANEL_ID = "INFORMATION_PANEL";
 	private final String SUMMARIZING_PANEL_ID = "SUMMARIZING_PANEL";
+
+	private final JButton m_startReviewingButton = new JButton("Review now");
 
 	// Contains the REVIEWING_PANEL and the INFORMATION_PANEL, using a CardLayout.
 	private final JPanel m_modesContainer;
@@ -80,8 +84,8 @@ public class MainWindow extends JFrame
 	private String getUICommands() {
 		// preconditions: none
 		// postconditions: none
-		return "Ctrl+N to add a card. Ctrl+Q to quit. "
-		    + "Ctrl+T to view/edit the study options.";
+		return "Ctrl+N to add a card. Ctrl+Q to quit. Ctrl+D to create a deck."
+		    + "Ctrl+L to load a deck. Ctrl+T to view/edit the study options.";
 	}
 
 	/**
@@ -111,10 +115,14 @@ public class MainWindow extends JFrame
 			    .durationToString(timeUntilNextReviewAsDuration);
 			message.append(timeUntilNextReviewAsText);
 			message.append("<br>");
+			m_startReviewingButton
+			    .setVisible(timeUntilNextReviewAsDuration.isNegative());
 		}
 		message.append(getUICommands());
 		message.append("</html>");
 		m_messageLabel.setText(message.toString());
+		this.setTitle("Eb: " + Deck.getName());
+
 		// postconditions: none (well, the label should have some text, but I'm
 		// willing to trust that that happens.
 	}
@@ -152,6 +160,29 @@ public class MainWindow extends JFrame
 		// settings)
 	}
 
+	private void createDeck() {
+		do {
+			String deckName = JOptionPane.showInputDialog(null,
+			    "Please give name " + "for deck to be created");
+			if (deckName == null) {
+				// cancel button has been pressed
+				return;
+			} else {
+				if (!Utilities.isStringValidIdentifier(deckName)) {
+					JOptionPane.showMessageDialog(null, "Sorry, \"" + deckName
+					    + "\" is not a valid name for a deck. Please choose another name.");
+					continue;
+				} else if (Deck.exists(deckName)) {
+					JOptionPane.showMessageDialog(null, "Sorry, the deck \"" + deckName
+					    + "\" already exists. Please choose another name.");
+					continue;
+				}
+				Deck.createDeckWithName(deckName);
+				return;
+			}
+		} while (true);
+	}
+
 	/**
 	 * Performs the proper buildup of the window (after the construction has
 	 * initialized all components properly).
@@ -159,6 +190,16 @@ public class MainWindow extends JFrame
 	private void init() {
 		// add menu
 		final JMenu fileMenu = new JMenu("File");
+		final JMenuItem createItem = new JMenuItem("Create deck");
+		createItem.setAccelerator(
+		    KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK));
+		createItem.addActionListener(e -> createDeck());
+		fileMenu.add(createItem);
+		final JMenuItem loadItem = new JMenuItem("Load deck");
+		loadItem.setAccelerator(
+		    KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.CTRL_MASK));
+		loadItem.addActionListener(e -> loadDeck());
+		fileMenu.add(loadItem);
 		final JMenuItem quitItem = new JMenuItem("Quit");
 		quitItem.setAccelerator(
 		    KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.CTRL_MASK));
@@ -210,10 +251,37 @@ public class MainWindow extends JFrame
 		// postconditions: none
 	}
 
+	private void loadDeck() {
+		do {
+			String deckName = JOptionPane.showInputDialog(null,
+			    "Please give name for deck to be loaded");
+			if (deckName == null) {
+				// cancel button has been pressed
+				return;
+			} else {
+				if (!Utilities.isStringValidIdentifier(deckName)) {
+					JOptionPane.showMessageDialog(null, "Sorry, \"" + deckName
+					    + "\" is not a valid name for a deck. Please choose another name.");
+					continue;
+				} else if (!Deck.exists(deckName)) {
+					JOptionPane.showMessageDialog(null,
+					    "Sorry, the deck \"" + deckName + "\" does not exist yet.");
+					continue;
+				}
+				Deck.loadDeck(deckName);
+				return;
+			}
+		} while (true);
+	}
+
 	private JPanel createInformationPanel() {
 		JPanel informationPanel = new JPanel();
 		informationPanel.setLayout(new BorderLayout());
 		informationPanel.add(m_messageLabel, BorderLayout.CENTER);
+		m_startReviewingButton.setVisible(false);
+		m_startReviewingButton.addActionListener(
+		    e -> ProgramController.setProgramState(ProgramState.REVIEWING));
+		informationPanel.add(m_startReviewingButton, BorderLayout.SOUTH);
 		return informationPanel;
 	}
 

@@ -12,13 +12,15 @@ public class LabelledTextField extends JPanel {
 	private final JTextField m_textField;
 	private final ListenerManager<TextFieldChangeListener> listenerManager;
 
-	LabelledTextField(String labelText, String textFieldContents) {
+	LabelledTextField(String labelText, String textFieldContents, int size,
+	    int precision) {
 		listenerManager = new ListenerManager<TextFieldChangeListener>(
 		    TextFieldChangeListener.ID);
 		m_label = new JLabel(labelText);
 		m_textField = new JTextField();
 		m_textField.setPreferredSize(new Dimension(40, 20));
-		m_textField.setDocument(new FixedSizeNumberDocument(m_textField, 3, 0));
+		m_textField
+		    .setDocument(new FixedSizeNumberDocument(m_textField, size, precision));
 		m_textField.getDocument()
 		    .addDocumentListener(new DelegatingDocumentListener(
 		        () -> listenerManager.notifyListeners()));
@@ -42,6 +44,9 @@ public class LabelledTextField extends JPanel {
 
 	public void setContents(int i) {
 		setContents(String.valueOf(i));
+	}
 
+	public void setContents(double d) {
+		setContents(String.valueOf(d));
 	}
 }

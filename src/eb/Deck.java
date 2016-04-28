@@ -336,6 +336,16 @@ public class Deck {
 		return m_contents.getReviewableCardList();
 	}
 
+	public static boolean exists(String deckName) {
+		File deckFile = LogicalDeck.getDeckFileHandle(deckName);
+		return deckFile.exists();
+	}
+
+	public static String getName() {
+		ensureDeckExists();
+		return m_contents.getName();
+	}
+
 	/**
 	 * Sets the interval for Eb to wait after the user adds a card before
 	 * presenting the card for review.

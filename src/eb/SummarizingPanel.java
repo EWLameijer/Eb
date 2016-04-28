@@ -1,5 +1,6 @@
 package eb;
 
+import java.awt.CardLayout;
 import java.awt.Graphics;
 import java.util.List;
 import java.util.OptionalDouble;
@@ -12,12 +13,39 @@ public class SummarizingPanel extends JPanel {
 	JLabel m_report = new JLabel();
 	JButton m_backToInformationModeButton = new JButton(
 	    "Back to information screen");
+	JButton m_backToReactiveModeButton = new JButton(
+	    "Back to information screen");
+	JButton m_backToReviewing = new JButton("Go to next round of reviews");
+	JPanel m_buttonPanel;
+	JPanel m_reviewsCompletedBPanel;
+	JPanel m_stillReviewsToDoBPanel;
+
+	private final String REVIEWS_COMPLETED_MODE = "reviews completed";
+	private final String STILL_REVIEWS_TODO_MODE = "still reviews to do";
 
 	SummarizingPanel() {
 		super();
+
+		m_reviewsCompletedBPanel = new JPanel();
+		m_backToReactiveModeButton.addActionListener(
+		    e -> ProgramController.setProgramState(ProgramState.REACTIVE));
+		m_reviewsCompletedBPanel.add(m_backToReactiveModeButton);
+
+		m_stillReviewsToDoBPanel = new JPanel();
+		m_backToInformationModeButton.addActionListener(
+		    e -> ProgramController.setProgramState(ProgramState.INFORMATIONAL));
+		m_stillReviewsToDoBPanel.add(m_backToInformationModeButton);
+		m_backToReviewing.addActionListener(
+		    e -> ProgramController.setProgramState(ProgramState.REVIEWING));
+		m_stillReviewsToDoBPanel.add(m_backToReviewing);
+
+		m_buttonPanel = new JPanel();
+		m_buttonPanel.setLayout(new CardLayout());
+		m_buttonPanel.add(m_reviewsCompletedBPanel, REVIEWS_COMPLETED_MODE);
+		m_buttonPanel.add(m_stillReviewsToDoBPanel, STILL_REVIEWS_TODO_MODE);
 		add(m_report);
-		m_backToInformationModeButton.addActionListener(e -> toInformationMode());
-		add(m_backToInformationModeButton);
+		add(m_buttonPanel);
+
 	}
 
 	private void toInformationMode() {
@@ -63,5 +91,11 @@ public class SummarizingPanel extends JPanel {
 		    + optionalDoubleToString(averageIncorrectTime) + "<br>");
 		text.append("</html>");
 		m_report.setText(text.toString());
+		CardLayout cardLayout = (CardLayout) m_buttonPanel.getLayout();
+		if (Deck.getReviewableCardList().size() == 0) {
+			cardLayout.show(m_buttonPanel, REVIEWS_COMPLETED_MODE);
+		} else {
+			cardLayout.show(m_buttonPanel, STILL_REVIEWS_TODO_MODE);
+		}
 	}
 }

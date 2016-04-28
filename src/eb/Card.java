@@ -108,6 +108,16 @@ public class Card implements Serializable {
 			if (lastReview.wasSuccess()) {
 				waitTime = Deck.getStudyOptions().getRememberedCardInterval()
 				    .asDuration();
+				double lengtheningFactor = Deck.getStudyOptions()
+				    .getLengtheningFactor();
+				int numberOfReviews = m_reviews.size();
+				// if there are older reviews, loop over them
+				int ancestorReviewIndex = numberOfReviews - 2;
+				while (ancestorReviewIndex > 0
+				    && m_reviews.get(ancestorReviewIndex).wasSuccess()) {
+					waitTime = Utilities.multiplyDurationBy(waitTime, lengtheningFactor);
+					ancestorReviewIndex--;
+				}
 			} else {
 				waitTime = Deck.getStudyOptions().getForgottenCardInterval()
 				    .asDuration();
@@ -153,10 +163,17 @@ public class Card implements Serializable {
 		// have been met.
 	}
 
+	private void reportReviews() {
+		for (Review review : m_reviews) {
+			System.out.println(review.getThinkingTime() + " " + review.wasSuccess());
+		}
+	}
+
 	public void addReview(Review review) {
 		Utilities.require(review != null,
 		    "Card.addReview error: " + "review cannot be null.");
 		m_reviews.add(review);
+		reportReviews();
 
 	}
 }

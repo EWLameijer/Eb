@@ -132,12 +132,7 @@ public class TimeInterval implements Serializable {
 
 	public Duration asDuration() {
 		Duration unitDuration = m_unit.getDuration();
-		// we work with things like 0.01 s. So two decimal places. Unfortunately,
-		// we can only multiply by longs, not doubles.
-		Duration hundredthUnitDuration = unitDuration.dividedBy(100);
-		long scalarTimesHundred = (long) (m_scalar * 100.0);
-
-		return hundredthUnitDuration.multipliedBy(scalarTimesHundred);
+		return Utilities.multiplyDurationBy(unitDuration, m_scalar);
 	}
 
 }

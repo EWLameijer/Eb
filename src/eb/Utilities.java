@@ -361,4 +361,14 @@ public class Utilities {
 		return secondsPart + nanoPart;
 	}
 
+	public static Duration multiplyDurationBy(Duration baseDuration,
+	    double multiplicationFactor) {
+		// we work with things like 0.01 s. So two decimal places. Unfortunately,
+		// we can only multiply by longs, not doubles.
+		Duration hundredthBaseDuration = baseDuration.dividedBy(100);
+		long scalarTimesHundred = (long) (multiplicationFactor * 100.0);
+
+		return hundredthBaseDuration.multipliedBy(scalarTimesHundred);
+	}
+
 }
