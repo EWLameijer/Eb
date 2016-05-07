@@ -21,7 +21,8 @@ public class LogicalDeck implements Serializable {
 	// The file extension of a deck.
 	private static final String DECKFILE_EXTENSION = ".deck";
 
-	// The name of the deck.
+	// The name of the deck (like "Spanish"). Does not include the ".deck"
+	// extension.
 	private final String m_name;
 
 	// The cards contained by this deck.
@@ -208,7 +209,7 @@ public class LogicalDeck implements Serializable {
 	 * @return how long it will be until the next review.
 	 */
 	public Duration getTimeUntilNextReview() {
-		Utilities.require(m_cards.size() > 0,
+		Utilities.require(!m_cards.isEmpty(),
 		    "LogicalDeck.getTimeUntilNextReview()) error: the time till next "
 		        + "review is undefined for an empty deck.");
 		Duration minimumTimeUntilNextReview = m_cards.get(0)

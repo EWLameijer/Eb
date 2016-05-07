@@ -8,6 +8,11 @@ public class ProgramController {
 	private static ProgramState c_programState = ProgramState.REACTIVE;
 	private static List<ProgramStateChangeListener> c_programStateChangeListeners = new ArrayList<>();
 
+	private ProgramController() {
+		Utilities.require(false, "ProgramController constructor error: "
+		    + " one should not initialize a static class.");
+	}
+
 	public static ProgramState getProgramState() {
 		return c_programState;
 	}
@@ -35,6 +40,10 @@ public class ProgramController {
 		        + "register the same ProgramStateChangeListener object twice.");
 
 		c_programStateChangeListeners.add(programStateChangeListener);
+	}
+
+	public static void respondToSwappedDeck() {
+		setProgramState(ProgramState.REACTIVE);
 	}
 
 }

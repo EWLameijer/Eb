@@ -112,6 +112,7 @@ public class TimeInterval implements Serializable {
 		// postconditions: none. Should have worked.
 	}
 
+	@Override
 	public boolean equals(Object otherObject) {
 		if (this == otherObject) {
 			return true;
@@ -121,12 +122,13 @@ public class TimeInterval implements Serializable {
 			return false;
 		} else {
 			TimeInterval otherInterval = (TimeInterval) otherObject;
-			return (m_scalar == otherInterval.m_scalar)
-			    && (m_unit == otherInterval.m_unit);
+			return (Utilities.doublesEqualWithinThousands(m_scalar,
+			    otherInterval.m_scalar)) && (m_unit == otherInterval.m_unit);
 		}
 	}
 
-	public int hash() {
+	@Override
+	public int hashCode() {
 		return Objects.hash(m_scalar, m_unit);
 	}
 

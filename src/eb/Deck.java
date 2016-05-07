@@ -9,6 +9,7 @@ import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
@@ -44,6 +45,9 @@ public class Deck {
 
 	// The objects which should be notified of any change in the deck
 	private static Set<DeckChangeListener> m_deckChangeListeners = new HashSet<>();
+	private static Set<DeckSwapListener> m_deckSwapListeners = new HashSet<>();
+
+	private static String c_nameOfLastReviewedDeck;
 
 	/**
 	 * Private constructor: should not be called as this is more of a static
@@ -93,7 +97,7 @@ public class Deck {
 		if (!deckHasBeenLoaded()) {
 			// No deck has been loaded yet - try to load the default deck,
 			// or else create it.
-			final boolean deckLoadedSuccessfully = loadDeck(DEFAULT_DECKNAME);
+			final boolean deckLoadedSuccessfully = loadDeck(getLastDeck());
 
 			// If loading the deck failed, try to create it.
 			// Note that createDeckWithName cannot return null; it will exit
@@ -112,6 +116,14 @@ public class Deck {
 		// next line is necessary to satisfy the nullness checker; after all,
 		// if m_contents is really null, we would have exited the program by now.
 		assert m_contents != null : "@AssumeAssertion(nullness)";
+	}
+
+	private static String getLastDeck() {
+		if (c_nameOfLastReviewedDeck.equals("")) {
+			return DEFAULT_DECKNAME;
+		} else {
+			return c_nameOfLastReviewedDeck;
+		}
 	}
 
 	/**
@@ -156,18 +168,30 @@ public class Deck {
 		try (ObjectInputStream objInStream = new ObjectInputStream(
 		    new FileInputStream(deckFile))) {
 			m_contents = (LogicalDeck) objInStream.readObject();
-			notifyOfDeckChange();
+			notifyOfDeckSwap();
 			return m_contents != null;
 		} catch (final Exception e) {
 			// something goes wrong with deserializing the deck; so
 			// you also can't read the file
-			System.out
-			    .println("Deck.loadDeckWithName: could not load deck from file");
-			e.printStackTrace();
+			Logger.getGlobal()
+			    .info(e + "Deck.loadDeckWithName: could not load deck from file");
 			return false;
 		}
 
 		// postconditions: none: boolean returned
+	}
+
+	private static void notifyOfDeckSwap() {
+		// preconditions: none (I assume the deck has really been swapped with
+		// another deck)
+		// first handle "static listener"
+		Reviewer.respondToSwappedDeck();
+		ProgramController.respondToSwappedDeck();
+
+		for (final DeckSwapListener deckSwapListener : m_deckSwapListeners) {
+			deckSwapListener.respondToSwappedDeck();
+		}
+		// postconditions: none
 	}
 
 	/**
@@ -198,7 +222,7 @@ public class Deck {
 		    + "problem creating and/or writing the new deck.");
 
 		// The deck has been changed. So ensure depending GUI-elements know that.
-		notifyOfDeckChange();
+		notifyOfDeckSwap();
 	}
 
 	/**
@@ -219,7 +243,7 @@ public class Deck {
 		} catch (final Exception e) {
 			// Something goes wrong with serializing the deck; so
 			// you cannot create the file.
-			e.printStackTrace();
+			Logger.getGlobal().info(e + "");
 			Utilities.require(false,
 			    "Deck.save() error: cannot write the new deck to disk.");
 		}
@@ -232,7 +256,8 @@ public class Deck {
 	 * Notifies all listeners that the deck has changed.
 	 */
 	private static void notifyOfDeckChange() {
-		// preconditions: none (I assume the deck has really changed)
+		// preconditions: none (I assume the deck has really changed/ cards have
+		// been added/removed)
 		for (final DeckChangeListener deckChangeListener : m_deckChangeListeners) {
 			deckChangeListener.respondToChangedDeck();
 		}
@@ -346,18 +371,23 @@ public class Deck {
 		return m_contents.getName();
 	}
 
-	/**
-	 * Sets the interval for Eb to wait after the user adds a card before
-	 * presenting the card for review.
-	 *
-	 */
-	/*
-	 * public static void setInitialInterval(TimeInterval newInterval) { //
-	 * precondition and postconditions: handled by the embedded LogicalDeck
-	 * ensureDeckExists(); if (m_contents.canSetInitialInterval(newInterval) {
-	 * m_contents.setInitialInterval(newInterval); } else {
-	 *
-	 * }
-	 */
-	// }
+	public static Duration getForgottenCardInterval() {
+		ensureDeckExists();
+		return m_contents.getStudyOptions().getForgottenCardInterval().asDuration();
+	}
+
+	public static Duration getRememberedCardInterval() {
+		ensureDeckExists();
+		return m_contents.getStudyOptions().getRememberedCardInterval()
+		    .asDuration();
+	}
+
+	public static double getLengtheningFactor() {
+		ensureDeckExists();
+		return m_contents.getStudyOptions().getLengtheningFactor();
+	}
+
+	public static void setNameOfLastReviewedDeck(String nameOfLastReviewedDeck) {
+		c_nameOfLastReviewedDeck = nameOfLastReviewedDeck;
+	}
 }

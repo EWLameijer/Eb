@@ -4,9 +4,17 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.beans.EventHandler;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -38,15 +46,18 @@ public class MainWindow extends JFrame
 	// the regular "reviewing" window, which should be active most of the
 	// time.
 	private final JLabel m_messageLabel;
-	// private final Color DEFAULT_BACKGROUND;
-	private final String REVIEW_PANEL_ID = "REVIEWING_PANEL";
-	private final String INFORMATION_PANEL_ID = "INFORMATION_PANEL";
-	private final String SUMMARIZING_PANEL_ID = "SUMMARIZING_PANEL";
+	private static final String REVIEW_PANEL_ID = "REVIEWING_PANEL";
+	private static final String INFORMATION_PANEL_ID = "INFORMATION_PANEL";
+	private static final String SUMMARIZING_PANEL_ID = "SUMMARIZING_PANEL";
+
+	private static final String EB_STATUS_FILE = "eb_status.txt";
 
 	private final JButton m_startReviewingButton = new JButton("Review now");
 
 	// Contains the REVIEWING_PANEL and the INFORMATION_PANEL, using a CardLayout.
 	private final JPanel m_modesContainer;
+
+	private ReviewPanel m_reviewPanel;
 
 	/**
 	 * MainWindow constructor.
@@ -57,7 +68,6 @@ public class MainWindow extends JFrame
 		m_messageLabel = new JLabel();
 		m_modesContainer = new JPanel();
 		m_modesContainer.setLayout(new CardLayout());
-		// DEFAULT_BACKGROUND = this.getContentPane().getBackground();
 	}
 
 	/**
@@ -171,14 +181,14 @@ public class MainWindow extends JFrame
 				if (!Utilities.isStringValidIdentifier(deckName)) {
 					JOptionPane.showMessageDialog(null, "Sorry, \"" + deckName
 					    + "\" is not a valid name for a deck. Please choose another name.");
-					continue;
 				} else if (Deck.exists(deckName)) {
 					JOptionPane.showMessageDialog(null, "Sorry, the deck \"" + deckName
 					    + "\" already exists. Please choose another name.");
-					continue;
+				} else {
+					// The deckname is valid!
+					Deck.createDeckWithName(deckName);
+					return;
 				}
-				Deck.createDeckWithName(deckName);
-				return;
 			}
 		} while (true);
 	}
@@ -225,30 +235,52 @@ public class MainWindow extends JFrame
 
 		JPanel informationPanel = createInformationPanel();
 		m_modesContainer.add(informationPanel, INFORMATION_PANEL_ID);
-		JPanel reviewPanel = new ReviewPanel();
-		m_modesContainer.add(reviewPanel, REVIEW_PANEL_ID);
+		m_reviewPanel = new ReviewPanel();
+		m_modesContainer.add(m_reviewPanel, REVIEW_PANEL_ID);
 		JPanel summarizingPanel = new SummarizingPanel();
 		m_modesContainer.add(summarizingPanel, SUMMARIZING_PANEL_ID);
 		add(m_modesContainer);
+
+		setNameOfLastReviewedDeck();
 
 		updateWindow();
 
 		// now show the window itself.
 		setSize(1000, 700);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent e) {
-				Deck.save();
-				e.getWindow().dispose();
-			}
-		});
+
+		// Instead of using the WindowAdapter class, use the EventHandler utility
+		// class to create a class with default noop methods, just overriding the
+		// windowClosing.
+		addWindowListener(EventHandler.create(WindowListener.class, this,
+		    "saveAndQuit", null, "windowClosing"));
 		setVisible(true);
 		Deck.addDeckChangeListener(this);
 		ProgramController.addProgramStateChangeListener(this);
 		Timer messageUpdater = new Timer(100, e -> updateWindow());
 		messageUpdater.start();
+		updateMessageLabel();
 		// postconditions: none
+	}
+
+	private void setNameOfLastReviewedDeck() {
+		Path statusFilePath = Paths.get(EB_STATUS_FILE);
+		List<String> lines;
+		try {
+			lines = Files.readAllLines(statusFilePath, Charset.forName("UTF-8"));
+			Optional<String> fileLine = lines.stream()
+			    .filter(e -> e.startsWith("most_recently_reviewed_deck: "))
+			    .findFirst();
+			if (fileLine.isPresent()) {
+				String deckName = fileLine.get()
+				    .substring("most_recently_reviewed_deck: ".length());
+				Deck.setNameOfLastReviewedDeck(deckName);
+			}
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
 	}
 
 	private void loadDeck() {
@@ -262,14 +294,14 @@ public class MainWindow extends JFrame
 				if (!Utilities.isStringValidIdentifier(deckName)) {
 					JOptionPane.showMessageDialog(null, "Sorry, \"" + deckName
 					    + "\" is not a valid name for a deck. Please choose another name.");
-					continue;
 				} else if (!Deck.exists(deckName)) {
 					JOptionPane.showMessageDialog(null,
 					    "Sorry, the deck \"" + deckName + "\" does not exist yet.");
-					continue;
+				} else {
+					// we have a valid deck here
+					Deck.loadDeck(deckName);
+					return;
 				}
-				Deck.loadDeck(deckName);
-				return;
 			}
 		} while (true);
 	}
@@ -297,11 +329,24 @@ public class MainWindow extends JFrame
 	/**
 	 * Saves the current deck and its status, and quits Eb.
 	 */
-	private void saveAndQuit() {
+	public void saveAndQuit() {
 		// preconditions: (well, Eb is necessarily running)
+		saveEbStatus();
 		Deck.save();
-		System.exit(0);
+		dispose();
 		// preconditions: none
+	}
+
+	private void saveEbStatus() {
+		List<String> lines = new ArrayList<>();
+		lines.add("most_recently_reviewed_deck: " + Deck.getName());
+		Path statusFilePath = Paths.get(EB_STATUS_FILE);
+		try {
+			Files.write(statusFilePath, lines, Charset.forName("UTF-8"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private void switchToPanel(String panelId) {
@@ -336,6 +381,9 @@ public class MainWindow extends JFrame
 	@Override
 	public void respondToProgramStateChange() {
 		ProgramState newProgramState = ProgramController.getProgramState();
+		m_reviewPanel.refresh(); // there may be new cards to refresh
+		updateWindow();
+		updateMessageLabel();
 		switch (newProgramState) {
 		case INFORMATIONAL:
 			showInformationPanel();
@@ -349,6 +397,9 @@ public class MainWindow extends JFrame
 		case SUMMARIZING:
 			showSummarizingPanel();
 			break;
+		default:
+			Utilities.require(false, "MainWindow.respondToProgramStateChange "
+			    + "error: receiving wrong program state.");
 		}
 	}
 

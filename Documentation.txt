@@ -1,4 +1,15 @@
+Urgent: ensure proper combination of vertical alignment with the scrollpane
+
+
+Urgent: browse/edit cards.
+
+
 Next experiment: allow the user to set a timer for answering
+
+
+
+
+
 
 Note: I want to refactor; I'm getting huge lists of panels and such.
 
@@ -111,7 +122,7 @@ Pressing "Ctrl-N" will open a card adding frame. This frame will be closed (with
 
 Adding cards is easy: you type in text in the top field (this is the 'front' of the card, which will be shown as the question/cue when you review the cards). Then you either click on the field below, or, more conveniently, press <Enter> if you are done filling in the text on the front. This will allow you to fill in the text for the back of the card, the 'answer'. When you are done, either press the "OK" button or simply press <Enter> again to add the new card to the collection.
 
-Note that if the front of the card is empty, or a duplicate of the front of another card, Eb will complain and refuse to add the card until the front has some contents and is unique. *@view duplicate-functionality?*
+Note that if the front of the card is empty, or a duplicate of the front of another card, Eb will complain and refuse to add the card until the front has some contents and is unique. *view duplicate-functionality?*
 
 
 *The Study Options Menu*
@@ -162,7 +173,7 @@ Any of these formats would be okay; they differ in human-readableness (YAML>JSON
 
 % The architecture of the Deck object %
 
-What is a Deck? Purely logically, a deck is a set of cards, each of which have their front and back and revision history. In practice, however, this is only true for an abstract (and fresh) deck. A deck, if things go right, becomes a tool to be shaped to the learner's mind, both by keeping records on each card of how well it has been remembered, as well as generic deck settings (the interval between the creation of the card and the first time it should be shown is likely different between a Java deck and a Russian deck). In principle, these data are separable; in practice, it's more convenient to store the deck settings and learning history of the deck together with the logical contents of the cards.
+What is a Deck? Purely logically, a deck is a set of cards, each of which have their front and back and revision history. In practice, however, this is only true for an abstract (and fresh) deck. A deck, if things go right, becomes a tool to be shaped to the learner's mind, both by keeping records on each card of how well it has been remembered, as well as generic deck settings (the interval between the creation of the card and the first time it should be shown is likely different between a Java deck and a Russian deck). In principle, these data are separable; in practice, it's more convenient to store the deck settings and learning  of the deck together with the logical contents of the cards.
 
 At a certain time, Eb can only have a single active deck. This suggests some constraint on the number of Deck objects that one can create at a time; a singleton pattern or monostate pattern jump to mind, or even a static class. None of those options look particularly appealing at this time; monostate is misleading, suggesting that one can create multiple independent objects while in reality all data is shared; a static class is (at the moment) pragmatically impossible because that doesn't work with serialization, and a singleton pattern, while 'correct', introduces the boilerplate .getInstance() everywhere. Another problem is that the 'logical' deck should have some kind of interaction with the GUI - interactions that are not part of the logical contents of the deck (if a new deck is loaded, it should not need to learn about how to update the GUI). For this reason, I created a static "Deck" class that contains a pointer to the logical deck (a regular class called 'LogicalDeck'. The Deck is kind of like the office manager, forwarding content-related calls to the LogicalDeck, and handling the messy work of interacting with the GUI, so the GUI elements are all anchored in the Deck, and things don't have to change when the logical deck is swapped (say from Java to Japanese).
 
@@ -260,13 +271,36 @@ Design
 7) Eb and git: make the Git-dir contain Eclipse-dir (so with root and class). Add executable JAR (and test it somewhere)
 
 
+@Version history:
+1.0. April 28, 2016. Eb can now be used for spaced repetition, at least cards can be created and reviewed, and one can set reviewing time.
+	Total features:
+	-3 modes: information mode, reviewing mode, summarizing mode 
+	-5 (working) shortcuts: add card, quit Eb, create deck, load deck, and view/edit study options.
+	-5 study opions: initial review interval, number of cards per reviewing session; base time to wait for re-reviewing remembered card; review time lengthening factor, time to wait for re-reviewing forgotten card.
+	
+1.1 
+	-New Card window will now also close when pressing OK in case of a totally empty card.
+	-In the New Card window, all texts are now trimmed when the edited side of the card loses focus (or the enter key is pressed). So you don't have to clean up spaces manually!
+	-when creating/switching a deck, the reviewing is now also correctly reset
+	-Eb now restarts on the last used deck.
+	-Ensured that loading a new window or starting Eb shows the proper deck name.
+
+
+
 
 Card	
 	Card(String, String)
+	addReview()
 	getFront()
 	getBack()
-	getLastReviewInstant()
-	hasBeenReviewed()
+	[]getLastReview()
+	[]getTimeUntilNextReview()
+	[]hasBeenReviewed()
+	reportReviews()
+
+	
+CardPanel
+	
 	
 Deck 
 	addCard()

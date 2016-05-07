@@ -113,12 +113,14 @@ public class StudyOptions implements Serializable {
 			    && m_reviewSessionSize == otherOptions.m_reviewSessionSize
 			    && m_rememberedCardInterval
 			        .equals(otherOptions.m_rememberedCardInterval)
-			    && m_lengtheningFactor == otherOptions.m_lengtheningFactor
+			    && Utilities.doublesEqualWithinThousands(m_lengtheningFactor,
+			        otherOptions.m_lengtheningFactor)
 			    && m_forgottenCardInterval
 			        .equals(otherOptions.m_forgottenCardInterval);
 		}
 	}
 
+	@Override
 	public int hashCode() {
 		return Objects.hash(m_initialInterval, m_reviewSessionSize,
 		    m_rememberedCardInterval, m_forgottenCardInterval);

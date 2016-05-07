@@ -10,12 +10,11 @@ import javax.swing.JTextField;
 public class LabelledTextField extends JPanel {
 	private final JLabel m_label;
 	private final JTextField m_textField;
-	private final ListenerManager<TextFieldChangeListener> listenerManager;
+	private final transient ListenerManager<TextFieldChangeListener> listenerManager;
 
 	LabelledTextField(String labelText, String textFieldContents, int size,
 	    int precision) {
-		listenerManager = new ListenerManager<TextFieldChangeListener>(
-		    TextFieldChangeListener.ID);
+		listenerManager = new ListenerManager<>(TextFieldChangeListener.ID);
 		m_label = new JLabel(labelText);
 		m_textField = new JTextField();
 		m_textField.setPreferredSize(new Dimension(40, 20));

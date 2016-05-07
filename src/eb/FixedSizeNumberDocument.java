@@ -1,5 +1,7 @@
 package eb;
 
+import java.util.logging.Logger;
+
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
@@ -110,7 +112,7 @@ public class FixedSizeNumberDocument extends PlainDocument {
 			super.insertString(offs, textToBeInserted.toString(), a);
 		} else {
 			m_owner.getToolkit().beep();
-			System.out.println("problems inserting " + str);
+			Logger.getGlobal().info("problems inserting " + str);
 		}
 	}
 
@@ -123,7 +125,7 @@ public class FixedSizeNumberDocument extends PlainDocument {
 	 */
 	private boolean contentsShouldRepresentInteger() {
 		// preconditions: none. Should work when the object exists.
-		return (m_sizeOfFractionalPart == 0);
+		return m_sizeOfFractionalPart == 0;
 		// postconditions: none. Simple return of boolean.
 	}
 

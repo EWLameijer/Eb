@@ -12,15 +12,15 @@ public class ListenerManager<T extends Listener> {
 	}
 
 	public void addListener(T listener, String id) {
-		Utilities.require(listener != null, "ListenerManager.addListener "
-		    + "error: listener object should not be null");
-		Utilities.require(id != null, "ListenerManager.addListener "
-		    + "error: identifier string should not be null");
-		Utilities.require(m_eventId.equals(id), "ListenerManager.addListener "
-		    + "error: identifier string " + id + " is not recognized.");
+		final String methodErrorHead = "ListenerManager.addListener error: ";
+		Utilities.require(listener != null,
+		    methodErrorHead + "listener object should not be null");
+		Utilities.require(id != null,
+		    methodErrorHead + "identifier string should not be null");
+		Utilities.require(m_eventId.equals(id),
+		    methodErrorHead + "identifier string " + id + " is not recognized.");
 		Utilities.require(!m_listeners.contains(listener),
-		    "ListenerManager.addListener error: one should not add the same "
-		        + "listener twice.");
+		    methodErrorHead + "one should not add the same listener twice.");
 		// if everything is correct, just do the work.
 		m_listeners.add(listener);
 

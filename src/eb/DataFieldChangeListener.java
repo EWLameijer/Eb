@@ -6,6 +6,7 @@ package eb;
  * 
  * @author Eric-Wubbo Lameijer
  */
+@FunctionalInterface
 interface DataFieldChangeListener {
 	abstract void respondToChangedDataField();
 }

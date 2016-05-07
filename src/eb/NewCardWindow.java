@@ -3,8 +3,11 @@ package eb;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -51,6 +54,7 @@ public class NewCardWindow extends JFrame {
 		m_frontOfCard = new JTextPane();
 		Utilities.makeTabAndEnterTransferFocus(m_frontOfCard);
 		m_frontOfCard.addKeyListener(new EscapeKeyListener());
+		m_frontOfCard.addFocusListener(new CleaningFocusListener());
 
 		// Now create the panel to edit the back of the card; make tab transfer
 		// focus to the front (for editing the front again), escape should (like
@@ -61,6 +65,7 @@ public class NewCardWindow extends JFrame {
 		Utilities.makeTabTransferFocus(m_backOfCard);
 		m_backOfCard.addKeyListener(new EnterKeyListener());
 		m_backOfCard.addKeyListener(new EscapeKeyListener());
+		m_backOfCard.addFocusListener(new CleaningFocusListener());
 
 		// Also add the two buttons (Cancel and OK).
 		m_cancelButton = new JButton("Cancel");
@@ -158,6 +163,20 @@ public class NewCardWindow extends JFrame {
 		}
 	}
 
+	class CleaningFocusListener implements FocusListener {
+
+		@Override
+		public void focusGained(FocusEvent arg0) {
+			// noop
+		}
+
+		@Override
+		public void focusLost(FocusEvent arg0) {
+			trimFields();
+		}
+
+	}
+
 	/**
 	 * Closes the frame, removing all its contents.
 	 */
@@ -165,6 +184,11 @@ public class NewCardWindow extends JFrame {
 		// preconditions: none
 		this.dispose();
 		// postconditions: none
+	}
+
+	public void trimFields() {
+		m_frontOfCard.setText(m_frontOfCard.getText().trim());
+		m_backOfCard.setText(m_backOfCard.getText().trim());
 	}
 
 	/**
@@ -179,35 +203,44 @@ public class NewCardWindow extends JFrame {
 		// and should therefore always activate when the associated button
 		// (in this case the OK button) is pressed.
 
-		// logging
-		System.out.printf("Front: %s, back %s%n", m_frontOfCard.getText(),
-		    m_backOfCard.getText());
+		trimFields();
+		final String frontText = m_frontOfCard.getText();
+		final String backText = m_backOfCard.getText();
 
-		// create a new card
-		final Card candidateCard = new Card(m_frontOfCard.getText(),
-		    m_backOfCard.getText());
-		if (Deck.canAddCard(candidateCard)) {
-			Deck.addCard(candidateCard);
-			m_frontOfCard.setText("");
-			m_backOfCard.setText("");
+		// Allow closing if the card is totally blank
+		if (frontText.equals("") && backText.equals("")) {
+			close();
 		} else {
-			// basically, two things can go wrong; either the front is empty
-			// or it is a duplicate
-			String errorMessage;
-			if (!Utilities.isStringValidIdentifier(m_frontOfCard.getText())) {
-				errorMessage = "Cannot add card: the front of a card cannot be blank.";
-			} else {
-				// must be duplicate card
-				errorMessage = "Cannot add card: there already is another card with "
-				    + "the same front";
-			}
-			JOptionPane.showMessageDialog(this, errorMessage, "Cannot add card",
-			    JOptionPane.ERROR_MESSAGE);
-		}
 
-		// Whatever happens, transfer the focus back to the TextArea representing
-		// the front of the card.
-		m_frontOfCard.requestFocusInWindow();
+			// logging
+			Logger.getGlobal().info(String.format("Front: %s, back %s%n",
+			    m_frontOfCard.getText(), m_backOfCard.getText()));
+
+			// create a new card
+			final Card candidateCard = new Card(frontText, backText);
+			if (Deck.canAddCard(candidateCard)) {
+				Deck.addCard(candidateCard);
+				m_frontOfCard.setText("");
+				m_backOfCard.setText("");
+			} else {
+				// basically, two things can go wrong; either the front is empty
+				// or it is a duplicate
+				String errorMessage;
+				if (!Utilities.isStringValidIdentifier(m_frontOfCard.getText())) {
+					errorMessage = "Cannot add card: the front of a card cannot be blank.";
+				} else {
+					// must be duplicate card
+					errorMessage = "Cannot add card: there already is another card with "
+					    + "the same front";
+				}
+				JOptionPane.showMessageDialog(this, errorMessage, "Cannot add card",
+				    JOptionPane.ERROR_MESSAGE);
+			}
+
+			// Whatever happens, transfer the focus back to the TextArea representing
+			// the front of the card.
+			m_frontOfCard.requestFocusInWindow();
+		}
 		// postconditions: If adding succeeded, the front and back should
 		// be blank again, if it didn't, they should be the same as they were
 		// before (so nothing changed). Since the logic of the postcondition

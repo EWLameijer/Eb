@@ -3,7 +3,6 @@ package eb;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -13,8 +12,9 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
+@SuppressWarnings("serial")
 class ButtonAction extends AbstractAction {
-	private Runnable m_action;
+	private transient Runnable m_action;
 
 	public ButtonAction(Runnable action) {
 		m_action = action;
@@ -22,7 +22,8 @@ class ButtonAction extends AbstractAction {
 
 	@Override
 	public void actionPerformed(ActionEvent ae) {
-		m_action.run();
+		Thread thread = new Thread(m_action);
+		thread.start();
 	}
 }
 
@@ -33,22 +34,21 @@ class ButtonAction extends AbstractAction {
  * 
  * @author Eric-Wubbo Lameijer
  */
+@SuppressWarnings("serial")
 public class ReviewPanel extends JPanel {
 
 	private CardPanel m_frontOfCardPanel;
 	private CardPanel m_backOfCardPanel;
 	private JPanel m_buttonPanel;
 
-	private final String HIDDEN_ANSWER = "HIDDEN_ANSWER";
-	private final String SHOWN_ANSWER = "SHOWN_ANSWER";
+	private static final String HIDDEN_ANSWER = "HIDDEN_ANSWER";
+	private static final String SHOWN_ANSWER = "SHOWN_ANSWER";
 
 	ReviewPanel() {
 		super();
 		setLayout(new GridBagLayout());
 		GridBagConstraints frontOfCardConstraints = new GridBagConstraints();
-		// GridBagConstraints(int gridx, int gridy, int gridwidth, int gridheight,
-		// double weightx, double weighty, int anchor, int fill, Insets insets,
-		// int ipadx, int ipady)
+
 		frontOfCardConstraints.gridx = 0;
 		frontOfCardConstraints.gridy = 0;
 		frontOfCardConstraints.gridwidth = 4;
@@ -143,11 +143,15 @@ public class ReviewPanel extends JPanel {
 		repaint();
 	}
 
+	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		Graphics2D g2 = (Graphics2D) g;
 		m_frontOfCardPanel.setText(Reviewer.getCurrentFront());
-		// m_frontOfCardPanel.setVisible(true);
+	}
+
+	public void refresh() {
+		repaint();
+
 	}
 
 }

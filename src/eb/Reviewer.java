@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * FirstTimer registers a time the first time it is activated (set). Subsequent
@@ -47,6 +48,14 @@ public class Reviewer {
 	private static FirstTimer c_stopTimer = new FirstTimer();
 	private static List<Review> c_reviewResults = new ArrayList<>();
 
+	/**
+	 * To hide implicit public reviewer
+	 */
+	private Reviewer() {
+		Utilities.require(false, "Reviewer constructor error: one should not "
+		    + "try to create an instance of the static reviewer class");
+	}
+
 	private static Card getCurrentCard() {
 		return c_cardCollection.get(c_counter - 1);
 	}
@@ -67,7 +76,7 @@ public class Reviewer {
 		    c_stopTimer.getInstant());
 		double duration_in_s = duration.getNano() / 1000_000_000.0
 		    + duration.getSeconds();
-		System.out.println(c_counter + " " + duration_in_s);
+		Logger.getGlobal().info(c_counter + " " + duration_in_s);
 		Review review = new Review(duration, remembered);
 		c_reviewResults.add(review);
 		getCurrentCard().addReview(review);
@@ -84,8 +93,8 @@ public class Reviewer {
 		int maxNumReviews = Deck.getStudyOptions().getReviewSessionSize();
 		List<Card> reviewableCards = Deck.getReviewableCardList();
 		int totalNumberOfReviewableCards = reviewableCards.size();
-		System.out.println(
-		    "Number of reviewable cards is " + totalNumberOfReviewableCards);
+		Logger.getGlobal()
+		    .info("Number of reviewable cards is " + totalNumberOfReviewableCards);
 		c_counter = Math.min(maxNumReviews, totalNumberOfReviewableCards);
 		// now, for best effect, those cards which have expired more recently should
 		// be rehearsed first, as other cards probably need to be relearned anyway,
@@ -97,6 +106,10 @@ public class Reviewer {
 		c_cardCollection = reviewableCards.subList(0, c_counter);
 		Collections.shuffle(c_cardCollection);
 
+	}
+
+	public static void respondToSwappedDeck() {
+		activate();
 	}
 
 	public static boolean hasNextCard() {

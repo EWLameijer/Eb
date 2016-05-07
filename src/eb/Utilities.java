@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import javax.swing.KeyStroke;
@@ -75,8 +76,10 @@ public class Utilities {
 		// preconditions: none
 		// postconditions: none
 		if (!condition) {
-			System.err.println(errorMessage);
-			System.exit(1);
+			Logger.getGlobal().info(errorMessage);
+			// throw a RuntimeException (a specific one to pacify SonarQube) in order
+			// to exit the program without using System.exit().
+			throw new IllegalArgumentException();
 		}
 	}
 
@@ -165,8 +168,8 @@ public class Utilities {
 	 * @return whether the character is this locale's decimal separator
 	 */
 	public static boolean isDecimalSeparator(char ch) {
-		// preconditions: none. 'ch' can't be null, for example.
-		return (ch == getDecimalSeparator());
+		// preconditions: none. the character cannot be null, for example.
+		return ch == getDecimalSeparator();
 		// postconditions: none. Simple return of boolean.
 	}
 
@@ -238,8 +241,8 @@ public class Utilities {
 		if (!isStringValidIdentifier(string)) {
 			return false;
 		}
-		String decimalSeparatorAsRegex = (getDecimalSeparator() == '.' ? "\\."
-		    : "" + getDecimalSeparator());
+		String decimalSeparatorAsRegex = getDecimalSeparator() == '.' ? "\\."
+		    : Character.toString(getDecimalSeparator());
 
 		String fractionalNumberRegex = "-?\\d*" + decimalSeparatorAsRegex
 		    + "?\\d{0," + maxPrecision + "}";
@@ -369,6 +372,48 @@ public class Utilities {
 		long scalarTimesHundred = (long) (multiplicationFactor * 100.0);
 
 		return hundredthBaseDuration.multipliedBy(scalarTimesHundred);
+	}
+
+	/**
+	 * returns whether two doubles are 'practically equal', their difference being
+	 * smaller than 1/1000th of the smallest number (or of the largest number, if
+	 * the smallest number happens to equal zero).
+	 * 
+	 * @param d1
+	 *          the first double to be compared
+	 * @param d2
+	 *          the second double to be compared
+	 * 
+	 * @return whether the two doubles are practically equal within 1/1000th of
+	 *         the smallest number unequal to zero.
+	 */
+	public static boolean doublesEqualWithinThousands(double d1, double d2) {
+		final double smallestAllowedDifference = 0.001;
+		if (Double.doubleToLongBits(d1 - d2) == 0) {
+			return true;
+		}
+
+		if (Double.doubleToLongBits(d1) == 0) {
+			// Note that d2 cannot be 0.0 because otherwise the first if-statement
+			// would already have returned.
+			return Math.abs(d2) < smallestAllowedDifference;
+		} else if (Double.doubleToLongBits(d2) == 0) {
+			return Math.abs(d1) < smallestAllowedDifference;
+		} else {
+			double largerAbsoluteNumber;
+			double smallerAbsoluteNumber;
+			if (Math.abs(d1) > Math.abs(d2)) {
+				largerAbsoluteNumber = d1;
+				smallerAbsoluteNumber = d2;
+			} else {
+				largerAbsoluteNumber = d2;
+				smallerAbsoluteNumber = d1;
+			}
+			double ratio = (largerAbsoluteNumber - smallerAbsoluteNumber)
+			    / smallerAbsoluteNumber;
+
+			return Math.abs(ratio) < smallestAllowedDifference;
+		}
 	}
 
 }

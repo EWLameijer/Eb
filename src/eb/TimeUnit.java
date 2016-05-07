@@ -61,6 +61,9 @@ public enum TimeUnit {
 	/**
 	 * Returns the names of all time units (like "week(s)") as a String array.
 	 *
+	 * Note: despite SonarLint's warnings, using Vector here because the client,
+	 * the DefaultComboBoxModel constructor, requires it.
+	 *
 	 * @return the names of all time units (like "week(s)") as a String array
 	 */
 	public static Vector<String> getUnitNames() {

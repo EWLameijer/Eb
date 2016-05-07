@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
@@ -35,7 +36,7 @@ public class TimeInputElement extends JPanel {
 	// initial study interval. Contains the hours of "3 hours".
 	private final JComboBox<String> m_unitComboBox;
 
-	private List<DataFieldChangeListener> m_dataFieldChangeListeners = new ArrayList<>();
+	private transient List<DataFieldChangeListener> m_dataFieldChangeListeners = new ArrayList<>();
 
 	/**
 	 * Constructs the TimeInputElement, given a name and a TimeInterval (which can
@@ -74,16 +75,6 @@ public class TimeInputElement extends JPanel {
 	}
 
 	/**
-	 * Initializes the TimeInputElement - this needs to be separate from the
-	 * constructor, or else the nullness checker will complain.
-	 */
-	private void init() {
-		add(m_label);
-		add(m_scalarField);
-		add(m_unitComboBox);
-	}
-
-	/**
 	 * Factory method to create a TimeInputElement, which is basically a small
 	 * JPanel that can be used to display a time. Factory method needed to handle
 	 * the separation between object construction and initialization 'stimulated'
@@ -103,6 +94,16 @@ public class TimeInputElement extends JPanel {
 	}
 
 	/**
+	 * Initializes the TimeInputElement - this needs to be separate from the
+	 * constructor, or else the nullness checker will complain.
+	 */
+	private void init() {
+		add(m_label);
+		add(m_scalarField);
+		add(m_unitComboBox);
+	}
+
+	/**
 	 * Sets the interval (displayed in the text field and combo box) to the given
 	 * time interval.
 	 *
@@ -119,7 +120,7 @@ public class TimeInputElement extends JPanel {
 		        + "may not be null.");
 		m_scalarField.setText(
 		    Utilities.doubleToMaxPrecisionString(timeInterval.getScalar(), 2));
-		System.out.println(
+		Logger.getGlobal().info(
 		    Utilities.doubleToMaxPrecisionString(timeInterval.getScalar(), 2));
 		m_unitComboBox
 		    .setSelectedItem(timeInterval.getUnit().getUserInterfaceName());

@@ -58,26 +58,6 @@ public class StudyOptionsWindow extends JFrame
 	private final TimeInputElement m_timeToWaitAfterIncorrectReview;
 
 	/**
-	 * Updates the title of the frame in response to changes to indicate to the
-	 * user whether there are unsaved changes.
-	 */
-	private void updateTitle() {
-		// preconditions: none. Is by definition only called when the object
-		// has been constructed already.
-		StudyOptions guiStudyOptions = gatherUIDataIntoStudyOptionsObject();
-		String title = "Study Options";
-		StudyOptions deckStudyOptions = Deck.getStudyOptions();
-		if (guiStudyOptions.equals(deckStudyOptions)) {
-			// if (guiStudyOptions.equals(Deck.getStudyOptions())) {
-			title += " - no unsaved changes";
-		} else {
-			title += " - UNSAVED CHANGES";
-		}
-		setTitle(title);
-		// postconditions: none. Simply changes the frame's title.
-	}
-
-	/**
 	 * Creates a new Study Options window.
 	 */
 	private StudyOptionsWindow() {
@@ -104,6 +84,25 @@ public class StudyOptionsWindow extends JFrame
 		    "Load settings of current deck");
 		m_setToTheseValuesButton = new JButton(
 		    "Set study parameters of this deck to these values");
+	}
+
+	/**
+	 * Updates the title of the frame in response to changes to indicate to the
+	 * user whether there are unsaved changes.
+	 */
+	private void updateTitle() {
+		// preconditions: none. Is by definition only called when the object
+		// has been constructed already.
+		StudyOptions guiStudyOptions = gatherUIDataIntoStudyOptionsObject();
+		String title = "Study Options";
+		StudyOptions deckStudyOptions = Deck.getStudyOptions();
+		if (guiStudyOptions.equals(deckStudyOptions)) {
+			title += " - no unsaved changes";
+		} else {
+			title += " - UNSAVED CHANGES";
+		}
+		setTitle(title);
+		// postconditions: none. Simply changes the frame's title.
 	}
 
 	/**
@@ -184,6 +183,7 @@ public class StudyOptionsWindow extends JFrame
 		getRootPane().getActionMap().put("Cancel", new AbstractAction() { //$NON-NLS-1$
 			private static final long serialVersionUID = 5281385300708334272L;
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				close();
 			}
@@ -241,6 +241,7 @@ public class StudyOptionsWindow extends JFrame
 		// postconditions: none
 	}
 
+	@Override
 	public void respondToChangedDataField() {
 		updateTitle();
 	}

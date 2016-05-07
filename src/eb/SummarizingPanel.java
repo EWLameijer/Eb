@@ -9,6 +9,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+@SuppressWarnings("serial")
 public class SummarizingPanel extends JPanel {
 	JLabel m_report = new JLabel();
 	JButton m_backToInformationModeButton = new JButton(
@@ -20,8 +21,8 @@ public class SummarizingPanel extends JPanel {
 	JPanel m_reviewsCompletedBPanel;
 	JPanel m_stillReviewsToDoBPanel;
 
-	private final String REVIEWS_COMPLETED_MODE = "reviews completed";
-	private final String STILL_REVIEWS_TODO_MODE = "still reviews to do";
+	private static final String REVIEWS_COMPLETED_MODE = "reviews completed";
+	private static final String STILL_REVIEWS_TODO_MODE = "still reviews to do";
 
 	SummarizingPanel() {
 		super();
@@ -48,10 +49,6 @@ public class SummarizingPanel extends JPanel {
 
 	}
 
-	private void toInformationMode() {
-		ProgramController.setProgramState(ProgramState.INFORMATIONAL);
-	}
-
 	private String optionalDoubleToString(OptionalDouble d) {
 		if (d.isPresent()) {
 			return String.format("%.2f", d.getAsDouble());
@@ -60,6 +57,7 @@ public class SummarizingPanel extends JPanel {
 		}
 	}
 
+	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		List<Review> results = Reviewer.getReviewResults();
@@ -92,7 +90,7 @@ public class SummarizingPanel extends JPanel {
 		text.append("</html>");
 		m_report.setText(text.toString());
 		CardLayout cardLayout = (CardLayout) m_buttonPanel.getLayout();
-		if (Deck.getReviewableCardList().size() == 0) {
+		if (Deck.getReviewableCardList().isEmpty()) {
 			cardLayout.show(m_buttonPanel, REVIEWS_COMPLETED_MODE);
 		} else {
 			cardLayout.show(m_buttonPanel, STILL_REVIEWS_TODO_MODE);
