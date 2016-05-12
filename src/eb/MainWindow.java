@@ -94,7 +94,7 @@ public class MainWindow extends JFrame
 	private String getUICommands() {
 		// preconditions: none
 		// postconditions: none
-		return "Ctrl+N to add a card. Ctrl+Q to quit. Ctrl+D to create a deck."
+		return "Ctrl+N to add a card. Ctrl+Q to quit. Ctrl+K to create a deck."
 		    + "Ctrl+L to load a deck. Ctrl+T to view/edit the study options.";
 	}
 
@@ -202,7 +202,7 @@ public class MainWindow extends JFrame
 		final JMenu fileMenu = new JMenu("File");
 		final JMenuItem createItem = new JMenuItem("Create deck");
 		createItem.setAccelerator(
-		    KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK));
+		    KeyStroke.getKeyStroke(KeyEvent.VK_K, ActionEvent.CTRL_MASK));
 		createItem.addActionListener(e -> createDeck());
 		fileMenu.add(createItem);
 		final JMenuItem loadItem = new JMenuItem("Load deck");
@@ -219,7 +219,10 @@ public class MainWindow extends JFrame
 		final JMenuItem addCardItem = new JMenuItem("Add Card");
 		addCardItem.setAccelerator(
 		    KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
-		addCardItem.addActionListener(e -> NewCardWindow.display());
+		addCardItem.addActionListener(e -> {
+			CardEditingManager editingManager = new CardEditingManager();
+			editingManager.activateCardCreationWindow();
+		});
 		deckManagementMenu.add(addCardItem);
 		final JMenuItem studyOptionsItem = new JMenuItem("Study Options");
 		studyOptionsItem.setAccelerator(

@@ -134,10 +134,11 @@ class CenteredBoxView extends BoxView {
 
 			textBlockHeight = spans[i];
 		}
-		int offset = (targetSpan - textBlockHeight) / 2;
-		for (int i = 0; i < offsets.length; i++) {
-			offsets[i] += offset;
+		if (textBlockHeight * offsets.length < targetSpan) {
+			int offset = (targetSpan - textBlockHeight) / 2;
+			for (int i = 0; i < offsets.length; i++) {
+				offsets[i] += offset;
+			}
 		}
-
 	}
 }

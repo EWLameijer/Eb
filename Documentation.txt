@@ -1,10 +1,31 @@
-Urgent: ensure proper combination of vertical alignment with the scrollpane
+Bugs (to be solved before submission. Then 4x10 new words as test)
+*Strategy: if 4x10 test works sufficiently, switch Programming to it. Otherwise, debug until 4x10 continuously sufficiently satisfied with performance
 
+whem switching decks, also ensure that both front and back are replaced on the screen.
+After editing card, back of card should be updated in window.
+Still can get message: the front of a card cannot be blank when OKing an empty window.
 
-Urgent: browse/edit cards.
+Important: edit cards.
+<avoid editing same card twice?>
+
+Quality of life:
+-intelligently suggest deck after seeing the letters the user types in load deck (so S->Spanish)
+-allow synchronizing with a text file (automatic reading from and writing to; 2 x tab as delimiter)
+-Macros for ease: E -> [EN], n-> <+g> or function to create 2/3/4-sided cards
+?Allow right hand panel to show answered cards.
+?Pane/Window for browsing cards?
+
+Refactoring
+-MessageBoard, enum EventType 
+-verwijder duplicate "last_reviewed_deck" strings
+-nullness preconditions from Guava?
 
 
 Next experiment: allow the user to set a timer for answering
+?NextNext experiment: implement perceptual learning
+?NextNext experiment: words vs phrases experiment 
+?NextNext experiment: show answers only at end-experiment.
+?NextNext experiment: 'spring cleaning' option.
 
 
 
@@ -284,6 +305,9 @@ Design
 	-when creating/switching a deck, the reviewing is now also correctly reset
 	-Eb now restarts on the last used deck.
 	-Ensured that loading a new window or starting Eb shows the proper deck name.
+	-In reviewing mode, text now properly aligned if it is bigger than the raw size of the card panel.
+	-The New Card window now uses internal scrollpanes to allow you to enter lots of text and be able to see it, even without resizing the window.
+	-Renamed Ctrl+D that created a deck to Ctrl+K, as Ctrl+D is more intuitive for deleting a deck or card, and that use may be necessary later.
 
 
 

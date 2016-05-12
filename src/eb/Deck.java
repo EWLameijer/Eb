@@ -8,6 +8,7 @@ import java.io.ObjectOutputStream;
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -389,5 +390,16 @@ public class Deck {
 
 	public static void setNameOfLastReviewedDeck(String nameOfLastReviewedDeck) {
 		c_nameOfLastReviewedDeck = nameOfLastReviewedDeck;
+	}
+
+	public static Optional<Card> getCardWithFront(String frontText) {
+		ensureDeckExists();
+		return m_contents.getCardWithFront(frontText);
+
+	}
+
+	public static void removeCard(Card card) {
+		ensureDeckExists();
+		m_contents.removeCard(card);
 	}
 }

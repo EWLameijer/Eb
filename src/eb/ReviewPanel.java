@@ -2,6 +2,7 @@ package eb;
 
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -72,7 +73,24 @@ public class ReviewPanel extends JPanel {
 		m_backOfCardPanel.setBackground(Color.YELLOW);
 		add(m_backOfCardPanel, backOfCardConstraints);
 
+		JButton editButton = new JButton("Edit card");
+		editButton.addActionListener(e -> {
+			Card currentCard = Deck.getCardWithFront(Reviewer.getCurrentFront())
+		      .get();
+			CardEditingManager editingManager = new CardEditingManager(currentCard);
+			editingManager.activateCardEditingWindow(currentCard);
+		});
+
+		JButton editButton2 = new JButton("Edit card");
+		editButton2.addActionListener(e -> {
+			Card currentCard = Deck.getCardWithFront(Reviewer.getCurrentFront())
+		      .get();
+			CardEditingManager editingManager = new CardEditingManager(currentCard);
+			editingManager.activateCardEditingWindow(currentCard);
+		});
+
 		JPanel buttonPanelForHiddenBack = new JPanel();
+		buttonPanelForHiddenBack.setLayout(new FlowLayout());
 		JButton showAnswerButton = new JButton("Show Answer");
 		showAnswerButton.getInputMap(WHEN_IN_FOCUSED_WINDOW)
 		    .put(KeyStroke.getKeyStroke('s'), "show answer");
@@ -80,6 +98,7 @@ public class ReviewPanel extends JPanel {
 		    new ButtonAction(() -> showAnswer()));
 		showAnswerButton.addActionListener(e -> showAnswer());
 		buttonPanelForHiddenBack.add(showAnswerButton);
+		buttonPanelForHiddenBack.add(editButton2);
 
 		JPanel buttonPanelForShownBack = new JPanel();
 		JButton rememberedButton = new JButton("Remembered");
@@ -97,6 +116,7 @@ public class ReviewPanel extends JPanel {
 
 		forgottenButton.addActionListener(e -> remembered(false));
 		buttonPanelForShownBack.add(forgottenButton);
+		buttonPanelForShownBack.add(editButton);
 
 		GridBagConstraints buttonPanelConstraints = new GridBagConstraints();
 		buttonPanelConstraints.gridx = 0;

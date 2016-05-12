@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Contains the properties belonging to the 'pure' deck itself, like its name
@@ -121,22 +122,7 @@ public class LogicalDeck implements Serializable {
 	 *         (false)
 	 */
 	private boolean isNotYetPresentInDeck(String front) {
-		// Preconditions: front is a valid identifier.
-		Utilities.require(Utilities.isStringValidIdentifier(front),
-		    "LogicalDeck.isNotYetPresentInDeck() error: the text on the front of the "
-		        + "card needs to be a valid identifier, not null or a string with "
-		        + "only whitespace characters.");
-
-		for (final Card card : m_cards) {
-			if (card.getFront().equals(front)) {
-				return false; // a card with the same front IS present in the deck.
-			}
-		}
-
-		// if you get here, no card with the checked-for front has been found
-		return true;
-
-		// Postconditions: none, really. Simple return of a boolean.
+		return !getCardWithFront(front).isPresent();
 	}
 
 	/**
@@ -240,5 +226,30 @@ public class LogicalDeck implements Serializable {
 
 	public String getName() {
 		return m_name;
+	}
+
+	public Optional<Card> getCardWithFront(String frontText) {
+		// Preconditions: front is a valid identifier.
+		Utilities.require(Utilities.isStringValidIdentifier(frontText),
+		    "LogicalDeck.isNotYetPresentInDeck() error: the text on the front of the "
+		        + "card needs to be a valid identifier, not null or a string with "
+		        + "only whitespace characters.");
+
+		for (final Card card : m_cards) {
+			if (card.getFront().equals(frontText)) {
+				return Optional.of(card); // a card with the same front IS present in
+				                          // the deck.
+			}
+		}
+
+		// if you get here, no card with the checked-for front has been found
+		return Optional.empty();
+
+		// Postconditions: none, really. Simple return of a boolean.
+	}
+
+	public void removeCard(Card card) {
+		m_cards.remove(card);
+
 	}
 }

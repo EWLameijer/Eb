@@ -21,10 +21,10 @@ public class Card implements Serializable {
 	private static final long serialVersionUID = -2746012998758766327L;
 
 	// The text/contents of the front of the card.
-	private final String m_textOnFront;
+	private String m_textOnFront;
 
 	// The text/contents of the back of the card.
-	private final String m_textOnBack;
+	private String m_textOnBack;
 
 	// The time/instant when this card was created.
 	private final Instant m_creationInstant;
@@ -189,6 +189,19 @@ public class Card implements Serializable {
 		    "Card.addReview error: review cannot be null.");
 		m_reviews.add(review);
 		reportReviews();
+	}
+
+	public void setFront(String front) {
+		Utilities.require(Utilities.isStringValidIdentifier(front),
+		    "Card.setFront() error: "
+		        + "the given front is not a valid identifier");
+		m_textOnFront = front;
+	}
+
+	public void setBack(String back) {
+		Utilities.require(Utilities.isStringValidIdentifier(back),
+		    "Card.setBack() error: " + "the given back is not a valid identifier");
+		m_textOnBack = back;
 	}
 
 }
