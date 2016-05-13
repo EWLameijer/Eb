@@ -1,7 +1,7 @@
 Bugs (to be solved before submission. Then 4x10 new words as test)
 *Strategy: if 4x10 test works sufficiently, switch Programming to it. Otherwise, debug until 4x10 continuously sufficiently satisfied with performance
 
-whem switching decks, also ensure that both front and back are replaced on the screen.
+when switching decks, also ensure that both front and back are replaced on the screen.
 After editing card, back of card should be updated in window.
 Still can get message: the front of a card cannot be blank when OKing an empty window.
 

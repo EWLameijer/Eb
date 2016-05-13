@@ -10,19 +10,17 @@ import javax.swing.JTextField;
 public class LabelledTextField extends JPanel {
 	private final JLabel m_label;
 	private final JTextField m_textField;
-	private final transient ListenerManager<TextFieldChangeListener> listenerManager;
 
 	LabelledTextField(String labelText, String textFieldContents, int size,
 	    int precision) {
-		listenerManager = new ListenerManager<>(TextFieldChangeListener.ID);
 		m_label = new JLabel(labelText);
 		m_textField = new JTextField();
 		m_textField.setPreferredSize(new Dimension(40, 20));
 		m_textField
 		    .setDocument(new FixedSizeNumberDocument(m_textField, size, precision));
-		m_textField.getDocument()
-		    .addDocumentListener(new DelegatingDocumentListener(
-		        () -> listenerManager.notifyListeners()));
+		// m_textField.getDocument()
+		// .addDocumentListener(new DelegatingDocumentListener(
+		// () -> listenerManager.notifyListeners()));
 		m_textField.setText(textFieldContents);
 		add(m_label);
 		add(m_textField);
@@ -34,11 +32,6 @@ public class LabelledTextField extends JPanel {
 
 	public void setContents(String text) {
 		m_textField.setText(text);
-	}
-
-	public void addListener(TextFieldChangeListener textFieldChangeListener,
-	    String id) {
-		listenerManager.addListener(textFieldChangeListener, id);
 	}
 
 	public void setContents(int i) {

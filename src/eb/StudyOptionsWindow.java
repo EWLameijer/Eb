@@ -193,9 +193,8 @@ public class StudyOptionsWindow extends JFrame
 		m_loadEbDefaultsButton.addActionListener(e -> loadEbDefaults());
 		m_setToTheseValuesButton.addActionListener(e -> saveSettingsToDeck());
 		m_initialIntervalBox.addDataFieldChangeListener(this);
-		m_sizeOfReview.addListener(this, TextFieldChangeListener.ID);
+		BlackBoard.register(this, UpdateType.TEXTFIELD_CHANGED);
 		m_timeToWaitAfterCorrectReview.addDataFieldChangeListener(this);
-		m_lengtheningFactor.addListener(this, TextFieldChangeListener.ID);
 		m_timeToWaitAfterIncorrectReview.addDataFieldChangeListener(this);
 
 		// Then create two panels: one for setting the correct values for the study
@@ -247,10 +246,9 @@ public class StudyOptionsWindow extends JFrame
 	}
 
 	@Override
-	public void respondToEventType(String eventId) {
-		if (eventId.equals(TextFieldChangeListener.ID)) {
+	public void respondToUpdate(UpdateType updateType) {
+		if (updateType == UpdateType.TEXTFIELD_CHANGED) {
 			updateTitle();
 		}
-
 	}
 }

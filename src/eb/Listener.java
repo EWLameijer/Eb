@@ -2,6 +2,6 @@ package eb;
 
 @FunctionalInterface
 public interface Listener {
-	void respondToEventType(String eventId);
+	void respondToUpdate(UpdateType updateType);
 
 }
