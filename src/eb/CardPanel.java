@@ -70,6 +70,7 @@ public class CardPanel extends JPanel {
 		m_textPane.setText(text);
 		repaint();
 	}
+
 }
 
 @SuppressWarnings("serial")

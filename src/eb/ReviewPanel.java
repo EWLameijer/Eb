@@ -36,7 +36,7 @@ class ButtonAction extends AbstractAction {
  * @author Eric-Wubbo Lameijer
  */
 @SuppressWarnings("serial")
-public class ReviewPanel extends JPanel {
+public class ReviewPanel extends JPanel implements Listener {
 
 	private CardPanel m_frontOfCardPanel;
 	private CardPanel m_backOfCardPanel;
@@ -44,6 +44,8 @@ public class ReviewPanel extends JPanel {
 
 	private static final String HIDDEN_ANSWER = "HIDDEN_ANSWER";
 	private static final String SHOWN_ANSWER = "SHOWN_ANSWER";
+
+	private boolean m_answerShown = false;
 
 	ReviewPanel() {
 		super();
@@ -143,6 +145,8 @@ public class ReviewPanel extends JPanel {
 		JPanel sidePanel = new JPanel();
 		sidePanel.setBackground(Color.RED);
 		add(sidePanel, sidePanelConstraints);
+
+		BlackBoard.register(this, UpdateType.CARD_CHANGED);
 	}
 
 	private void remembered(boolean wasRemembered) {
@@ -150,6 +154,7 @@ public class ReviewPanel extends JPanel {
 		cardLayout.show(m_buttonPanel, HIDDEN_ANSWER);
 		Reviewer.wasRemembered(wasRemembered);
 		m_backOfCardPanel.setText("");
+		m_answerShown = false;
 		if (Reviewer.hasNextCard()) {
 			m_frontOfCardPanel.setText(Reviewer.getCurrentFront());
 			repaint();
@@ -160,6 +165,7 @@ public class ReviewPanel extends JPanel {
 		CardLayout cardLayout = (CardLayout) (m_buttonPanel.getLayout());
 		cardLayout.show(m_buttonPanel, SHOWN_ANSWER);
 		m_backOfCardPanel.setText(Reviewer.getCurrentBack());
+		m_answerShown = true;
 		repaint();
 	}
 
@@ -171,6 +177,15 @@ public class ReviewPanel extends JPanel {
 
 	public void refresh() {
 		repaint();
+
+	}
+
+	@Override
+	public void respondToUpdate(UpdateType updateType) {
+		if (updateType == UpdateType.CARD_CHANGED) {
+			m_frontOfCardPanel.setText(Reviewer.getCurrentFront());
+			m_backOfCardPanel.setText(m_answerShown ? Reviewer.getCurrentBack() : "");
+		}
 
 	}
 

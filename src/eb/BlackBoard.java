@@ -24,6 +24,9 @@ public class BlackBoard {
 	public static void register(Listener listener, UpdateType updateType) {
 		Utilities.require(listener != null,
 		    "BlackBoard.register() error: listener object should not be null");
+		if (!c_listeners.containsKey(updateType)) {
+			c_listeners.put(updateType, new HashSet<Listener>());
+		}
 		c_listeners.get(updateType).add(listener);
 	}
 

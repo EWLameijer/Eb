@@ -153,15 +153,14 @@ public class CardEditingManager {
 			final Card candidateCard = new Card(frontText, backText);
 			Deck.addCard(candidateCard);
 			m_cardEditingWindow.updateContents("", "");
-
 		} else {
 			// in editing mode
 			m_cardToBeModified.setFront(frontText);
 			m_cardToBeModified.setBack(backText);
 			c_cardsBeingEdited.remove(m_cardToBeModified);
 			m_cardEditingWindow.dispose();
-
 		}
+		BlackBoard.post(UpdateType.CARD_CHANGED);
 	}
 
 	public void endEditing() {
