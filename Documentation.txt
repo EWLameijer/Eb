@@ -1,13 +1,41 @@
 *Strategy: if 4x10 test works sufficiently, switch Programming to it. Otherwise, debug until 4x10 continuously sufficiently satisfied with performance
 
+Test 1 (di 17/5) Okay, works well.
+
+
+Timer project
+2) create a (sometimes visible) TimeInputElement for the timer in the options window.
+3) if in reactive state and there is a review and the review is timed, show a starter 
+panel to let the user start the review.
+4) let the review start as soon as the "start" button on this panel is pressed
+5) ensure that if the card was timed out, there is no remembered or forgotten button, 
+just a next button.
+6) in the summarizing screen, add text indicating the number of timed-outs 
+
+[DONE]
+1) create a timed combobox in the options window
+
 Bugs (to be solved before submission. Then 4x10 new words as test)
 
+
+What is going wrong?
+methods in CardEditingManager and CardEditingWindow don't have clear names 
+and clear responsibilities.
+
+CardEditingManager:
+	Responsibilities:
+		-opens and closes/disposes CardEditingWindow =>
+		-initializes CardEditingWindow with the correct front and back =>
+
+CardEditingWindow
+	Responsibilities:
+		-returns user-provided values to the CardEditingManager => 
+		  calls cardEditingManager.processProposedContents
 
 
 
 
 Edit card; Ctrl+E
-Kan ook gewoon (done/failed laten zien)
 Kan ook gewoon (done/failed laten zien)
 when switching decks, also ensure that both front and back are replaced on the screen.
 
@@ -28,6 +56,11 @@ Refactoring
 -verwijder duplicate "last_reviewed_deck" strings
 -nullness preconditions from Guava?
 -Split panel in reviewing pane, so only need one Edit button
+
+Modes:
+timed: no yes [if yes: timer]
+feedback: immediate, delayed
+mode: normal, perceptual [if perceptual: number of alternatives]
 
 
 Next experiment: allow the user to set a timer for answering

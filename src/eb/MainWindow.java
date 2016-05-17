@@ -94,7 +94,7 @@ public class MainWindow extends JFrame
 	private String getUICommands() {
 		// preconditions: none
 		// postconditions: none
-		return "Ctrl+N to add a card. Ctrl+Q to quit. Ctrl+K to create a deck."
+		return "Ctrl+N to add a card. Ctrl+Q to quit. Ctrl+K to create a deck. "
 		    + "Ctrl+L to load a deck. Ctrl+T to view/edit the study options.";
 	}
 
@@ -282,6 +282,7 @@ public class MainWindow extends JFrame
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
+			Deck.setNameOfLastReviewedDeck("");
 		}
 
 	}

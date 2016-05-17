@@ -57,3 +57,4 @@ bin/eb/*.class
 sonar*
 CleaningCode.ods
 eb_status.txt
+/bin/

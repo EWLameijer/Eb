@@ -56,6 +56,8 @@ public class StudyOptionsWindow extends JFrame
 	private final LabelledTextField m_lengtheningFactor;
 
 	private final TimeInputElement m_timeToWaitAfterIncorrectReview;
+	
+	private final LabelledComboBox m_timedModus;
 
 	/**
 	 * Creates a new Study Options window.
@@ -78,6 +80,8 @@ public class StudyOptionsWindow extends JFrame
 		m_timeToWaitAfterIncorrectReview = TimeInputElement.createInstance(
 		    "Time to wait for re-reviewing forgotten card:",
 		    studyOptions.getForgottenCardInterval());
+		String[] normalTimedOptions = new String[]{"normal", "timed"};
+		m_timedModus = new LabelledComboBox("normal or timed", normalTimedOptions);
 		m_cancelButton = new JButton("Discard unsaved changes and close");
 		m_loadEbDefaultsButton = new JButton("Load Eb's default values");
 		m_loadCurrentDeckSettingsButton = new JButton(
@@ -214,6 +218,7 @@ public class StudyOptionsWindow extends JFrame
 		settingsBox.add(m_timeToWaitAfterCorrectReview);
 		settingsBox.add(m_lengtheningFactor);
 		settingsBox.add(m_timeToWaitAfterIncorrectReview);
+		settingsBox.add(m_timedModus);
 		settingsPane.add(settingsBox, BorderLayout.NORTH);
 
 		buttonsPane.add(m_cancelButton);

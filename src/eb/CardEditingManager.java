@@ -19,8 +19,6 @@ public class CardEditingManager {
 	// is null in case of creating a new card.
 	private Card m_cardToBeModified;
 
-	private boolean m_areContentsAcceptable = false;
-
 	private CardEditingWindow m_cardEditingWindow;
 
 	// prevent a card from being edited in two windows at the same time.
@@ -44,8 +42,7 @@ public class CardEditingManager {
 		m_cardToBeModified = null;
 	}
 
-	private void closeOptionPaneWithResult(boolean result) {
-		m_areContentsAcceptable = result;
+	private void closeOptionPane() {
 		JOptionPane.getRootFrame().dispose();
 	}
 
@@ -72,11 +69,12 @@ public class CardEditingManager {
 		}
 	}
 
-	public boolean returnProposedContents(String frontText, String backText) {
+	public void processProposedContents(String frontText, String backText) {
 		// Case 1 of 4: If both fields are blank, simply dispose of the window;
 		// the user has changed his or her mind
 		if (frontText.equals("") && backText.equals("")) {
 			endEditing();
+			return;
 		}
 
 		// Case 2 of 4: the front is empty, the back is not. This is not hasty
@@ -86,7 +84,7 @@ public class CardEditingManager {
 			JOptionPane.showMessageDialog(null,
 			    "Cannot " + verb + " card: the front of a card cannot be blank.",
 			    "Cannot " + verb + " card", JOptionPane.ERROR_MESSAGE);
-			return false;
+			return;
 		}
 
 		// Case 3 of 4: the front of the card is new or the front is the same
@@ -96,7 +94,7 @@ public class CardEditingManager {
 		if (frontText.equals(getCurrentFront())
 		    || !currentCardWithThisFront.isPresent()) {
 			submitCardContents(frontText, backText);
-			return true;
+			return;
 		}
 
 		// Case 4 of 4: there is a current (but different) card with this exact
@@ -104,7 +102,7 @@ public class CardEditingManager {
 		Card duplicate = currentCardWithThisFront.get();
 		JButton reeditButton = new JButton("Re-edit card");
 		reeditButton.addActionListener(e -> {
-			closeOptionPaneWithResult(false);
+			closeOptionPane();
 		});
 
 		JButton mergeButton = new JButton("Merge backs of cards");
@@ -114,13 +112,13 @@ public class CardEditingManager {
 			String newBack = currentBack + "; " + otherBack;
 			m_cardEditingWindow.updateContents(frontText, newBack);
 			Deck.removeCard(duplicate);
-			closeOptionPaneWithResult(false);
+			closeOptionPane();
 		});
 		JButton deleteThisButton = new JButton("Delete this card");
 		deleteThisButton.addActionListener(e -> {
 			if (inCardCreatingMode()) {
 				m_cardEditingWindow.updateContents("", "");
-				closeOptionPaneWithResult(false);
+				closeOptionPane();
 			} else {
 				endEditing();
 			}
@@ -128,7 +126,7 @@ public class CardEditingManager {
 		JButton deleteOtherButton = new JButton("Delete the other card");
 		deleteOtherButton.addActionListener(e -> {
 			Deck.removeCard(duplicate);
-			closeOptionPaneWithResult(false);
+			closeOptionPane();
 			submitCardContents(frontText, backText);
 		});
 		Object[] buttons = { reeditButton, mergeButton, deleteThisButton,
@@ -138,7 +136,6 @@ public class CardEditingManager {
 		        + duplicate.getBack() + "'",
 		    "A card with this front already exists. What do you want to do?", 0,
 		    JOptionPane.QUESTION_MESSAGE, null, buttons, null);
-		return m_areContentsAcceptable;
 	}
 
 	/**
@@ -164,10 +161,10 @@ public class CardEditingManager {
 	}
 
 	public void endEditing() {
-
 		if (!inCardCreatingMode()) {
 			c_cardsBeingEdited.remove(m_cardToBeModified);
 		}
+		m_cardEditingWindow.dispose();
 	}
 
 }

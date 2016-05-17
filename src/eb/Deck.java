@@ -48,7 +48,7 @@ public class Deck {
 	private static Set<DeckChangeListener> m_deckChangeListeners = new HashSet<>();
 	private static Set<DeckSwapListener> m_deckSwapListeners = new HashSet<>();
 
-	private static String c_nameOfLastReviewedDeck;
+	private static String c_nameOfLastReviewedDeck = "";
 
 	/**
 	 * Private constructor: should not be called as this is more of a static

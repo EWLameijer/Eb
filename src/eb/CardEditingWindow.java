@@ -17,8 +17,11 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextPane;
 
 /**
- * NewCardWindow allows the user to create a new card in the GUI, and to send it
- * for checking and storage to the Deck.
+ * CardEditingWindow allows the user to add a new card to the deck, or to edit an 
+ * existing card.
+ * 
+ * It is managed by a CardEditingManager object, which checks the returned contents
+ * and opens/closes it.
  *
  * @author Eric-Wubbo Lameijer
  */
@@ -212,23 +215,9 @@ public class CardEditingWindow extends JFrame {
 		final String frontText = m_frontOfCard.getText();
 		final String backText = m_backOfCard.getText();
 
-		m_manager.returnProposedContents(frontText, backText);
-
-		// Allow closing if the card is totally blank
-		if (frontText.equals("") && backText.equals("")) {
-			dispose();
-		} else {
-
-			// logging
-			Logger.getGlobal().info(String.format("Front: %s, back %s%n",
-			    m_frontOfCard.getText(), m_backOfCard.getText()));
-
-			// note that the
-
-			// Whatever happens, transfer the focus back to the TextArea representing
-			// the front of the card.
-			m_frontOfCard.requestFocusInWindow();
-		}
+		m_manager.processProposedContents(frontText, backText);
+// m_frontOfCard.requestFocusInWindow();
+		
 		// postconditions: If adding succeeded, the front and back should
 		// be blank again, if it didn't, they should be the same as they were
 		// before (so nothing changed). Since the logic of the postcondition
