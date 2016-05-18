@@ -112,7 +112,7 @@ public class StudyOptionsWindow extends JFrame
 			title += " - UNSAVED CHANGES";
 		}
 		setTitle(title);
-		m_timeForTimer.setVisible(guiStudyOptions.getTimedModus());
+		m_timeForTimer.setVisible(guiStudyOptions.isTimedModus());
 		// postconditions: none. Simply changes the frame's title.
 	}
 
@@ -134,8 +134,8 @@ public class StudyOptionsWindow extends JFrame
 		m_lengtheningFactor.setContents(settings.getLengtheningFactor());
 		m_timeToWaitAfterIncorrectReview
 		    .setInterval(settings.getForgottenCardInterval());
-		m_timedModus.setTo(settings.getTimedModus() ? "timed" : "normal");
-		m_timeForTimer.setVisible(settings.getTimedModus());
+		m_timedModus.setTo(settings.isTimedModus() ? "timed" : "normal");
+		m_timeForTimer.setVisible(settings.isTimedModus());
 		m_timeForTimer.setInterval(settings.getTimerInterval());
 	}
 
@@ -229,7 +229,7 @@ public class StudyOptionsWindow extends JFrame
 		settingsBox.add(m_timeToWaitAfterCorrectReview);
 		settingsBox.add(m_lengtheningFactor);
 		settingsBox.add(m_timeToWaitAfterIncorrectReview);
-		boolean isTimed = Deck.getStudyOptions().getTimedModus();
+		boolean isTimed = Deck.getStudyOptions().isTimedModus();
 		m_timedModus.setTo(isTimed ? "timed" : "normal");
 		settingsBox.add(m_timedModus);
 		settingsBox.add(m_timeForTimer);

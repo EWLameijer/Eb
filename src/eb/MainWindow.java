@@ -53,7 +53,7 @@ public class MainWindow extends JFrame
 
 	private static final String EB_STATUS_FILE = "eb_status.txt";
 
-	private final JButton m_startReviewingButton = new JButton("Review now");
+	private final JButton m_startReviewingButton = new JButton();
 
 	// Contains the REVIEWING_PANEL and the INFORMATION_PANEL, using a CardLayout.
 	private final JPanel m_modesContainer;
@@ -133,6 +133,15 @@ public class MainWindow extends JFrame
 		message.append("</html>");
 		m_messageLabel.setText(message.toString());
 		this.setTitle("Eb: " + Deck.getName());
+		String reviewButtonText;
+		if (Deck.getStudyOptions().isTimedModus()) {
+			TimeInterval timeInterval = Deck.getStudyOptions().getTimerInterval();
+			reviewButtonText = "Review now (timed, " + timeInterval.getScalar() + " " +
+					timeInterval.getUnit().getUserInterfaceName() + ")";
+		} else {
+			reviewButtonText = "Review now";
+		}
+		m_startReviewingButton.setText(reviewButtonText);
 
 		// postconditions: none (well, the label should have some text, but I'm
 		// willing to trust that that happens.
@@ -243,6 +252,8 @@ public class MainWindow extends JFrame
 		m_modesContainer.add(m_reviewPanel, REVIEW_PANEL_ID);
 		JPanel summarizingPanel = new SummarizingPanel();
 		m_modesContainer.add(summarizingPanel, SUMMARIZING_PANEL_ID);
+		TimedReviewStartPanel timedReviewStartPanel = new TimedReviewStartPanel();
+		m_modesContainer.add(timedReviewStartPanel, TIMED_REVIEW_START_PANEL_ID);
 		add(m_modesContainer);
 
 		setNameOfLastReviewedDeck();
@@ -375,8 +386,12 @@ public class MainWindow extends JFrame
 	 */
 	private void showReactivePanel() {
 		if (mustReviewNow()) {
-			ProgramController.setProgramState(ProgramState.REVIEWING);
-			showReviewingPanel();
+			if (Deck.getStudyOptions().isTimedModus()) {
+				ProgramController.setProgramState(ProgramState.WAITING_FOR_TIMER_START);
+			} else {
+				ProgramController.setProgramState(ProgramState.REVIEWING);
+				showReviewingPanel();
+			}
 		} else {
 			showInformationPanel();
 		}
@@ -400,6 +415,9 @@ public class MainWindow extends JFrame
 			break;
 		case SUMMARIZING:
 			showSummarizingPanel();
+			break;
+		case WAITING_FOR_TIMER_START:
+			switchToPanel(TIMED_REVIEW_START_PANEL_ID);
 			break;
 		default:
 			Utilities.require(false, "MainWindow.respondToProgramStateChange "

@@ -6,14 +6,12 @@ Test 1 (di 17/5) Okay, works well.
 Timer project
 
 
-3) if in reactive state and there is a review and the review is timed, show a starter 
-panel to let the user start the review.
-	3a) Create an extra panel
-	3b) Add it to the total layout
-	3c) Create "Yes" and "No" buttons, and add those to the panel.
-	3d) if "No" button is clicked, go to basic window with Review
-	3e) Make the review button show Review - timed - X seconds
-4) let the review start as soon as the "start" button on this panel is pressed
+
+
+
+
+
+4) let the review start as soon as the "start" button on the starter panel is pressed
 5) ensure that if the card was timed out, there is no remembered or forgotten button, 
 just a next button.
 6) in the summarizing screen, add text indicating the number of timed-outs 
@@ -28,6 +26,14 @@ well as an equality operator.
 	    the correct value (instead of setting it to "normal" automatically
 	2b) ensure that setting the status to normal or timed properly updates the 
 	    visibility of the timer-time box.
+	    	3a) Create an extra panel
+	3b) Add it to the total layout
+	3c) Create "Yes" and "No" buttons, and add those to the panel.
+		3d) if "No" button is clicked, go to basic window with Review
+			3f) If in reactive mode and option is timer: show timer window
+	3e) Make the review button show Review - timed - X seconds
+	3) if in reactive state and there is a review and the review is timed, show a starter 
+panel to let the user start the review.
 
 Bugs (to be solved before submission. Then 4x10 new words as test)
 

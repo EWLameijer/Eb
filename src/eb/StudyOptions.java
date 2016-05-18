@@ -164,7 +164,7 @@ public class StudyOptions implements Serializable {
 		return m_lengtheningFactor;
 	}
 
-	public boolean getTimedModus() {
+	public boolean isTimedModus() {
 		return m_isTimed;
 	}
 
