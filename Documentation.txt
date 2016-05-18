@@ -4,14 +4,15 @@ Test 1 (di 17/5) Okay, works well.
 
 
 Timer project
-1b) add the status of the timed combobox to the equality comparisons.
-	First: let the labelledComboBox inherit from InputPanel
-	Then: create a normal vs timed element in 
-1c) also make changing the status of the combo box signal unsaved changes. Perhaps make it a subclass of a generic “InputElement” that defines a signalling method as 
-well as an equality operator.
-2) create a (sometimes visible) TimeInputElement for the timer in the options window.
+
+
 3) if in reactive state and there is a review and the review is timed, show a starter 
 panel to let the user start the review.
+	3a) Create an extra panel
+	3b) Add it to the total layout
+	3c) Create "Yes" and "No" buttons, and add those to the panel.
+	3d) if "No" button is clicked, go to basic window with Review
+	3e) Make the review button show Review - timed - X seconds
 4) let the review start as soon as the "start" button on this panel is pressed
 5) ensure that if the card was timed out, there is no remembered or forgotten button, 
 just a next button.
@@ -19,6 +20,14 @@ just a next button.
 
 [DONE]
 1) create a timed combobox in the options window
+1b) add the status of the timed combobox to the equality comparisons.
+1c) also make changing the status of the combo box signal unsaved changes. Perhaps make it a subclass of a generic “InputElement” that defines a signalling method as 
+well as an equality operator.
+2) create a (sometimes visible) TimeInputElement for the timer in the options window.
+	2a) Based on how the TimeInputElement handles the combo box, set the combo box to
+	    the correct value (instead of setting it to "normal" automatically
+	2b) ensure that setting the status to normal or timed properly updates the 
+	    visibility of the timer-time box.
 
 Bugs (to be solved before submission. Then 4x10 new words as test)
 

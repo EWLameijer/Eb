@@ -49,6 +49,7 @@ public class MainWindow extends JFrame
 	private static final String REVIEW_PANEL_ID = "REVIEWING_PANEL";
 	private static final String INFORMATION_PANEL_ID = "INFORMATION_PANEL";
 	private static final String SUMMARIZING_PANEL_ID = "SUMMARIZING_PANEL";
+	private static final String TIMED_REVIEW_START_PANEL_ID = "TIMER_START_PANEL";
 
 	private static final String EB_STATUS_FILE = "eb_status.txt";
 

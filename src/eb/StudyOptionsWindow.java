@@ -58,6 +58,8 @@ public class StudyOptionsWindow extends JFrame
 	private final TimeInputElement m_timeToWaitAfterIncorrectReview;
 	
 	private final LabelledComboBox m_timedModus;
+	
+	private final TimeInputElement m_timeForTimer;
 
 	/**
 	 * Creates a new Study Options window.
@@ -82,19 +84,23 @@ public class StudyOptionsWindow extends JFrame
 		    studyOptions.getForgottenCardInterval());
 		String[] normalTimedOptions = new String[]{"normal", "timed"};
 		m_timedModus = new LabelledComboBox("normal or timed", normalTimedOptions);
+		m_timeForTimer = TimeInputElement.createInstance(
+				"Maximum time for answering a card:", studyOptions.getTimerInterval());
+		
 		m_cancelButton = new JButton("Discard unsaved changes and close");
 		m_loadEbDefaultsButton = new JButton("Load Eb's default values");
 		m_loadCurrentDeckSettingsButton = new JButton(
 		    "Load settings of current deck");
 		m_setToTheseValuesButton = new JButton(
 		    "Set study parameters of this deck to these values");
+		
 	}
 
 	/**
 	 * Updates the title of the frame in response to changes to indicate to the
 	 * user whether there are unsaved changes.
 	 */
-	private void updateTitle() {
+	private void updateFrame() {
 		// preconditions: none. Is by definition only called when the object
 		// has been constructed already.
 		StudyOptions guiStudyOptions = gatherUIDataIntoStudyOptionsObject();
@@ -106,6 +112,7 @@ public class StudyOptionsWindow extends JFrame
 			title += " - UNSAVED CHANGES";
 		}
 		setTitle(title);
+		m_timeForTimer.setVisible(guiStudyOptions.getTimedModus());
 		// postconditions: none. Simply changes the frame's title.
 	}
 
@@ -128,6 +135,8 @@ public class StudyOptionsWindow extends JFrame
 		m_timeToWaitAfterIncorrectReview
 		    .setInterval(settings.getForgottenCardInterval());
 		m_timedModus.setTo(settings.getTimedModus() ? "timed" : "normal");
+		m_timeForTimer.setVisible(settings.getTimedModus());
+		m_timeForTimer.setInterval(settings.getTimerInterval());
 	}
 
 	/**
@@ -161,7 +170,7 @@ public class StudyOptionsWindow extends JFrame
 		    m_timeToWaitAfterCorrectReview.getInterval(),
 		    m_timeToWaitAfterIncorrectReview.getInterval(),
 		    Utilities.stringToDouble(m_lengtheningFactor.getContents()),
-		    m_timedModus.getValue().equals("timed"));
+		    m_timedModus.getValue().equals("timed"), m_timeForTimer.getInterval());
 	}
 
 	/**
@@ -170,7 +179,7 @@ public class StudyOptionsWindow extends JFrame
 	private void saveSettingsToDeck() {
 		StudyOptions guiStudyOptions = gatherUIDataIntoStudyOptionsObject();
 		Deck.setStudyOptions(guiStudyOptions);
-		updateTitle(); // Should be set to 'no unsaved changes' again.
+		updateFrame(); // Should be set to 'no unsaved changes' again.
 	}
 
 	/**
@@ -220,7 +229,11 @@ public class StudyOptionsWindow extends JFrame
 		settingsBox.add(m_timeToWaitAfterCorrectReview);
 		settingsBox.add(m_lengtheningFactor);
 		settingsBox.add(m_timeToWaitAfterIncorrectReview);
+		boolean isTimed = Deck.getStudyOptions().getTimedModus();
+		m_timedModus.setTo(isTimed ? "timed" : "normal");
 		settingsBox.add(m_timedModus);
+		settingsBox.add(m_timeForTimer);
+		m_timeForTimer.setVisible(isTimed);
 		settingsPane.add(settingsBox, BorderLayout.NORTH);
 
 		buttonsPane.add(m_cancelButton);
@@ -233,7 +246,7 @@ public class StudyOptionsWindow extends JFrame
 
 		setSize(700, 400);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		updateTitle();
+		updateFrame();
 		setVisible(true);
 	}
 
@@ -249,13 +262,13 @@ public class StudyOptionsWindow extends JFrame
 
 	@Override
 	public void respondToChangedDataField() {
-		updateTitle();
+		updateFrame();
 	}
 
 	@Override
 	public void respondToUpdate(UpdateType updateType) {
 		if (updateType == UpdateType.INPUTFIELD_CHANGED) {
-			updateTitle();
+			updateFrame();
 		}
 	}
 }

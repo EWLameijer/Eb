@@ -17,8 +17,11 @@ public class BlackBoard {
 	static Map<UpdateType, HashSet<Listener>> c_listeners = new HashMap<UpdateType, HashSet<Listener>>();
 
 	public static void post(UpdateType updateType) {
-		c_listeners.get(updateType).stream()
+		HashSet<Listener> listeners = c_listeners.get(updateType);
+		if (listeners != null) {
+			listeners.stream()
 		    .forEach(e -> e.respondToUpdate(updateType));
+		}
 	}
 
 	public static void register(Listener listener, UpdateType updateType) {

@@ -129,9 +129,10 @@ public class TimeInputElement extends JPanel {
 	}
 
 	private void notifyDataFieldChangeListeners() {
-		for (DataFieldChangeListener dataFieldChangeListener : m_dataFieldChangeListeners) {
-			dataFieldChangeListener.respondToChangedDataField();
-		}
+		BlackBoard.post(UpdateType.INPUTFIELD_CHANGED);
+		//for (DataFieldChangeListener dataFieldChangeListener : m_dataFieldChangeListeners) {
+		//	dataFieldChangeListener.respondToChangedDataField();
+		//}
 	}
 
 	/**
