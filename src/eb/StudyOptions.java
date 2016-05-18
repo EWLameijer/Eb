@@ -39,6 +39,9 @@ public class StudyOptions implements Serializable {
 
 	private static final double DEFAULT_LENGTHENING_FACTOR = 5.0;
 	private double m_lengtheningFactor;
+	
+	private static final boolean DEFAULT_IS_TIMED = false;
+	private boolean m_isTimed;
 
 	/**
 	 * StudyOptions constructor; sets all elements to proper initial values.
@@ -49,7 +52,8 @@ public class StudyOptions implements Serializable {
 	 */
 	StudyOptions(TimeInterval initialInterval,
 	    Optional<Integer> reviewSessionSize, TimeInterval rememberedInterval,
-	    TimeInterval forgottenInterval, Optional<Double> lengtheningFactor) {
+	    TimeInterval forgottenInterval, Optional<Double> lengtheningFactor,
+	    boolean isTimed) {
 		// preconditions: none. Is private constructor, should be fed valid values
 		// internally
 		m_initialInterval = new TimeInterval(initialInterval);
@@ -57,6 +61,7 @@ public class StudyOptions implements Serializable {
 		m_rememberedCardInterval = new TimeInterval(rememberedInterval);
 		m_lengtheningFactor = lengtheningFactor.orElse(DEFAULT_LENGTHENING_FACTOR);
 		m_forgottenCardInterval = new TimeInterval(forgottenInterval);
+		m_isTimed = isTimed;
 		// postconditions: none. Should work.
 	}
 
@@ -85,7 +90,8 @@ public class StudyOptions implements Serializable {
 		// preconditions: none
 		return new StudyOptions(DEFAULT_INITIAL_INTERVAL,
 		    Optional.of(DEFAULT_REVIEW_SESSION_SIZE), DEFAULT_REMEMBERED_INTERVAL,
-		    DEFAULT_FORGOTTEN_INTERVAL, Optional.of(DEFAULT_LENGTHENING_FACTOR));
+		    DEFAULT_FORGOTTEN_INTERVAL, Optional.of(DEFAULT_LENGTHENING_FACTOR),
+		    DEFAULT_IS_TIMED);
 		// postconditions: none. Should have worked.
 	}
 
@@ -116,14 +122,15 @@ public class StudyOptions implements Serializable {
 			    && Utilities.doublesEqualWithinThousands(m_lengtheningFactor,
 			        otherOptions.m_lengtheningFactor)
 			    && m_forgottenCardInterval
-			        .equals(otherOptions.m_forgottenCardInterval);
+			        .equals(otherOptions.m_forgottenCardInterval)
+			    && m_isTimed == otherOptions.m_isTimed;
 		}
 	}
 
 	@Override
 	public int hashCode() {
 		return Objects.hash(m_initialInterval, m_reviewSessionSize,
-		    m_rememberedCardInterval, m_forgottenCardInterval);
+		    m_rememberedCardInterval, m_forgottenCardInterval, m_isTimed);
 	}
 
 	public int getReviewSessionSize() {
@@ -140,5 +147,9 @@ public class StudyOptions implements Serializable {
 
 	public double getLengtheningFactor() {
 		return m_lengtheningFactor;
+	}
+
+	public boolean getTimedModus() {
+		return m_isTimed;
 	}
 }

@@ -280,8 +280,7 @@ public class MainWindow extends JFrame
 				Deck.setNameOfLastReviewedDeck(deckName);
 			}
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			// If input fails, set name to ""
 			Deck.setNameOfLastReviewedDeck("");
 		}
 

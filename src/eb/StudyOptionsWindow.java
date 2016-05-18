@@ -127,6 +127,7 @@ public class StudyOptionsWindow extends JFrame
 		m_lengtheningFactor.setContents(settings.getLengtheningFactor());
 		m_timeToWaitAfterIncorrectReview
 		    .setInterval(settings.getForgottenCardInterval());
+		m_timedModus.setTo(settings.getTimedModus() ? "timed" : "normal");
 	}
 
 	/**
@@ -159,7 +160,8 @@ public class StudyOptionsWindow extends JFrame
 		    Utilities.stringToInt(m_sizeOfReview.getContents()),
 		    m_timeToWaitAfterCorrectReview.getInterval(),
 		    m_timeToWaitAfterIncorrectReview.getInterval(),
-		    Utilities.stringToDouble(m_lengtheningFactor.getContents()));
+		    Utilities.stringToDouble(m_lengtheningFactor.getContents()),
+		    m_timedModus.getValue().equals("timed"));
 	}
 
 	/**
@@ -197,7 +199,7 @@ public class StudyOptionsWindow extends JFrame
 		m_loadEbDefaultsButton.addActionListener(e -> loadEbDefaults());
 		m_setToTheseValuesButton.addActionListener(e -> saveSettingsToDeck());
 		m_initialIntervalBox.addDataFieldChangeListener(this);
-		BlackBoard.register(this, UpdateType.TEXTFIELD_CHANGED);
+		BlackBoard.register(this, UpdateType.INPUTFIELD_CHANGED);
 		m_timeToWaitAfterCorrectReview.addDataFieldChangeListener(this);
 		m_timeToWaitAfterIncorrectReview.addDataFieldChangeListener(this);
 
@@ -252,7 +254,7 @@ public class StudyOptionsWindow extends JFrame
 
 	@Override
 	public void respondToUpdate(UpdateType updateType) {
-		if (updateType == UpdateType.TEXTFIELD_CHANGED) {
+		if (updateType == UpdateType.INPUTFIELD_CHANGED) {
 			updateTitle();
 		}
 	}

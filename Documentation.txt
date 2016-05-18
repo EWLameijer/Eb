@@ -4,6 +4,11 @@ Test 1 (di 17/5) Okay, works well.
 
 
 Timer project
+1b) add the status of the timed combobox to the equality comparisons.
+	First: let the labelledComboBox inherit from InputPanel
+	Then: create a normal vs timed element in 
+1c) also make changing the status of the combo box signal unsaved changes. Perhaps make it a subclass of a generic “InputElement” that defines a signalling method as 
+well as an equality operator.
 2) create a (sometimes visible) TimeInputElement for the timer in the options window.
 3) if in reactive state and there is a review and the review is timed, show a starter 
 panel to let the user start the review.
