@@ -1,6 +1,15 @@
-*Strategy: if 4x10 test works sufficiently, switch Programming to it. Otherwise, debug until 4x10 continuously sufficiently satisfied with performance
+*Strategy: if 4x10 test works sufficiently AND saving project works to
+phase 2, switch Programming to it 
++ start Chinese [5 min per 120 min non-maintenance]. 
+Otherwise, debug until 4x10 continuously sufficiently satisfied with performance
 
 Test 1 (di 17/5) Okay, works well.
+Test 2 (wo 18/5) Okay, works well.
+Test 3 (do 19/5) Okay, works well.
+
+Urgent ***Saving project: on closing Eb or changing deck, save contents of cards to
+text file deckname_DDMMYY_HHMM.txt (in alphabetical order)
+*** Phase 2: allow user to set the saving location of the txtfile (Study options window)  
 
 
 Timer project
