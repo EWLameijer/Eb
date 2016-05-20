@@ -1,11 +1,14 @@
 package eb;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoField;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -241,6 +244,7 @@ public class Deck {
 		try (ObjectOutputStream objOutStream = new ObjectOutputStream(
 		    new FileOutputStream(m_contents.getFileHandle()))) {
 			objOutStream.writeObject(m_contents);
+			m_contents.saveDeckToTextfile();
 		} catch (final Exception e) {
 			// Something goes wrong with serializing the deck; so
 			// you cannot create the file.
@@ -252,6 +256,8 @@ public class Deck {
 		// postconditions: the save has to be a success! Which it is if no
 		// exception occurred - in other words, if you get here.
 	}
+
+
 
 	/**
 	 * Notifies all listeners that the deck has changed.
