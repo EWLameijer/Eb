@@ -8,10 +8,14 @@ Test 2 (wo 18/5) Okay, works well.
 Test 3 (do 19/5) Okay, works well.
 Test 4 (vr 20/5) Okay, works well.
 
+Refactoring: make reviewer normal controller (so un-static)
+For a part this may work, but a Deck/LogicalDeck-like solution may be more logical
+
 Urgent ***Saving project: on closing Eb or changing deck, save contents of cards to
 text file deckname_DDMMYY_HHMM.txt (in alphabetical order)
 *** Phase 2: allow user to set the saving location of the txtfile (Study options window)  
 
+??? Log in archiving window to see current status of deck (like Spanish tm Phrases)
 
 Timer project
 
@@ -535,6 +539,44 @@ Option 3: I can make DeckManager 'wrapping' functions, so DeckManager.getCardCou
 	However, this is ugly as it leads to interface duplication, wrapping all Deck's methods in 
 	
 Ideas
-Sanitize the front and deck, removing leading and lagging whitespace?
 Better error message; either front or duplicate.
+
+Erghh... now reviewPanel gives an exception; basically because one tries to update the view, while it is the controller that should be responsible for updating it
+
+TASK:
+
+USER:
+	Main window  - modes:
+		-REACTIVE: shows number of cards in deck + time till next review + shortcut keys. Time to next review is positive
+		-INFORMATIONAL: same as informational window, but time till next review is negative. Possesses button to start review.
+		-REVIEWING: shows card that is to be reviewed
+		-SUMMARIZING: shows statistics of last round of reviews.
+		
+	1. New card/edit card window:
+		Shows front and back of new card or of card being edited 
+		
+	2. Study options window:
+		Shows ways in which to customize the study options 
+		
+	3. Archive settings window:
+		Shows where the deck gets archived.
+		
+
+	Options (6):
+		-Quit: Ctrl + Q
+		-Create New card: Ctrl + N => opens SW1
+		-Create deck: Ctrl + K
+		-Open Study options window: Ctrl + T 
+		-Open Archive settings window: Ctrl + R
+		-Load Deck: Ctrl + L
+		
+Currently 36 classes - too many for 1 level. Split!
+=> 31 classes. Nice!
+Eb - Eb = ok
+Eb.data: Card, Deck, LogicalDeck, review = OK
+Eb.eventHandling: BlackBoard, listener, UPdate, updatetype = Ok
+Eb.mainWindow: cardPanel, mainWindow. MainWindowState, Reviewer, ReviewPanel, SummarizingPanel, TimedReviewStartPanel; 3 have to do with reviewing, extract them!
+
+
+
 

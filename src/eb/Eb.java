@@ -1,5 +1,7 @@
 package eb;
 
+import eb.mainwindow.MainWindow;
+
 /**
  * Runs Eb.
  *

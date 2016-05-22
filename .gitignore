@@ -58,3 +58,7 @@ sonar*
 CleaningCode.ods
 eb_status.txt
 /bin/
+
+# And my standard test decks
+Spanish*
+default*

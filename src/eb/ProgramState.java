@@ -1,5 +1,0 @@
-package eb;
-
-public enum ProgramState {
-	REACTIVE, REVIEWING, SUMMARIZING, INFORMATIONAL, WAITING_FOR_TIMER_START;
-}
