@@ -123,10 +123,11 @@ public class CardEditingManager {
 		});
 		JButton deleteThisButton = new JButton("Delete this card");
 		deleteThisButton.addActionListener(e -> {
+			closeOptionPane();
 			if (inCardCreatingMode()) {
 				m_cardEditingWindow.updateContents("", "");
-				closeOptionPane();
 			} else {
+				Deck.removeCard(m_cardToBeModified);
 				endEditing();
 			}
 		});
@@ -157,6 +158,7 @@ public class CardEditingManager {
 			final Card candidateCard = new Card(frontText, backText);
 			Deck.addCard(candidateCard);
 			m_cardEditingWindow.updateContents("", "");
+			m_cardEditingWindow.focusFront();
 		} else {
 			// in editing mode
 			m_cardToBeModified.setFront(frontText);

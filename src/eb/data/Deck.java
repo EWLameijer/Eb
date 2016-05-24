@@ -353,5 +353,11 @@ public class Deck {
 	public static void removeCard(Card card) {
 		ensureDeckExists();
 		m_contents.removeCard(card);
+		BlackBoard.post(new Update(UpdateType.DECK_CHANGED));
+	}
+
+	public static boolean contains(Card card) {
+		ensureDeckExists();
+		return m_contents.contains(card);
 	}
 }

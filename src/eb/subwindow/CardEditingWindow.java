@@ -7,7 +7,6 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -19,11 +18,11 @@ import javax.swing.JTextPane;
 import eb.utilities.Utilities;
 
 /**
- * CardEditingWindow allows the user to add a new card to the deck, or to edit an 
- * existing card.
+ * CardEditingWindow allows the user to add a new card to the deck, or to edit
+ * an existing card.
  * 
- * It is managed by a CardEditingManager object, which checks the returned contents
- * and opens/closes it.
+ * It is managed by a CardEditingManager object, which checks the returned
+ * contents and opens/closes it.
  *
  * @author Eric-Wubbo Lameijer
  */
@@ -218,8 +217,8 @@ public class CardEditingWindow extends JFrame {
 		final String backText = m_backOfCard.getText();
 
 		m_manager.processProposedContents(frontText, backText);
-// m_frontOfCard.requestFocusInWindow();
-		
+		//
+
 		// postconditions: If adding succeeded, the front and back should
 		// be blank again, if it didn't, they should be the same as they were
 		// before (so nothing changed). Since the logic of the postcondition
@@ -299,5 +298,9 @@ public class CardEditingWindow extends JFrame {
 		m_frontOfCard.setText(frontText);
 		m_backOfCard.setText(backText);
 
+	}
+
+	public void focusFront() {
+		m_frontOfCard.requestFocusInWindow();
 	}
 }

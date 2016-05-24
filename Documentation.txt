@@ -3,20 +3,36 @@ phase 2, switch Programming to it
 + start Chinese [5 min per 120 min non-maintenance]. 
 Otherwise, debug until 4x10 continuously sufficiently satisfied with performance
 
+Current projects:
+Bugs (urgent)
+	-saving Japanese/Chinese: characters in alternative encodings not saved!
+	-of making a same front: delete the other card hides the current card front, which is not good!
+	
+Core features:
+	-1.1: edit cards 
+	-1.2: save archive to random directory
+	-2.0: get timer working 
+	-3.0: get delayed review working 
+	-4.0: get perceptual learning working
+Small features
+	-make E edit card 
+	-change background of Edit Card to something else (not green!)
+	-Underline S from Show anwer, and R/F of other buttons
+
+
+?3field: so [m]/[p] automatically
+
 Test 1 (di 17/5) Okay, works well.
 Test 2 (wo 18/5) Okay, works well.
 Test 3 (do 19/5) Okay, works well.
 Test 4 (vr 20/5) Okay, works well.
-
-Refactoring: make reviewer normal controller (so un-static)
-For a part this may work, but a Deck/LogicalDeck-like solution may be more logical
 
 Urgent ***Saving project: on closing Eb or changing deck, save contents of cards to
 text file deckname_DDMMYY_HHMM.txt (in alphabetical order)
 *** Phase 2: allow user to set the saving location of the txtfile (Study options window)  
 
 ??? Log in archiving window to see current status of deck (like Spanish tm Phrases)
-
+? Having tabs that can be used to switch decks.
 Timer project
 
 
@@ -386,6 +402,11 @@ Design
 	-Renamed Ctrl+D that created a deck to Ctrl+K, as Ctrl+D is more intuitive for deleting a deck or card, and that use may be necessary later.
 	-One can now edit cards!
 	-Solved a bug in which the back (and front) of a card were not updated after editing a card.
+	-Solved a bug in which creating a deck (while in review screen) did not switch to the new deck.
+	-Solved a bug that when creating a deck/swapping a deck while in reviewing mode kept the "review" button visible in the main window, even if that was not appropriate.
+	-Adding a new card will now bring the cursor back to the front of the field, as to fill in the next card more easily.
+	-Pressing the "Enter" key in the summarizing screen now switches back to normal mode
+	-Solved bug: when making a card with an same front: delete now properly closes dialog
 
 
 

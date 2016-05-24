@@ -8,6 +8,7 @@ import java.util.OptionalDouble;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 
 import eb.data.Deck;
 import eb.data.Review;
@@ -15,6 +16,7 @@ import eb.eventhandling.BlackBoard;
 import eb.eventhandling.Update;
 import eb.eventhandling.UpdateType;
 import eb.mainwindow.reviewing.Reviewer;
+import eb.utilities.ButtonAction;
 
 @SuppressWarnings("serial")
 public class SummarizingPanel extends JPanel {
@@ -35,9 +37,11 @@ public class SummarizingPanel extends JPanel {
 		super();
 
 		m_reviewsCompletedBPanel = new JPanel();
-		m_backToReactiveModeButton.addActionListener(
-		    e -> BlackBoard.post(new Update(UpdateType.PROGRAMSTATE_CHANGED,
-		        MainWindowState.REACTIVE.name())));
+		m_backToReactiveModeButton.getInputMap(WHEN_IN_FOCUSED_WINDOW)
+		    .put(KeyStroke.getKeyStroke("pressed ENTER"), "back to reactive mode");
+		m_backToReactiveModeButton.getActionMap().put("back to reactive mode",
+		    new ButtonAction(() -> toReactiveMode()));
+		m_backToReactiveModeButton.addActionListener(e -> toReactiveMode());
 		m_reviewsCompletedBPanel.add(m_backToReactiveModeButton);
 
 		m_stillReviewsToDoBPanel = new JPanel();
@@ -57,6 +61,11 @@ public class SummarizingPanel extends JPanel {
 		add(m_report);
 		add(m_buttonPanel);
 
+	}
+
+	private void toReactiveMode() {
+		BlackBoard.post(new Update(UpdateType.PROGRAMSTATE_CHANGED,
+		    MainWindowState.REACTIVE.name()));
 	}
 
 	private String optionalDoubleToString(OptionalDouble d) {

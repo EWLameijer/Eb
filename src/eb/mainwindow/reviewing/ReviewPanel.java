@@ -6,35 +6,15 @@ import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
 
-import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
 import eb.data.Card;
 import eb.data.Deck;
-import eb.eventhandling.BlackBoard;
-import eb.eventhandling.Listener;
-import eb.eventhandling.Update;
-import eb.eventhandling.UpdateType;
 import eb.subwindow.CardEditingManager;
-
-@SuppressWarnings("serial")
-class ButtonAction extends AbstractAction {
-	private transient Runnable m_action;
-
-	public ButtonAction(Runnable action) {
-		m_action = action;
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent ae) {
-		Thread thread = new Thread(m_action);
-		thread.start();
-	}
-}
+import eb.utilities.ButtonAction;
 
 /**
  * The panel used to review cards (shows front, on clicking "Show Answer" the
@@ -44,7 +24,7 @@ class ButtonAction extends AbstractAction {
  * @author Eric-Wubbo Lameijer
  */
 @SuppressWarnings("serial")
-public class ReviewPanel extends JPanel implements Listener {
+public class ReviewPanel extends JPanel {
 
 	private CardPanel m_frontOfCardPanel;
 	private CardPanel m_backOfCardPanel;
@@ -53,8 +33,6 @@ public class ReviewPanel extends JPanel implements Listener {
 
 	private static final String HIDDEN_ANSWER = "HIDDEN_ANSWER";
 	private static final String SHOWN_ANSWER = "SHOWN_ANSWER";
-
-	private boolean m_answerShown = false;
 
 	public ReviewPanel() {
 		super();
@@ -83,14 +61,6 @@ public class ReviewPanel extends JPanel implements Listener {
 		m_backOfCardPanel = new CardPanel();
 		m_backOfCardPanel.setBackground(Color.YELLOW);
 		add(m_backOfCardPanel, backOfCardConstraints);
-
-		JButton editButton = new JButton("Edit card");
-		editButton.addActionListener(e -> {
-			Card currentCard = Deck.getCardWithFront(Reviewer.getCurrentFront())
-		      .get();
-			CardEditingManager editingManager = new CardEditingManager(currentCard);
-			editingManager.activateCardEditingWindow(currentCard);
-		});
 
 		JPanel buttonPanelForHiddenBack = new JPanel();
 		buttonPanelForHiddenBack.setLayout(new FlowLayout());
@@ -136,6 +106,14 @@ public class ReviewPanel extends JPanel implements Listener {
 		m_situationalButtonPanel.setBackground(Color.GREEN);
 		add(m_situationalButtonPanel, situationalButtonPanelConstraints);
 
+		JButton editButton = new JButton("Edit card");
+		editButton.addActionListener(e -> {
+			Card currentCard = Deck.getCardWithFront(Reviewer.getCurrentFront())
+		      .get();
+			CardEditingManager editingManager = new CardEditingManager(currentCard);
+			editingManager.activateCardEditingWindow(currentCard);
+		});
+
 		// the fixed button panel contains buttons that need to be visible always
 		GridBagConstraints fixedButtonPanelConstraints = new GridBagConstraints();
 		fixedButtonPanelConstraints.gridx = 3;
@@ -146,9 +124,9 @@ public class ReviewPanel extends JPanel implements Listener {
 		fixedButtonPanelConstraints.weighty = 1.0;
 		fixedButtonPanelConstraints.fill = GridBagConstraints.BOTH;
 		m_fixedButtonPanel = new JPanel();
-		m_fixedButtonPanel.add(editButton, fixedButtonPanelConstraints);
-		m_situationalButtonPanel.setBackground(Color.GREEN);
-		add(m_situationalButtonPanel, fixedButtonPanelConstraints);
+		m_fixedButtonPanel.add(editButton);
+		m_fixedButtonPanel.setBackground(Color.GREEN);
+		add(m_fixedButtonPanel, fixedButtonPanelConstraints);
 
 		// panel, to be used in future to show successful/unsuccessful cards.
 		// for now hidden?
@@ -163,27 +141,19 @@ public class ReviewPanel extends JPanel implements Listener {
 		JPanel sidePanel = new JPanel();
 		sidePanel.setBackground(Color.RED);
 		add(sidePanel, sidePanelConstraints);
-
-		BlackBoard.register(this, UpdateType.CARD_CHANGED);
 	}
 
 	private void remembered(boolean wasRemembered) {
 		CardLayout cardLayout = (CardLayout) (m_situationalButtonPanel.getLayout());
 		cardLayout.show(m_situationalButtonPanel, HIDDEN_ANSWER);
 		Reviewer.wasRemembered(wasRemembered);
-		m_backOfCardPanel.setText("");
-		m_answerShown = false;
-		if (Reviewer.hasNextCard()) {
-			m_frontOfCardPanel.setText(Reviewer.getCurrentFront());
-			repaint();
-		}
+		repaint();
 	}
 
 	private void showAnswer() {
 		CardLayout cardLayout = (CardLayout) (m_situationalButtonPanel.getLayout());
 		cardLayout.show(m_situationalButtonPanel, SHOWN_ANSWER);
-		m_backOfCardPanel.setText(Reviewer.getCurrentBack());
-		m_answerShown = true;
+		Reviewer.showAnswer();
 		repaint();
 	}
 
@@ -198,13 +168,9 @@ public class ReviewPanel extends JPanel implements Listener {
 
 	}
 
-	@Override
-	public void respondToUpdate(Update update) {
-		if (update.getType() == UpdateType.CARD_CHANGED) {
-			m_frontOfCardPanel.setText(Reviewer.getCurrentFront());
-			m_backOfCardPanel.setText(m_answerShown ? Reviewer.getCurrentBack() : "");
-		}
-
+	public void updatePanels(String frontText, String backText) {
+		m_frontOfCardPanel.setText(frontText);
+		m_backOfCardPanel.setText(backText);
 	}
 
 }

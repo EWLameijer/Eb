@@ -60,7 +60,13 @@ public class LogicalDeck implements Serializable {
 		// postconditions: none. The deck should have been constructed,
 		// everything should work
 	}
-	
+
+	public boolean contains(Card card) {
+		Utilities.require(card != null,
+		    "LogicalDeck.contains() error: card can not be null.");
+		return m_cards.contains(card);
+	}
+
 	private String formatToTwoDigits(int input) {
 		if (input < 10) {
 			return "0" + input;
@@ -68,38 +74,37 @@ public class LogicalDeck implements Serializable {
 			return "" + input;
 		}
 	}
-	
+
 	public void saveDeckToTextfile() {
 		// TODO Auto-generated method stub
 		// Phase 1: get proper filename for deck
 		LocalDateTime now = LocalDateTime.now();
-		String textFileName = getName() 
-				+ "_"
-				+ formatToTwoDigits(now.get(ChronoField.DAY_OF_MONTH)) 
-				+ formatToTwoDigits(now.get(ChronoField.MONTH_OF_YEAR))
-				+ formatToTwoDigits(now.get(ChronoField.YEAR) % 100 )
-				+ "_"
-				+ formatToTwoDigits(now.get(ChronoField.HOUR_OF_DAY))
-				+ formatToTwoDigits(now.get(ChronoField.MINUTE_OF_HOUR))
-				+ ".txt";
-		try ( FileWriter outputFile = new FileWriter(textFileName)) {
+		String textFileName = getName() + "_"
+		    + formatToTwoDigits(now.get(ChronoField.DAY_OF_MONTH))
+		    + formatToTwoDigits(now.get(ChronoField.MONTH_OF_YEAR))
+		    + formatToTwoDigits(now.get(ChronoField.YEAR) % 100) + "_"
+		    + formatToTwoDigits(now.get(ChronoField.HOUR_OF_DAY))
+		    + formatToTwoDigits(now.get(ChronoField.MINUTE_OF_HOUR)) + ".txt";
+		try (FileWriter outputFile = new FileWriter(textFileName)) {
 			outputFile.write("Number of cards is: " + m_cards.size() + Utilities.EOL);
-			m_cards.stream().sorted( (first,second) -> first.getFront().compareTo(second.getFront())).
-				forEach(e -> 
-					{ 
-						try {
-							outputFile.write(e.getFront() + "\t\t" + e.getBack() + Utilities.EOL);
-						} catch (IOException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-					}
-				);
-			
+			m_cards.stream()
+			    .sorted(
+			        (first, second) -> first.getFront().compareTo(second.getFront()))
+			    .forEach(e -> {
+				    try {
+					    outputFile
+			            .write(e.getFront() + "\t\t" + e.getBack() + Utilities.EOL);
+				    } catch (IOException e1) {
+					    // TODO Auto-generated catch block
+					    e1.printStackTrace();
+				    }
+			    });
+
 		} catch (Exception e) {
-			Utilities.require(false, "Deck.saveDeckToTextfile() error: cannot save text "
-					+ "copy of deck.");
-		}	
+			Utilities.require(false,
+			    "Deck.saveDeckToTextfile() error: cannot save text "
+			        + "copy of deck.");
+		}
 	}
 
 	/**

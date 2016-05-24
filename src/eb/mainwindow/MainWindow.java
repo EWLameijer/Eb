@@ -129,6 +129,9 @@ public class MainWindow extends JFrame implements Listener {
 			message.append("<br>");
 			m_startReviewingButton
 			    .setVisible(timeUntilNextReviewAsDuration.isNegative());
+		} else {
+			// no cards
+			m_startReviewingButton.setVisible(false);
 		}
 		message.append(getUICommands());
 		message.append("</html>");
@@ -277,6 +280,7 @@ public class MainWindow extends JFrame implements Listener {
 		addWindowListener(EventHandler.create(WindowListener.class, this,
 		    "saveAndQuit", null, "windowClosing"));
 		setVisible(true);
+		BlackBoard.register(this, UpdateType.DECK_SWAPPED);
 		BlackBoard.register(this, UpdateType.DECK_CHANGED);
 		BlackBoard.register(this, UpdateType.PROGRAMSTATE_CHANGED);
 		Timer messageUpdater = new Timer(100, e -> updateWindow());
@@ -390,7 +394,7 @@ public class MainWindow extends JFrame implements Listener {
 	}
 
 	private void showReviewingPanel() {
-		Reviewer.start();
+		Reviewer.start(m_reviewPanel);
 		switchToPanel(REVIEW_PANEL_ID);
 	}
 
@@ -417,8 +421,7 @@ public class MainWindow extends JFrame implements Listener {
 	public void respondToUpdate(Update update) {
 		if (update.getType() == UpdateType.DECK_CHANGED) {
 			updateWindow();
-		}
-		if (update.getType() == UpdateType.PROGRAMSTATE_CHANGED) {
+		} else if (update.getType() == UpdateType.PROGRAMSTATE_CHANGED) {
 			m_state = MainWindowState.valueOf(update.getContents());
 			m_reviewPanel.refresh(); // there may be new cards to refresh
 			updateWindow();
@@ -443,6 +446,9 @@ public class MainWindow extends JFrame implements Listener {
 				Utilities.require(false, "MainWindow.respondToProgramStateChange "
 				    + "error: receiving wrong program state.");
 			}
+		} else if (update.getType() == UpdateType.DECK_SWAPPED) {
+			BlackBoard.post(new Update(UpdateType.PROGRAMSTATE_CHANGED,
+			    MainWindowState.REACTIVE.name()));
 		}
 	}
 

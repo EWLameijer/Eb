@@ -37,4 +37,11 @@ public class BlackBoard {
 	public static void unRegister(Listener listener, UpdateType updateType) {
 		c_listeners.get(updateType).remove(listener);
 	}
+
+	public static void unRegister(Listener listener) {
+		for (UpdateType key : c_listeners.keySet()) {
+			c_listeners.get(key).remove(listener);
+		}
+
+	}
 }
