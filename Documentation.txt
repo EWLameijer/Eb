@@ -5,11 +5,14 @@ Otherwise, debug until 4x10 continuously sufficiently satisfied with performance
 
 Current projects:
 Bugs (urgent)
-	-saving Japanese/Chinese: characters in alternative encodings not saved!
 	-of making a same front: delete the other card hides the current card front, which is not good!
 	
 Core features:
 	-1.1: edit cards 
+		test: normal modify card Ok
+		test: give known front + reedit card: OK
+		test: give known front + merge back of cards:
+	
 	-1.2: save archive to random directory
 	-2.0: get timer working 
 	-3.0: get delayed review working 
@@ -18,6 +21,8 @@ Small features
 	-make E edit card 
 	-change background of Edit Card to something else (not green!)
 	-Underline S from Show anwer, and R/F of other buttons
+Refactorings:
+
 
 
 ?3field: so [m]/[p] automatically
@@ -407,6 +412,7 @@ Design
 	-Adding a new card will now bring the cursor back to the front of the field, as to fill in the next card more easily.
 	-Pressing the "Enter" key in the summarizing screen now switches back to normal mode
 	-Solved bug: when making a card with an same front: delete now properly closes dialog
+	-Solved a bug in which the backup file did not save exotic characters correctly.
 
 
 

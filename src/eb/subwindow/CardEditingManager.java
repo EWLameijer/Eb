@@ -117,9 +117,10 @@ public class CardEditingManager {
 			String currentBack = backText;
 			String otherBack = duplicate.getBack();
 			String newBack = currentBack + "; " + otherBack;
+			closeOptionPane();
 			m_cardEditingWindow.updateContents(frontText, newBack);
 			Deck.removeCard(duplicate);
-			closeOptionPane();
+
 		});
 		JButton deleteThisButton = new JButton("Delete this card");
 		deleteThisButton.addActionListener(e -> {

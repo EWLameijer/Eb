@@ -1,8 +1,10 @@
 package eb.data;
 
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -85,7 +87,8 @@ public class LogicalDeck implements Serializable {
 		    + formatToTwoDigits(now.get(ChronoField.YEAR) % 100) + "_"
 		    + formatToTwoDigits(now.get(ChronoField.HOUR_OF_DAY))
 		    + formatToTwoDigits(now.get(ChronoField.MINUTE_OF_HOUR)) + ".txt";
-		try (FileWriter outputFile = new FileWriter(textFileName)) {
+		try (BufferedWriter outputFile = new BufferedWriter(
+		    new OutputStreamWriter(new FileOutputStream(textFileName), "UTF-8"));) {
 			outputFile.write("Number of cards is: " + m_cards.size() + Utilities.EOL);
 			m_cards.stream()
 			    .sorted(

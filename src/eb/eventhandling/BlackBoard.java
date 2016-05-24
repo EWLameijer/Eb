@@ -21,7 +21,9 @@ public class BlackBoard {
 	public static void post(Update update) {
 		HashSet<Listener> listeners = c_listeners.get(update.getType());
 		if (listeners != null) {
-			listeners.stream().forEach(e -> e.respondToUpdate(update));
+			for (Listener listener : listeners) {
+				listener.respondToUpdate(update);
+			}
 		}
 	}
 

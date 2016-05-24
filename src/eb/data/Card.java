@@ -148,7 +148,7 @@ public class Card implements Serializable {
 	 * 
 	 * @return the most recent review.
 	 */
-	private Review getLastReview() {
+	public Review getLastReview() {
 		// preconditions: a review must have taken place, one should not call this
 		// on a freshly created card.
 		Utilities.require(!m_reviews.isEmpty(), "History.getLastReview() "

@@ -55,13 +55,11 @@ class ReviewSession implements Listener {
 	private int m_counter;
 	private FirstTimer m_startTimer = new FirstTimer();
 	private FirstTimer m_stopTimer = new FirstTimer();
-	private List<Review> m_reviewResults = new ArrayList<>();
 	private final ReviewPanel m_reviewPanel;
 	private boolean m_showAnswer;
 
 	ReviewSession(ReviewPanel reviewPanel) {
 		m_reviewPanel = reviewPanel;
-		m_reviewResults = new ArrayList<>();
 		int maxNumReviews = Deck.getStudyOptions().getReviewSessionSize();
 		List<Card> reviewableCards = Deck.getReviewableCardList();
 		int totalNumberOfReviewableCards = reviewableCards.size();
@@ -75,7 +73,7 @@ class ReviewSession implements Listener {
 		    .sort((firstCard, secondCard) -> secondCard.getTimeUntilNextReview()
 		        .compareTo(firstCard.getTimeUntilNextReview()));
 		// get the first n for the review
-		m_cardCollection = reviewableCards.subList(0, m_counter);
+		m_cardCollection = new ArrayList<>(reviewableCards.subList(0, m_counter));
 		Collections.shuffle(m_cardCollection);
 		BlackBoard.register(this, UpdateType.CARD_CHANGED);
 		BlackBoard.register(this, UpdateType.DECK_CHANGED);
@@ -134,7 +132,6 @@ class ReviewSession implements Listener {
 		    + duration.getSeconds();
 		Logger.getGlobal().info(m_counter + " " + duration_in_s);
 		Review review = new Review(duration, remembered);
-		m_reviewResults.add(review);
 		getCurrentCard().addReview(review);
 		m_startTimer.reset();
 		m_stopTimer.reset();
@@ -155,7 +152,12 @@ class ReviewSession implements Listener {
 	}
 
 	public List<Review> getReviewResults() {
-		return m_reviewResults;
+		List<Review> listOfReviews = new ArrayList<>();
+		for (int index = m_cardCollection.size() - 1; index > m_counter
+		    - 1; index--) {
+			listOfReviews.add(m_cardCollection.get(index).getLastReview());
+		}
+		return listOfReviews;
 	}
 
 	public void updatePanels() {
@@ -187,7 +189,6 @@ class ReviewSession implements Listener {
 					m_counter--;
 				}
 				m_cardCollection.remove(cardIndex);
-				m_reviewResults.remove(cardIndex);
 			}
 		}
 		updatePanels();
