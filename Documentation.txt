@@ -5,13 +5,15 @@ Otherwise, debug until 4x10 continuously sufficiently satisfied with performance
 
 Current projects:
 Bugs (urgent)
-	-of making a same front: delete the other card hides the current card front, which is not good!
+	-
 	
 Core features:
 	-1.1: edit cards 
-		test: normal modify card Ok
+		test: normal modify card OK
 		test: give known front + reedit card: OK
-		test: give known front + merge back of cards:
+		test: give known front + merge back of cards OK
+		test: give known front + delete this card OK
+		test: give known front + delete other card OK
 	
 	-1.2: save archive to random directory
 	-2.0: get timer working 
