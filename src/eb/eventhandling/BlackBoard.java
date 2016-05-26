@@ -1,7 +1,8 @@
 package eb.eventhandling;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 import eb.utilities.Utilities;
@@ -16,13 +17,15 @@ import eb.utilities.Utilities;
  */
 public class BlackBoard {
 
-	static Map<UpdateType, HashSet<Listener>> c_listeners = new HashMap<UpdateType, HashSet<Listener>>();
+	// note that the more logical Map<UpdateType, HashSet<Listener> gives problems
+	// if you iterate over the set, as calling respondToUpdate may modify the set
+	static Map<UpdateType, ArrayList<Listener>> c_listeners = new HashMap<UpdateType, ArrayList<Listener>>();
 
 	public static void post(Update update) {
-		HashSet<Listener> listeners = c_listeners.get(update.getType());
+		List<Listener> listeners = c_listeners.get(update.getType());
 		if (listeners != null) {
-			for (Listener listener : listeners) {
-				listener.respondToUpdate(update);
+			for (int index = 0; index < listeners.size(); index++) {
+				listeners.get(index).respondToUpdate(update);
 			}
 		}
 	}
@@ -31,7 +34,7 @@ public class BlackBoard {
 		Utilities.require(listener != null,
 		    "BlackBoard.register() error: listener object should not be null");
 		if (!c_listeners.containsKey(updateType)) {
-			c_listeners.put(updateType, new HashSet<Listener>());
+			c_listeners.put(updateType, new ArrayList<Listener>());
 		}
 		c_listeners.get(updateType).add(listener);
 	}

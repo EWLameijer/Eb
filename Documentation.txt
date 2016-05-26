@@ -5,24 +5,20 @@ Otherwise, debug until 4x10 continuously sufficiently satisfied with performance
 
 Current projects:
 Bugs (urgent)
-	-
+	-als je opent met een review werken de buttons niet. Kennelijk vraagt het pane niet automatisch de focus?
+	-Nieuwe kaart maken bij collectie: naar summarizing window (5 min), 10 bij 2e voor repro. Anders bij refactoring bekijken.
+
 	
 Core features:
-	-1.1: edit cards 
-		test: normal modify card OK
-		test: give known front + reedit card: OK
-		test: give known front + merge back of cards OK
-		test: give known front + delete this card OK
-		test: give known front + delete other card OK
-	
 	-1.2: save archive to random directory
+	-1.3:
 	-2.0: get timer working 
 	-3.0: get delayed review working 
 	-4.0: get perceptual learning working
 Small features
-	-make E edit card 
 	-change background of Edit Card to something else (not green!)
-	-Underline S from Show anwer, and R/F of other buttons
+Larger features (consider carefully)
+	-Creating tabs, so you can easily go to to next thing in collection
 Refactorings:
 
 
@@ -416,6 +412,9 @@ Design
 	-Solved bug: when making a card with an same front: delete now properly closes dialog
 	-Solved a bug in which the backup file did not save exotic characters correctly.
 
+R 1.2
+	-Pressing 'E' now edits the card 
+	-added mnemonics to the buttons in the review pane.
 
 
 

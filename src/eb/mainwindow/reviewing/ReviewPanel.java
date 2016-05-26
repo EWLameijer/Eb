@@ -6,6 +6,7 @@ import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.KeyEvent;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -65,6 +66,7 @@ public class ReviewPanel extends JPanel {
 		JPanel buttonPanelForHiddenBack = new JPanel();
 		buttonPanelForHiddenBack.setLayout(new FlowLayout());
 		JButton showAnswerButton = new JButton("Show Answer");
+		showAnswerButton.setMnemonic(KeyEvent.VK_S);
 		showAnswerButton.getInputMap(WHEN_IN_FOCUSED_WINDOW)
 		    .put(KeyStroke.getKeyStroke('s'), "show answer");
 		showAnswerButton.getActionMap().put("show answer",
@@ -74,6 +76,7 @@ public class ReviewPanel extends JPanel {
 
 		JPanel buttonPanelForShownBack = new JPanel();
 		JButton rememberedButton = new JButton("Remembered");
+		rememberedButton.setMnemonic(KeyEvent.VK_R);
 		rememberedButton.getInputMap(WHEN_IN_FOCUSED_WINDOW)
 		    .put(KeyStroke.getKeyStroke('r'), "remembered");
 		rememberedButton.getActionMap().put("remembered",
@@ -81,6 +84,7 @@ public class ReviewPanel extends JPanel {
 		rememberedButton.addActionListener(e -> remembered(true));
 		buttonPanelForShownBack.add(rememberedButton);
 		JButton forgottenButton = new JButton("Forgotten");
+		forgottenButton.setMnemonic(KeyEvent.VK_F);
 		forgottenButton.getInputMap(WHEN_IN_FOCUSED_WINDOW)
 		    .put(KeyStroke.getKeyStroke('f'), "forgotten");
 		forgottenButton.getActionMap().put("forgotten",
@@ -107,11 +111,12 @@ public class ReviewPanel extends JPanel {
 		add(m_situationalButtonPanel, situationalButtonPanelConstraints);
 
 		JButton editButton = new JButton("Edit card");
+		editButton.setMnemonic(KeyEvent.VK_E);
+		editButton.getInputMap(WHEN_IN_FOCUSED_WINDOW)
+		    .put(KeyStroke.getKeyStroke('e'), "edit");
+		editButton.getActionMap().put("edit", new ButtonAction(() -> editCard()));
 		editButton.addActionListener(e -> {
-			Card currentCard = Deck.getCardWithFront(Reviewer.getCurrentFront())
-		      .get();
-			CardEditingManager editingManager = new CardEditingManager(currentCard);
-			editingManager.activateCardEditingWindow(currentCard);
+			editCard();
 		});
 
 		// the fixed button panel contains buttons that need to be visible always
@@ -125,7 +130,6 @@ public class ReviewPanel extends JPanel {
 		fixedButtonPanelConstraints.fill = GridBagConstraints.BOTH;
 		m_fixedButtonPanel = new JPanel();
 		m_fixedButtonPanel.add(editButton);
-		m_fixedButtonPanel.setBackground(Color.GREEN);
 		add(m_fixedButtonPanel, fixedButtonPanelConstraints);
 
 		// panel, to be used in future to show successful/unsuccessful cards.
@@ -141,6 +145,12 @@ public class ReviewPanel extends JPanel {
 		JPanel sidePanel = new JPanel();
 		sidePanel.setBackground(Color.RED);
 		add(sidePanel, sidePanelConstraints);
+	}
+
+	private void editCard() {
+		Card currentCard = Deck.getCardWithFront(Reviewer.getCurrentFront()).get();
+		CardEditingManager editingManager = new CardEditingManager(currentCard);
+		editingManager.activateCardEditingWindow(currentCard);
 	}
 
 	private void remembered(boolean wasRemembered) {
