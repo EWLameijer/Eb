@@ -171,6 +171,7 @@ public class Deck {
 			LogicalDeck loadedDeck = (LogicalDeck) objInStream.readObject();
 			if (loadedDeck != null) {
 				m_contents = loadedDeck;
+				m_contents.fixNewFields();
 				BlackBoard.post(new Update(UpdateType.DECK_SWAPPED));
 			}
 			return loadedDeck != null;

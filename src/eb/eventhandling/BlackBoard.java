@@ -19,7 +19,7 @@ public class BlackBoard {
 
 	// note that the more logical Map<UpdateType, HashSet<Listener> gives problems
 	// if you iterate over the set, as calling respondToUpdate may modify the set
-	static Map<UpdateType, ArrayList<Listener>> c_listeners = new HashMap<UpdateType, ArrayList<Listener>>();
+	static Map<UpdateType, ArrayList<Listener>> c_listeners = new HashMap<>();
 
 	// Hide implicit public constructor
 	private BlackBoard() {

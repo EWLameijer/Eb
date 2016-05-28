@@ -321,4 +321,14 @@ public class LogicalDeck implements Serializable {
 	public void setArchivingDirectory(File directory) {
 		m_archivingDirectory = directory.getAbsolutePath();
 	}
+
+	/**
+	 * Helps avoid problems when deserializing after a code update.
+	 */
+	public void fixNewFields() {
+		if (m_archivingDirectory == null) {
+			m_archivingDirectory = "";
+		}
+
+	}
 }
