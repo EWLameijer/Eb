@@ -11,12 +11,12 @@ Bugs (urgent)
 	
 Core features:
 	-1.2: save archive to random directory
-	-1.3:
+	-1.3: [m] [p] easy to make
 	-2.0: get timer working 
 	-3.0: get delayed review working 
 	-4.0: get perceptual learning working
 Small features
-	-change background of Edit Card to something else (not green!)
+	-Add icon to Eb (like the curve?)
 Larger features (consider carefully)
 	-Creating tabs, so you can easily go to to next thing in collection
 Refactorings:
