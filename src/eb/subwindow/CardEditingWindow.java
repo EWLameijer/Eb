@@ -54,12 +54,14 @@ public class CardEditingWindow extends JFrame {
 	    CardEditingManager manager) {
 		// preconditions: none (we can assume the user clicked the appropriate
 		// button, and even otherwise there is not a big problem)
-		Utilities.require(frontText != null, "CardEditingWindow.constructor error: "
-		    + " the text for the front of the card should not be null.");
-		Utilities.require(backText != null, "CardEditingWindow.constructor error: "
-		    + " the text for the back of the card should not be null.");
-		Utilities.require(manager != null, "CardEditingWindow.constructor error: "
-		    + " the card manager is undefined.");
+		final String errorHeader = "CardEditingWindow.constructor error: ";
+		final String emptySideErrorFormatStr = "the text for the %s of the card should not be null.";
+		Utilities.require(frontText != null,
+		    errorHeader + String.format(emptySideErrorFormatStr, "front"));
+		Utilities.require(backText != null,
+		    errorHeader + String.format(emptySideErrorFormatStr, "back"));
+		Utilities.require(manager != null,
+		    errorHeader + "the card manager is undefined.");
 
 		m_manager = manager;
 
@@ -275,12 +277,14 @@ public class CardEditingWindow extends JFrame {
 	static CardEditingWindow display(String frontText, String backText,
 	    CardEditingManager manager) {
 		// preconditions: inputs should not be null
-		Utilities.require(frontText != null, "CardEditingWindow.display() error: "
-		    + " the text for the front of the card should not be null.");
-		Utilities.require(backText != null, "CardEditingWindow.display() error: "
-		    + " the text for the back of the card should not be null.");
-		Utilities.require(manager != null, "CardEditingWindow.display() error: "
-		    + " the card manager is undefined.");
+		final String errorHeader = "CardEditingWindow.display() error: ";
+		final String emptySideErrorFormatStr = "the text for the %s of the card should not be null.";
+		Utilities.require(frontText != null,
+		    errorHeader + String.format(emptySideErrorFormatStr, "front"));
+		Utilities.require(backText != null,
+		    errorHeader + String.format(emptySideErrorFormatStr, "back"));
+		Utilities.require(manager != null,
+		    errorHeader + "the card manager is undefined.");
 
 		final CardEditingWindow newCardWindow = new CardEditingWindow(frontText,
 		    backText, manager);

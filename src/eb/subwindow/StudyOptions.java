@@ -44,8 +44,8 @@ public class StudyOptions implements Serializable {
 	private static final double DEFAULT_LENGTHENING_FACTOR = 5.0;
 	private double m_lengtheningFactor;
 
-	private static final boolean DEFAULT_IS_TIMED = false;
-	private boolean m_isTimed;
+	private static final TimedModus DEFAULT_IS_TIMED = TimedModus.FALSE;
+	private TimedModus m_isTimed;
 
 	private static final TimeInterval DEFAULT_TIMER_INTERVAL = new TimeInterval(
 	    5.0, TimeUnit.SECOND);
@@ -61,7 +61,7 @@ public class StudyOptions implements Serializable {
 	StudyOptions(TimeInterval initialInterval,
 	    Optional<Integer> reviewSessionSize, TimeInterval rememberedInterval,
 	    TimeInterval forgottenInterval, Optional<Double> lengtheningFactor,
-	    boolean isTimed, TimeInterval timerInterval) {
+	    TimedModus isTimed, TimeInterval timerInterval) {
 		// preconditions: none. Is private constructor, should be fed valid values
 		// internally
 		m_initialInterval = new TimeInterval(initialInterval);
@@ -139,7 +139,7 @@ public class StudyOptions implements Serializable {
 	private boolean timerSettingsSameAs(StudyOptions otherOptions) {
 		if (m_isTimed != otherOptions.m_isTimed)
 			return false;
-		if (m_isTimed) {
+		if (m_isTimed == TimedModus.TRUE) {
 			return m_timerInterval.equals(otherOptions.m_timerInterval);
 		} else {
 			// timer settings off - then length of timer interval does not matter
@@ -170,14 +170,18 @@ public class StudyOptions implements Serializable {
 		return m_lengtheningFactor;
 	}
 
-	public boolean isTimedModus() {
-		return m_isTimed;
-	}
-
 	public TimeInterval getTimerInterval() {
 		if (m_timerInterval == null) {
 			m_timerInterval = DEFAULT_TIMER_INTERVAL;
 		}
 		return m_timerInterval;
+	}
+
+	public boolean isTimed() {
+		return m_isTimed == TimedModus.TRUE;
+	}
+
+	public TimedModus getTimedModus() {
+		return m_isTimed;
 	}
 }

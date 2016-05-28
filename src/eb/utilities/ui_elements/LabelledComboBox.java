@@ -26,7 +26,7 @@ public class LabelledComboBox extends InputPanel {
 	}
 
 	@Override
-	boolean equals(InputPanel otherInputPanel) {
+	boolean areContentsEqual(InputPanel otherInputPanel) {
 		if (this == otherInputPanel) {
 			return true;
 		} else if (otherInputPanel == null) {

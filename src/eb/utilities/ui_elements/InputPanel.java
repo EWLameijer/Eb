@@ -12,6 +12,6 @@ public abstract class InputPanel extends JPanel {
 		BlackBoard.post(new Update(UpdateType.INPUTFIELD_CHANGED));
 	}
 
-	abstract boolean equals(InputPanel otherInputPanel);
+	abstract boolean areContentsEqual(InputPanel otherInputPanel);
 
 }

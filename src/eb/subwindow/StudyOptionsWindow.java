@@ -91,7 +91,8 @@ public class StudyOptionsWindow extends JFrame implements Listener {
 		m_timeToWaitAfterIncorrectReview = TimeInputElement.createInstance(
 		    "Time to wait for re-reviewing forgotten card:",
 		    studyOptions.getForgottenCardInterval());
-		String[] normalTimedOptions = new String[] { "normal", "timed" };
+		String[] normalTimedOptions = new String[] { TimedModus.FALSE.getName(),
+		    TimedModus.TRUE.getName() };
 		m_timedModus = new LabelledComboBox("normal or timed", normalTimedOptions);
 		m_timeForTimer = TimeInputElement.createInstance(
 		    "Maximum time for answering a card:", studyOptions.getTimerInterval());
@@ -121,7 +122,7 @@ public class StudyOptionsWindow extends JFrame implements Listener {
 			title += " - UNSAVED CHANGES";
 		}
 		setTitle(title);
-		m_timeForTimer.setVisible(guiStudyOptions.isTimedModus());
+		m_timeForTimer.setVisible(guiStudyOptions.isTimed());
 		// postconditions: none. Simply changes the frame's title.
 	}
 
@@ -143,8 +144,8 @@ public class StudyOptionsWindow extends JFrame implements Listener {
 		m_lengtheningFactor.setContents(settings.getLengtheningFactor());
 		m_timeToWaitAfterIncorrectReview
 		    .setInterval(settings.getForgottenCardInterval());
-		m_timedModus.setTo(settings.isTimedModus() ? "timed" : "normal");
-		m_timeForTimer.setVisible(settings.isTimedModus());
+		m_timedModus.setTo(settings.getTimedModus().getName());
+		m_timeForTimer.setVisible(settings.isTimed());
 		m_timeForTimer.setInterval(settings.getTimerInterval());
 	}
 
@@ -179,7 +180,8 @@ public class StudyOptionsWindow extends JFrame implements Listener {
 		    m_timeToWaitAfterCorrectReview.getInterval(),
 		    m_timeToWaitAfterIncorrectReview.getInterval(),
 		    Utilities.stringToDouble(m_lengtheningFactor.getContents()),
-		    m_timedModus.getValue().equals("timed"), m_timeForTimer.getInterval());
+		    TimedModus.stringToTimedModus(m_timedModus.getValue()),
+		    m_timeForTimer.getInterval());
 	}
 
 	/**
@@ -235,11 +237,11 @@ public class StudyOptionsWindow extends JFrame implements Listener {
 		settingsBox.add(m_timeToWaitAfterCorrectReview);
 		settingsBox.add(m_lengtheningFactor);
 		settingsBox.add(m_timeToWaitAfterIncorrectReview);
-		boolean isTimed = Deck.getStudyOptions().isTimedModus();
-		m_timedModus.setTo(isTimed ? "timed" : "normal");
+		TimedModus timedModus = Deck.getStudyOptions().getTimedModus();
+		m_timedModus.setTo(timedModus.getName());
 		settingsBox.add(m_timedModus);
 		settingsBox.add(m_timeForTimer);
-		m_timeForTimer.setVisible(isTimed);
+		m_timeForTimer.setVisible(Deck.getStudyOptions().isTimed());
 		settingsPane.add(settingsBox, BorderLayout.NORTH);
 
 		buttonsPane.add(m_cancelButton);

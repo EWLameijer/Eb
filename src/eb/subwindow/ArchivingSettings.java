@@ -1,9 +1,14 @@
 package eb.subwindow;
 
 import java.io.File;
+import java.io.Serializable;
 
-public class ArchivingSettings {
+public class ArchivingSettings implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private File m_archivingDirectory;
 
 	private ArchivingSettings() {

@@ -139,7 +139,7 @@ public class MainWindow extends JFrame implements Listener {
 		m_messageLabel.setText(message.toString());
 		this.setTitle("Eb: " + Deck.getName());
 		String reviewButtonText;
-		if (Deck.getStudyOptions().isTimedModus()) {
+		if (Deck.getStudyOptions().isTimed()) {
 			TimeInterval timeInterval = Deck.getStudyOptions().getTimerInterval();
 			reviewButtonText = "Review now (timed, " + timeInterval.getScalar() + " "
 			    + timeInterval.getUnit().getUserInterfaceName() + ")";
@@ -406,7 +406,7 @@ public class MainWindow extends JFrame implements Listener {
 	 */
 	private void showReactivePanel() {
 		if (mustReviewNow()) {
-			if (Deck.getStudyOptions().isTimedModus()) {
+			if (Deck.getStudyOptions().isTimed()) {
 				BlackBoard.post(new Update(UpdateType.PROGRAMSTATE_CHANGED,
 				    MainWindowState.WAITING_FOR_TIMER_START.name()));
 			} else {
