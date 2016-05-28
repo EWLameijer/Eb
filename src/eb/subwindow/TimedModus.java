@@ -10,13 +10,13 @@ import eb.utilities.Utilities;
  *
  */
 class TimedModusHelper {
+	public static final String NORMAL_IDENTIFIER = "normal";
+	public static final String TIMED_IDENTIFIER = "timed";
+
 	TimedModusHelper() {
 		Utilities.require(false, "TimedModusHelper constructor error: "
 		    + "TimedModusHelper should never be initialized. ");
 	}
-
-	public static final String NORMAL_IDENTIFIER = "normal";
-	public static final String TIMED_IDENTIFIER = "timed";
 }
 
 public enum TimedModus {
