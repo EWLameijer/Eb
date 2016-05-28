@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
+import eb.subwindow.ArchivingSettings;
 import eb.subwindow.StudyOptions;
 import eb.utilities.TimeInterval;
 import eb.utilities.Utilities;
@@ -39,7 +40,7 @@ public class LogicalDeck implements Serializable {
 	private final String m_name;
 
 	// The location where the archive file will be stored
-	private String m_archivingDirectory;
+	private ArchivingSettings m_archivingSettings;
 
 	// The cards contained by this deck.
 	private final List<Card> m_cards;
@@ -63,7 +64,7 @@ public class LogicalDeck implements Serializable {
 		m_name = name;
 		m_cards = new ArrayList<>();
 		m_studyOptions = StudyOptions.getDefault();
-		m_archivingDirectory = "";
+		m_archivingSettings = ArchivingSettings.getDefault();
 
 		// postconditions: none. The deck should have been constructed,
 		// everything should work
@@ -94,8 +95,9 @@ public class LogicalDeck implements Serializable {
 	public void saveDeckToTextfile() {
 		// Phase 1: get proper filename for deck
 		LocalDateTime now = LocalDateTime.now();
-		String textFileDirectory = m_archivingDirectory.isEmpty() ? ""
-		    : m_archivingDirectory + File.separator;
+		String nameOfArchivingDirectory = m_archivingSettings.getDirectoryName();
+		String textFileDirectory = nameOfArchivingDirectory.isEmpty() ? ""
+		    : nameOfArchivingDirectory + File.separator;
 		String textFileName = textFileDirectory + getName() + "_"
 		    + formatToTwoDigits(now.get(ChronoField.DAY_OF_MONTH))
 		    + formatToTwoDigits(now.get(ChronoField.MONTH_OF_YEAR))
@@ -319,15 +321,15 @@ public class LogicalDeck implements Serializable {
 	}
 
 	public void setArchivingDirectory(File directory) {
-		m_archivingDirectory = directory.getAbsolutePath();
+		m_archivingSettings.setDirectory(directory);
 	}
 
 	/**
 	 * Helps avoid problems when deserializing after a code update.
 	 */
 	public void fixNewFields() {
-		if (m_archivingDirectory == null) {
-			m_archivingDirectory = "";
+		if (m_archivingSettings == null) {
+			m_archivingSettings = ArchivingSettings.getDefault();
 		}
 
 	}

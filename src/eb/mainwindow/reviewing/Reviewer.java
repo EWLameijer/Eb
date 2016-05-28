@@ -94,11 +94,4 @@ public class Reviewer {
 		ensureReviewSessionIsValid();
 		c_session.showAnswer();
 	}
-
-	public static void reset(ReviewSession reviewSession) {
-		// if (c_session == reviewSession) {
-		// c_session = null;
-		// }
-	}
-
 }

@@ -12,7 +12,6 @@ import eb.data.Deck;
 import eb.eventhandling.BlackBoard;
 import eb.eventhandling.Update;
 import eb.eventhandling.UpdateType;
-import eb.utilities.Utilities;
 
 /**
  * CardEditingManager coordinates the flow of information from the window that
@@ -77,40 +76,45 @@ public class CardEditingManager {
 	}
 
 	public void processProposedContents(String frontText, String backText) {
-		// Case 1 of 4: If both fields are blank, simply dispose of the window;
-		// the user has changed his or her mind
-		if (frontText.equals("") && backText.equals("")) {
-			endEditing();
-			return;
-		}
+		// Case 1 of 3: there are empty fields. Or at least: the front is empty.
+		// Investigate the exact problem.
+		if (frontText.isEmpty()) {
+			// if back is empty, then this is just a hasty return. Is okay.
+			if (backText.isEmpty()) {
+				endEditing();
+			} else {
+				// back is filled: so there is an error
+				String verb = inCardCreatingMode() ? "add" : "modify";
+				JOptionPane.showMessageDialog(null,
+				    "Cannot " + verb + " card: the front of a card cannot be blank.",
+				    "Cannot " + verb + " card", JOptionPane.ERROR_MESSAGE);
+			}
+		} else {
+			// front text is not empty. Now, this can either be problematic or not.
 
-		// Case 2 of 4: the front is empty, the back is not. This is not hasty
-		// closing (pressing ENTER instead of ESCAPE), this is an error.
-		if (!Utilities.isStringValidIdentifier(frontText)) {
-			String verb = inCardCreatingMode() ? "add" : "modify";
-			JOptionPane.showMessageDialog(null,
-			    "Cannot " + verb + " card: the front of a card cannot be blank.",
-			    "Cannot " + verb + " card", JOptionPane.ERROR_MESSAGE);
-			return;
-		}
+			// Case 2 of 3: the front of the card is new or the front is the same
+			// as the old front (when editing). Add the card and be done with it.
+			// (well, when adding cards one should not close the new card window)
+			Optional<Card> currentCardWithThisFront = Deck
+			    .getCardWithFront(frontText);
+			if (frontText.equals(getCurrentFront())
+			    || !currentCardWithThisFront.isPresent()) {
+				submitCardContents(frontText, backText);
+			} else {
 
-		// Case 3 of 4: the front of the card is new or the front is the same
-		// as the old front (when editing). Add the card and be done with it.
-		// (well, when adding cards one should not close the new card window)
-		Optional<Card> currentCardWithThisFront = Deck.getCardWithFront(frontText);
-		if (frontText.equals(getCurrentFront())
-		    || !currentCardWithThisFront.isPresent()) {
-			submitCardContents(frontText, backText);
-			return;
+				// Case 3 of 3: there is a current (but different) card with this exact
+				// same front. Resolve this conflict.
+				Card duplicate = currentCardWithThisFront.get();
+				handleCardBeingDuplicate(frontText, backText, duplicate);
+			}
 		}
+	}
 
-		// Case 4 of 4: there is a current (but different) card with this exact
-		// same front. Resolve this conflict.
-		Card duplicate = currentCardWithThisFront.get();
+	private void handleCardBeingDuplicate(String frontText, String backText,
+	    Card duplicate) {
+
 		JButton reeditButton = new JButton("Re-edit card");
-		reeditButton.addActionListener(e -> {
-			closeOptionPane();
-		});
+		reeditButton.addActionListener(e -> closeOptionPane());
 
 		JButton mergeButton = new JButton("Merge backs of cards");
 		mergeButton.addActionListener(e -> {

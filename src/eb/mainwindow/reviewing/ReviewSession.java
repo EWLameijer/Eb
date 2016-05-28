@@ -98,7 +98,6 @@ class ReviewSession implements Listener {
 	 */
 	private void cleanUp() {
 		BlackBoard.unRegister(this);
-		Reviewer.reset(this);
 	}
 
 	public void wasRemembered(boolean remembered) {

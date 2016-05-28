@@ -120,7 +120,7 @@ public class Deck {
 	}
 
 	private static String getLastDeck() {
-		if (c_nameOfLastReviewedDeck.equals("")) {
+		if (c_nameOfLastReviewedDeck.isEmpty()) {
 			return DEFAULT_DECKNAME;
 		} else {
 			return c_nameOfLastReviewedDeck;

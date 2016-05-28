@@ -121,9 +121,7 @@ public class ReviewPanel extends JPanel {
 		editButton.getInputMap(WHEN_IN_FOCUSED_WINDOW)
 		    .put(KeyStroke.getKeyStroke('e'), "edit");
 		editButton.getActionMap().put("edit", new ButtonAction(() -> editCard()));
-		editButton.addActionListener(e -> {
-			editCard();
-		});
+		editButton.addActionListener(e -> editCard());
 
 		// the fixed button panel contains buttons that need to be visible always
 		GridBagConstraints fixedButtonPanelConstraints = new GridBagConstraints();
