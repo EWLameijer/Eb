@@ -2,15 +2,27 @@ package eb.subwindow;
 
 import eb.utilities.Utilities;
 
+/**
+ * Needed, as enums have to start with the enum values, and you cannot use
+ * identifiers which are defined only later.
+ * 
+ * @author Eric-Wubbo Lameijer
+ *
+ */
 class TimedModusHelper {
-	public final static String normalIdentifier = "normal";
-	public final static String timedIdentifier = "timed";
+	TimedModusHelper() {
+		Utilities.require(false, "TimedModusHelper constructor error: "
+		    + "TimedModusHelper should never be initialized. ");
+	}
+
+	public static final String NORMAL_IDENTIFIER = "normal";
+	public static final String TIMED_IDENTIFIER = "timed";
 }
 
 public enum TimedModus {
 
-	TRUE(TimedModusHelper.timedIdentifier), FALSE(
-	    TimedModusHelper.normalIdentifier);
+	TRUE(TimedModusHelper.TIMED_IDENTIFIER), FALSE(
+	    TimedModusHelper.NORMAL_IDENTIFIER);
 
 	private String m_uiName;
 
@@ -25,9 +37,9 @@ public enum TimedModus {
 	public static TimedModus stringToTimedModus(String value) {
 		Utilities.require(value != null, "TimedModus.stringToTimedModus() error: "
 		    + "the incoming value may not be null.");
-		if (value.equals(TimedModusHelper.timedIdentifier)) {
+		if (value.equals(TimedModusHelper.TIMED_IDENTIFIER)) {
 			return TimedModus.TRUE;
-		} else if (value.equals(TimedModusHelper.normalIdentifier)) {
+		} else if (value.equals(TimedModusHelper.NORMAL_IDENTIFIER)) {
 			return TimedModus.FALSE;
 		} else {
 			Utilities.require(false, "TimedModus.stringToTimedModus() error: "

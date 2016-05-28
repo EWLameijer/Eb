@@ -229,6 +229,7 @@ public class Deck {
 			// If there is no deck, there is no necessity to save it...
 			return;
 		}
+		ensureDeckExists();
 		try (ObjectOutputStream objOutStream = new ObjectOutputStream(
 		    new FileOutputStream(m_contents.getFileHandle()))) {
 			objOutStream.writeObject(m_contents);

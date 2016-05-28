@@ -114,8 +114,7 @@ public class TimeInputElement extends JPanel {
 	 *          the time interval that should be displayed by this
 	 *          TimeInputElement (text field and combo box).
 	 */
-	public void setInterval(eb.utilities.ui_elements.TimeInputElement this,
-	    TimeInterval timeInterval) {
+	public void setInterval(TimeInterval timeInterval) {
 		// preconditions: timeInterval should not be null
 		Utilities.require(timeInterval != null,
 		    "TimeInputElement.setInterval error: the provided time interval "
