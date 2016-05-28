@@ -15,6 +15,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -298,20 +299,21 @@ public class MainWindow extends JFrame implements Listener {
 
 	private void setNameOfLastReviewedDeck() {
 		Path statusFilePath = Paths.get(EB_STATUS_FILE);
+		final String mostRecentDeckIdentifier = "most_recently_reviewed_deck: ";
 		List<String> lines;
 		try {
 			lines = Files.readAllLines(statusFilePath, Charset.forName("UTF-8"));
 			Optional<String> fileLine = lines.stream()
-			    .filter(e -> e.startsWith("most_recently_reviewed_deck: "))
-			    .findFirst();
+			    .filter(e -> e.startsWith(mostRecentDeckIdentifier)).findFirst();
 			if (fileLine.isPresent()) {
 				String deckName = fileLine.get()
-				    .substring("most_recently_reviewed_deck: ".length());
+				    .substring(mostRecentDeckIdentifier.length());
 				Deck.setNameOfLastReviewedDeck(deckName);
 			}
-		} catch (IOException e1) {
+		} catch (IOException e) {
 			// If input fails, set name to ""
 			Deck.setNameOfLastReviewedDeck("");
+			Logger.getGlobal().info(e + "");
 		}
 
 	}
@@ -378,8 +380,7 @@ public class MainWindow extends JFrame implements Listener {
 		try {
 			Files.write(statusFilePath, lines, Charset.forName("UTF-8"));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Logger.getGlobal().info(e + "");
 		}
 	}
 

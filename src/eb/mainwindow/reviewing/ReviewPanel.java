@@ -2,14 +2,13 @@ package eb.mainwindow.reviewing;
 
 import java.awt.CardLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
+import java.beans.EventHandler;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -41,13 +40,9 @@ public class ReviewPanel extends JPanel {
 	public ReviewPanel() {
 		super();
 		this.setFocusable(true);
-		this.addComponentListener(new ComponentAdapter() {
-			@Override
-			public void componentShown(ComponentEvent e) {
-				Component src = (Component) e.getSource();
-				src.requestFocusInWindow();
-			}
-		});
+		addComponentListener(EventHandler.create(ComponentListener.class, this,
+		    "requestFocusInWindow", null, "componentShown"));
+
 		setLayout(new GridBagLayout());
 		GridBagConstraints frontOfCardConstraints = new GridBagConstraints();
 

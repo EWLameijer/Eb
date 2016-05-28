@@ -11,20 +11,6 @@ public class Update {
 		    "Update constructor error: must give second parameter when "
 		        + "the program state changes.");
 		init(updateType, "");
-
-	}
-
-	private void init(UpdateType updateType, String string) {
-		m_updateType = updateType;
-		m_contents = string;
-	}
-
-	public UpdateType getType() {
-		return m_updateType;
-	}
-
-	public String getContents() {
-		return m_contents;
 	}
 
 	/**
@@ -41,6 +27,19 @@ public class Update {
 		        + "the program state changes.");
 		init(updateType, contents);
 
+	}
+
+	private void init(UpdateType updateType, String string) {
+		m_updateType = updateType;
+		m_contents = string;
+	}
+
+	public UpdateType getType() {
+		return m_updateType;
+	}
+
+	public String getContents() {
+		return m_contents;
 	}
 
 }
