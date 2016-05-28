@@ -6,12 +6,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
+import java.io.Writer;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 import eb.subwindow.StudyOptions;
 import eb.utilities.TimeInterval;
@@ -36,6 +38,9 @@ public class LogicalDeck implements Serializable {
 	// extension.
 	private final String m_name;
 
+	// The location where the archive file will be stored
+	private String m_archivingDirectory;
+
 	// The cards contained by this deck.
 	private final List<Card> m_cards;
 
@@ -58,6 +63,7 @@ public class LogicalDeck implements Serializable {
 		m_name = name;
 		m_cards = new ArrayList<>();
 		m_studyOptions = StudyOptions.getDefault();
+		m_archivingDirectory = "";
 
 		// postconditions: none. The deck should have been constructed,
 		// everything should work
@@ -73,15 +79,24 @@ public class LogicalDeck implements Serializable {
 		if (input < 10) {
 			return "0" + input;
 		} else {
-			return "" + input;
+			return Integer.toString(input);
+		}
+	}
+
+	private void writeLine(Writer writer, Card card) {
+		try {
+			writer.write(card.getFront() + "\t\t" + card.getBack() + Utilities.EOL);
+		} catch (IOException e) {
+			Logger.getGlobal().info(e + "");
 		}
 	}
 
 	public void saveDeckToTextfile() {
-		// TODO Auto-generated method stub
 		// Phase 1: get proper filename for deck
 		LocalDateTime now = LocalDateTime.now();
-		String textFileName = getName() + "_"
+		String textFileDirectory = m_archivingDirectory.isEmpty() ? ""
+		    : m_archivingDirectory + File.separator;
+		String textFileName = textFileDirectory + getName() + "_"
 		    + formatToTwoDigits(now.get(ChronoField.DAY_OF_MONTH))
 		    + formatToTwoDigits(now.get(ChronoField.MONTH_OF_YEAR))
 		    + formatToTwoDigits(now.get(ChronoField.YEAR) % 100) + "_"
@@ -93,17 +108,10 @@ public class LogicalDeck implements Serializable {
 			m_cards.stream()
 			    .sorted(
 			        (first, second) -> first.getFront().compareTo(second.getFront()))
-			    .forEach(e -> {
-				    try {
-					    outputFile
-			            .write(e.getFront() + "\t\t" + e.getBack() + Utilities.EOL);
-				    } catch (IOException e1) {
-					    // TODO Auto-generated catch block
-					    e1.printStackTrace();
-				    }
-			    });
+			    .forEach(e -> writeLine(outputFile, e));
 
 		} catch (Exception e) {
+			Logger.getGlobal().info(e + "");
 			Utilities.require(false,
 			    "Deck.saveDeckToTextfile() error: cannot save text "
 			        + "copy of deck.");
@@ -308,5 +316,9 @@ public class LogicalDeck implements Serializable {
 	public void removeCard(Card card) {
 		m_cards.remove(card);
 
+	}
+
+	public void setArchivingDirectory(File directory) {
+		m_archivingDirectory = directory.getAbsolutePath();
 	}
 }

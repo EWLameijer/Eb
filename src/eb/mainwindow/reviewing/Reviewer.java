@@ -1,9 +1,10 @@
 package eb.mainwindow.reviewing;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 
+import eb.data.Deck;
+import eb.data.LogicalDeck;
 import eb.data.Review;
 import eb.utilities.Utilities;
 
@@ -51,6 +52,7 @@ public class Reviewer {
 
 	static ReviewSession c_session;
 	static ReviewPanel c_reviewPanel;
+	static LogicalDeck c_currentDeck;
 
 	/**
 	 * To hide implicit public reviewer
@@ -63,37 +65,40 @@ public class Reviewer {
 	public static void start(ReviewPanel reviewPanel) {
 		c_reviewPanel = reviewPanel;
 		c_session = new ReviewSession(reviewPanel);
+		c_currentDeck = Deck.getContents();
+	}
+
+	private static void ensureReviewSessionIsValid() {
+		if (c_currentDeck != Deck.getContents() || c_session == null) {
+			c_currentDeck = Deck.getContents();
+			c_session = new ReviewSession(c_reviewPanel);
+		}
 	}
 
 	public static List<Review> getReviewResults() {
-		if (c_session == null) {
-			return new ArrayList<>();
-		} else {
-			return c_session.getReviewResults();
-		}
+		ensureReviewSessionIsValid();
+		return c_session.getReviewResults();
 	}
 
 	public static String getCurrentFront() {
-		if (c_session == null) {
-			return "";
-		} else {
-			return c_session.getCurrentFront();
-		}
+		ensureReviewSessionIsValid();
+		return c_session.getCurrentFront();
 	}
 
 	public static void wasRemembered(boolean wasRemembered) {
+		ensureReviewSessionIsValid();
 		c_session.wasRemembered(wasRemembered);
 	}
 
 	public static void showAnswer() {
+		ensureReviewSessionIsValid();
 		c_session.showAnswer();
-
 	}
 
 	public static void reset(ReviewSession reviewSession) {
-		if (c_session == reviewSession) {
-			c_session = null;
-		}
+		// if (c_session == reviewSession) {
+		// c_session = null;
+		// }
 	}
 
 }

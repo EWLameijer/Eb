@@ -168,9 +168,12 @@ public class Deck {
 		save();
 		try (ObjectInputStream objInStream = new ObjectInputStream(
 		    new FileInputStream(deckFile))) {
-			m_contents = (LogicalDeck) objInStream.readObject();
-			BlackBoard.post(new Update(UpdateType.DECK_SWAPPED));
-			return m_contents != null;
+			LogicalDeck loadedDeck = (LogicalDeck) objInStream.readObject();
+			if (loadedDeck != null) {
+				m_contents = loadedDeck;
+				BlackBoard.post(new Update(UpdateType.DECK_SWAPPED));
+			}
+			return loadedDeck != null;
 		} catch (final Exception e) {
 			// something goes wrong with deserializing the deck; so
 			// you also can't read the file
@@ -359,5 +362,16 @@ public class Deck {
 	public static boolean contains(Card card) {
 		ensureDeckExists();
 		return m_contents.contains(card);
+	}
+
+	public static LogicalDeck getContents() {
+		ensureDeckExists();
+		return m_contents;
+	}
+
+	public static void setArchivingDirectory(File directory) {
+		ensureDeckExists();
+		m_contents.setArchivingDirectory(directory);
+
 	}
 }

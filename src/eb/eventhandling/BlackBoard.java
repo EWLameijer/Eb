@@ -21,6 +21,13 @@ public class BlackBoard {
 	// if you iterate over the set, as calling respondToUpdate may modify the set
 	static Map<UpdateType, ArrayList<Listener>> c_listeners = new HashMap<UpdateType, ArrayList<Listener>>();
 
+	// Hide implicit public constructor
+	private BlackBoard() {
+		Utilities.require(false,
+		    "BlackBoard constructor error: BlackBoard is a static utility class "
+		        + "and therefore no objects of it should be constructed.");
+	}
+
 	public static void post(Update update) {
 		List<Listener> listeners = c_listeners.get(update.getType());
 		if (listeners != null) {

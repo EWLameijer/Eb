@@ -7,6 +7,7 @@ import eb.eventhandling.BlackBoard;
 import eb.eventhandling.Update;
 import eb.eventhandling.UpdateType;
 
+@SuppressWarnings("serial")
 public class TimedReviewStartPanel extends JPanel {
 
 	TimedReviewStartPanel() {

@@ -6,6 +6,7 @@ import eb.eventhandling.BlackBoard;
 import eb.eventhandling.Update;
 import eb.eventhandling.UpdateType;
 
+@SuppressWarnings("serial")
 public abstract class InputPanel extends JPanel {
 	protected void notifyOfChange() {
 		BlackBoard.post(new Update(UpdateType.INPUTFIELD_CHANGED));

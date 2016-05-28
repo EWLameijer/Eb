@@ -3,24 +3,29 @@ phase 2, switch Programming to it
 + start Chinese [5 min per 120 min non-maintenance]. 
 Otherwise, debug until 4x10 continuously sufficiently satisfied with performance
 
+Archive to random directory:
+
+
+
 Current projects:
 Bugs (urgent)
-	-Nieuwe kaart maken bij collectie: naar summarizing window (5 min), 10 bij 2e voor repro. Anders bij refactoring bekijken.
-
+	Summarizing panel shows up empty!
 	
 Core features:
 	-1.2: save archive to random directory
 	-1.3: allow 3-side/4-side cards
 	-1.4: make deck list and add command for next deck
 	-2.0: get timer working 
+	-2.1: ?
 	-3.0: get delayed review working 
 	-4.0: get perceptual learning working
+	-4.1: Add an Eb icon
 Small features
-	Make load screen a combobox, so you only need first char
+	?
 Larger features (consider carefully)
-	-Creating tabs, so you can easily go to to next thing in collection
+	?
 Refactorings:
-
+	?
 
 
 ?3field: so [m]/[p] automatically

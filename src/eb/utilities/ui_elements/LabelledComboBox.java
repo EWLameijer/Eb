@@ -5,6 +5,7 @@ import javax.swing.JLabel;
 
 import eb.utilities.Utilities;
 
+@SuppressWarnings("serial")
 public class LabelledComboBox extends InputPanel {
 	private final JLabel m_label;
 	private final JComboBox<String> m_comboBox;

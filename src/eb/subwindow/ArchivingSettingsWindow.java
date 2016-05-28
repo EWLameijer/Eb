@@ -1,14 +1,17 @@
 package eb.subwindow;
 
 import java.awt.Container;
+import java.io.File;
 
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
+import eb.data.Deck;
 import eb.utilities.ui_elements.LabelledTextField;
 
+@SuppressWarnings("serial")
 public class ArchivingSettingsWindow extends JFrame {
 
 	LabelledTextField m_archivingLocation;
@@ -24,11 +27,12 @@ public class ArchivingSettingsWindow extends JFrame {
 	private void changeArchivingLocation() {
 		JFileChooser chooser = new JFileChooser();
 		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		int result = chooser.showOpenDialog(this);
+		int result = chooser.showSaveDialog(this);
 		if (result == JFileChooser.CANCEL_OPTION) {
 			return;
 		} else {
-
+			File selectedDirectory = chooser.getSelectedFile();
+			Deck.setArchivingDirectory(selectedDirectory);
 		}
 
 	}
