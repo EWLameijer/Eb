@@ -4,24 +4,28 @@ phase 2, switch Programming to it
 Otherwise, debug until 4x10 continuously sufficiently satisfied with performance
 
 Archive to random directory:
+Text field can now grow in size appropriately
+But actually, a label would be enough, one should not need to/be able to change the directory by editing. Only one way to do something...
+
 
 
 
 Current projects:
-Bugs (urgent)
+Bugs (urgent) [after again tolerating the new version]
 	Summarizing panel shows up empty!
 	
 Core features:
 	-1.2: save archive to random directory
-	-1.3: [m] [p] easy to make
-	-1.4: make deck list and add command for next deck
+	-1.3: read archive from textfile
+	-1.4: [m] [p] easy to make
+	-1.5: make deck list and add command for next deck
 	-2.0: get timer working 
 	-2.1: ?
 	-3.0: get delayed review working 
 	-4.0: get perceptual learning working
 	-4.1: Add an Eb icon
 Small features
-	?
+	-make escape also close the ArchivingSettings window
 Larger features (consider carefully)
 	?
 Refactorings:
@@ -393,13 +397,13 @@ Design
 
 
 @Version history:
-1.0. April 28, 2016. Eb can now be used for spaced repetition, at least cards can be created and reviewed, and one can set reviewing time.
+R1.0. April 28, 2016. Eb can now be used for spaced repetition, at least cards can be created and reviewed, and one can set reviewing time.
 	Total features:
 	-3 modes: information mode, reviewing mode, summarizing mode 
 	-5 (working) shortcuts: add card, quit Eb, create deck, load deck, and view/edit study options.
 	-5 study opions: initial review interval, number of cards per reviewing session; base time to wait for re-reviewing remembered card; review time lengthening factor, time to wait for re-reviewing forgotten card.
 	
-1.1 
+R1.1 
 	-New Card window will now also close when pressing OK in case of a totally empty card.
 	-In the New Card window, all texts are now trimmed when the edited side of the card loses focus (or the enter key is pressed). So you don't have to clean up spaces manually!
 	-when creating/switching a deck, the reviewing is now also correctly reset
@@ -422,6 +426,7 @@ R1.2
 	-added mnemonics to the buttons in the review pane.
 	-changed background of Edit Card to something not green.
 	-solved a bug in which the shortcut keys of the review window occasionally did not work.
+	-Added the option to save archiving files; these files can be saved to whatever directory one prefers.
 
 
 

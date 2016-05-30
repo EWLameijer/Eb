@@ -7,19 +7,27 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 import eb.data.Deck;
-import eb.utilities.ui_elements.LabelledTextField;
 
 @SuppressWarnings("serial")
 public class ArchivingSettingsWindow extends JFrame {
 
-	LabelledTextField m_archivingLocation;
+	JLabel m_archivingLocation;
 	JButton m_changeLocationButton;
 
 	ArchivingSettingsWindow() {
 		super("Deck archiving settings");
-		m_archivingLocation = new LabelledTextField("Location for archive files: ");
+		String archivingDirectoryName = Deck.getArchivingDirectoryName();
+		String displayedDirectoryName;
+		if (archivingDirectoryName.isEmpty()) {
+			displayedDirectoryName = "[default]";
+		} else {
+			displayedDirectoryName = archivingDirectoryName;
+		}
+		m_archivingLocation = new JLabel(
+		    "Location for archive files: " + displayedDirectoryName);
 		m_changeLocationButton = new JButton("Change location for archive files");
 		m_changeLocationButton.addActionListener(e -> changeArchivingLocation());
 	}
@@ -33,6 +41,7 @@ public class ArchivingSettingsWindow extends JFrame {
 		} else {
 			File selectedDirectory = chooser.getSelectedFile();
 			Deck.setArchivingDirectory(selectedDirectory);
+			m_archivingLocation.setText(selectedDirectory.getAbsolutePath());
 		}
 
 	}
@@ -40,6 +49,7 @@ public class ArchivingSettingsWindow extends JFrame {
 	private void init() {
 		Container box = Box.createHorizontalBox();
 		box.add(m_archivingLocation);
+		box.add(Box.createHorizontalStrut(10));
 		box.add(m_changeLocationButton);
 		add(box);
 		setSize(700, 400);

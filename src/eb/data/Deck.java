@@ -374,6 +374,10 @@ public class Deck {
 	public static void setArchivingDirectory(File directory) {
 		ensureDeckExists();
 		m_contents.setArchivingDirectory(directory);
+	}
 
+	public static String getArchivingDirectoryName() {
+		ensureDeckExists();
+		return m_contents.getArchivingDirectoryName();
 	}
 }

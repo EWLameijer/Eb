@@ -333,4 +333,8 @@ public class LogicalDeck implements Serializable {
 		}
 
 	}
+
+	public String getArchivingDirectoryName() {
+		return m_archivingSettings.getDirectoryName();
+	}
 }

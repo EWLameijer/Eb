@@ -42,7 +42,7 @@ public class LabelledTextField extends JPanel {
 	public LabelledTextField(String labelText) {
 		m_label = new JLabel(labelText);
 		m_textField = new JTextField("EMPTY");
-		m_textField.setPreferredSize(new Dimension(40, 20));
+		m_textField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
 		add(m_label);
 		add(m_textField);
 	}
