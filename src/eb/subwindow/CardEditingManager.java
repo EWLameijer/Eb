@@ -52,7 +52,7 @@ public class CardEditingManager {
 		JOptionPane.getRootFrame().dispose();
 	}
 
-	private boolean inCardCreatingMode() {
+	public boolean inCardCreatingMode() {
 		return m_cardToBeModified == null;
 	}
 

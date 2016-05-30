@@ -5,10 +5,10 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 @SuppressWarnings("serial")
-public class ButtonAction extends AbstractAction {
+public class ProgrammableAction extends AbstractAction {
 	private transient Runnable m_action;
 
-	public ButtonAction(Runnable action) {
+	public ProgrammableAction(Runnable action) {
 		m_action = action;
 	}
 

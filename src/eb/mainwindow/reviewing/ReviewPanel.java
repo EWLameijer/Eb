@@ -17,7 +17,7 @@ import javax.swing.KeyStroke;
 import eb.data.Card;
 import eb.data.Deck;
 import eb.subwindow.CardEditingManager;
-import eb.utilities.ButtonAction;
+import eb.utilities.ProgrammableAction;
 
 /**
  * The panel used to review cards (shows front, on clicking "Show Answer" the
@@ -76,7 +76,7 @@ public class ReviewPanel extends JPanel {
 		showAnswerButton.getInputMap(WHEN_IN_FOCUSED_WINDOW)
 		    .put(KeyStroke.getKeyStroke('s'), "show answer");
 		showAnswerButton.getActionMap().put("show answer",
-		    new ButtonAction(() -> showAnswer()));
+		    new ProgrammableAction(() -> showAnswer()));
 		showAnswerButton.addActionListener(e -> showAnswer());
 		buttonPanelForHiddenBack.add(showAnswerButton);
 
@@ -86,7 +86,7 @@ public class ReviewPanel extends JPanel {
 		rememberedButton.getInputMap(WHEN_IN_FOCUSED_WINDOW)
 		    .put(KeyStroke.getKeyStroke('r'), "remembered");
 		rememberedButton.getActionMap().put("remembered",
-		    new ButtonAction(() -> remembered(true)));
+		    new ProgrammableAction(() -> remembered(true)));
 		rememberedButton.addActionListener(e -> remembered(true));
 		buttonPanelForShownBack.add(rememberedButton);
 		JButton forgottenButton = new JButton("Forgotten");
@@ -94,7 +94,7 @@ public class ReviewPanel extends JPanel {
 		forgottenButton.getInputMap(WHEN_IN_FOCUSED_WINDOW)
 		    .put(KeyStroke.getKeyStroke('f'), "forgotten");
 		forgottenButton.getActionMap().put("forgotten",
-		    new ButtonAction(() -> remembered(false)));
+		    new ProgrammableAction(() -> remembered(false)));
 
 		forgottenButton.addActionListener(e -> remembered(false));
 		buttonPanelForShownBack.add(forgottenButton);
@@ -120,7 +120,7 @@ public class ReviewPanel extends JPanel {
 		editButton.setMnemonic(KeyEvent.VK_E);
 		editButton.getInputMap(WHEN_IN_FOCUSED_WINDOW)
 		    .put(KeyStroke.getKeyStroke('e'), "edit");
-		editButton.getActionMap().put("edit", new ButtonAction(() -> editCard()));
+		editButton.getActionMap().put("edit", new ProgrammableAction(() -> editCard()));
 		editButton.addActionListener(e -> editCard());
 
 		// the fixed button panel contains buttons that need to be visible always

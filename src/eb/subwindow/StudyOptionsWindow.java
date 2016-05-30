@@ -3,10 +3,8 @@ package eb.subwindow;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
-import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -19,6 +17,7 @@ import eb.eventhandling.BlackBoard;
 import eb.eventhandling.Listener;
 import eb.eventhandling.Update;
 import eb.eventhandling.UpdateType;
+import eb.utilities.ProgrammableAction;
 import eb.utilities.Utilities;
 import eb.utilities.ui_elements.LabelledComboBox;
 import eb.utilities.ui_elements.LabelledTextField;
@@ -206,14 +205,8 @@ public class StudyOptionsWindow extends JFrame implements Listener {
 		m_cancelButton.addActionListener(e -> close());
 		getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
 		    .put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "Cancel"); //$NON-NLS-1$
-		getRootPane().getActionMap().put("Cancel", new AbstractAction() { //$NON-NLS-1$
-			private static final long serialVersionUID = 5281385300708334272L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				close();
-			}
-		});
+		getRootPane().getActionMap().put("Cancel",
+		    new ProgrammableAction(() -> close()));
 		m_loadCurrentDeckSettingsButton
 		    .addActionListener(e -> loadCurrentDeckSettings());
 		m_loadEbDefaultsButton.addActionListener(e -> loadEbDefaults());

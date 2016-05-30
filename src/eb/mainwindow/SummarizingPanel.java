@@ -16,7 +16,7 @@ import eb.eventhandling.BlackBoard;
 import eb.eventhandling.Update;
 import eb.eventhandling.UpdateType;
 import eb.mainwindow.reviewing.Reviewer;
-import eb.utilities.ButtonAction;
+import eb.utilities.ProgrammableAction;
 
 @SuppressWarnings("serial")
 public class SummarizingPanel extends JPanel {
@@ -40,7 +40,7 @@ public class SummarizingPanel extends JPanel {
 		m_backToReactiveModeButton.getInputMap(WHEN_IN_FOCUSED_WINDOW)
 		    .put(KeyStroke.getKeyStroke("pressed ENTER"), "back to reactive mode");
 		m_backToReactiveModeButton.getActionMap().put("back to reactive mode",
-		    new ButtonAction(() -> toReactiveMode()));
+		    new ProgrammableAction(() -> toReactiveMode()));
 		m_backToReactiveModeButton.addActionListener(e -> toReactiveMode());
 		m_reviewsCompletedBPanel.add(m_backToReactiveModeButton);
 

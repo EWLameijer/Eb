@@ -11,7 +11,7 @@ But actually, a label would be enough, one should not need to/be able to change 
 
 
 Current projects:
-Bugs (urgent) [after again tolerating the new version]
+Bugs (urgent) [after again tolerating the new version] Mon/Tue/Wed/Thu
 	Summarizing panel shows up empty!
 	
 Core features:
@@ -25,7 +25,7 @@ Core features:
 	-4.0: get perceptual learning working
 	-4.1: Add an Eb icon
 Small features
-	-make escape also close the ArchivingSettings window
+	?
 Larger features (consider carefully)
 	?
 Refactorings:
@@ -427,6 +427,10 @@ R1.2
 	-changed background of Edit Card to something not green.
 	-solved a bug in which the shortcut keys of the review window occasionally did not work.
 	-Added the option to save archiving files; these files can be saved to whatever directory one prefers.
+	
+R1.3
+	-name of deck is now also shown on top of card editing window.
+	-The ArchivingSettings window can now also be closed by pressing "escape"
 
 
 

@@ -15,6 +15,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextPane;
 
+import eb.data.Deck;
 import eb.utilities.Utilities;
 
 /**
@@ -48,7 +49,7 @@ public class CardEditingWindow extends JFrame {
 	private final CardEditingManager m_manager;
 
 	/**
-	 * Creates a <code>NewCardWindow</code> to add cards to the current deck.
+	 * Creates a <code>CardEditingWindow</code> to add cards to the current deck.
 	 */
 	CardEditingWindow(String frontText, String backText,
 	    CardEditingManager manager) {
@@ -64,6 +65,8 @@ public class CardEditingWindow extends JFrame {
 		    errorHeader + "the card manager is undefined.");
 
 		m_manager = manager;
+		String operation = m_manager.inCardCreatingMode() ? "add" : "edit";
+		this.setTitle(Deck.getName() + ": " + operation + " card");
 
 		// Create the panel to edit the front of the card, and make enter
 		// and tab transfer focus to the panel for editing the back of the card.
