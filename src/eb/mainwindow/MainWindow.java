@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowListener;
 import java.beans.EventHandler;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -18,6 +19,7 @@ import java.util.Optional;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -225,6 +227,11 @@ public class MainWindow extends JFrame implements Listener {
 		    KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.CTRL_MASK));
 		loadItem.addActionListener(e -> loadDeck());
 		fileMenu.add(loadItem);
+		final JMenuItem restoreItem = new JMenuItem("Restore from archive");
+		restoreItem.setAccelerator(
+		    KeyStroke.getKeyStroke(KeyEvent.VK_H, ActionEvent.CTRL_MASK));
+		restoreItem.addActionListener(e -> restoreDeck());
+		fileMenu.add(restoreItem);
 		final JMenuItem quitItem = new JMenuItem("Quit");
 		quitItem.setAccelerator(
 		    KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.CTRL_MASK));
@@ -288,6 +295,18 @@ public class MainWindow extends JFrame implements Listener {
 		messageUpdater.start();
 		updateMessageLabel();
 		// postconditions: none
+	}
+
+	private void restoreDeck() {
+		@@@
+		JFileChooser chooser = new JFileChooser();
+		int result = chooser.showOpenDialog(this);
+		if (result == JFileChooser.CANCEL_OPTION) {
+			return;
+		} else {
+			File selectedFile = chooser.getSelectedFile();
+			System.out.println(selectedFile.getAbsolutePath());
+		}
 	}
 
 	/**
