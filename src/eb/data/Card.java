@@ -29,10 +29,10 @@ public class Card implements Serializable {
 	private String m_textOnBack;
 
 	// The time/instant when this card was created.
-	private final Instant m_creationInstant;
+	private Instant m_creationInstant;
 
 	// The reviews of the cards.
-	private final List<Review> m_reviews;
+	private List<Review> m_reviews;
 
 	/**
 	 * Creates a new card; ensures that the input is valid. Note that empty cards
@@ -48,6 +48,15 @@ public class Card implements Serializable {
 	 *          not be null.
 	 */
 	public Card(String textOnFront, String textOnBack) {
+		init(textOnFront, textOnBack);
+	}
+
+	public Card(String line) {
+		String[] strings = line.split("\\t\\t");
+		init(strings[0], strings[1]);
+	}
+
+	private void init(String textOnFront, String textOnBack) {
 		// preconditions: textOnFront and textOnBack should not be null,
 		// as that is likely due to a logic error somewhere and at least is
 		// rather untidy

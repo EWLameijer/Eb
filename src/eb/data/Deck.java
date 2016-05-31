@@ -380,4 +380,12 @@ public class Deck {
 		ensureDeckExists();
 		return m_contents.getArchivingDirectoryName();
 	}
+
+	public static void createCardFromLine(String line) {
+		ensureDeckExists();
+		Card card = new Card(line);
+		Utilities.require(canAddCard(card), "Deck.createCardFromLine() error: "
+		    + "the card from line '" + line + "' cannot be added.");
+		addCard(card);
+	}
 }

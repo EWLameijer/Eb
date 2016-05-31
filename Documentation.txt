@@ -15,7 +15,6 @@ Bugs (urgent) [after again tolerating the new version] Mon/Tue/Wed/Thu
 	Summarizing panel shows up empty!
 	
 Core features:
-	-1.3: read archive from textfile
 	-1.4: [m] [p] easy to make
 	-1.5: make deck list and add command to go to next deck
 	-2.0: get timer working 
@@ -429,7 +428,8 @@ R1.2
 	
 R1.3
 	-name of deck is now also shown on top of card editing window.
-	-The ArchivingSettings window can now also be closed by pressing "escape"
+	-the ArchivingSettings window can now also be closed by pressing "escape"
+	-a deck can now be restored from a text file by the Ctrl+H option.
 
 
 
