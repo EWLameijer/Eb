@@ -33,6 +33,7 @@ Okay. Wat is the problem? Basically that the reviewsession needs a panel.
 
 Current projects:
 Bugs (urgent) 
+	-
 	-second round goes wrong!
 	-add version number to output!
 	-mnemonics do not work for summarizing panel!
@@ -465,6 +466,7 @@ R1.3
 R1.4
 	-You can now create a new archiving directory while setting the archiving directory (so you do not need to create the archiving directory externally anymore).
 	-solved a bug that gave trouble when swapping decks.
+	-solved a bug that gave trouble when creating a new deck (the screen did not swap properly)
 
 
 

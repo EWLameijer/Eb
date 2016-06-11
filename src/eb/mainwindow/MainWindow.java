@@ -222,7 +222,13 @@ public class MainWindow extends JFrame implements Listener {
 					    + "\" already exists. Please choose another name.");
 				} else {
 					// The deckname is valid!
+					m_messageUpdater.stop();
 					Deck.createDeckWithName(deckName);
+					// reset window
+					m_state = MainWindowState.REACTIVE;
+					updateMessageLabel();
+					m_messageUpdater.start();
+
 					return;
 				}
 			}
