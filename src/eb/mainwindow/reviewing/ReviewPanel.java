@@ -120,7 +120,8 @@ public class ReviewPanel extends JPanel {
 		editButton.setMnemonic(KeyEvent.VK_E);
 		editButton.getInputMap(WHEN_IN_FOCUSED_WINDOW)
 		    .put(KeyStroke.getKeyStroke('e'), "edit");
-		editButton.getActionMap().put("edit", new ProgrammableAction(() -> editCard()));
+		editButton.getActionMap().put("edit",
+		    new ProgrammableAction(() -> editCard()));
 		editButton.addActionListener(e -> editCard());
 
 		// the fixed button panel contains buttons that need to be visible always
@@ -179,7 +180,6 @@ public class ReviewPanel extends JPanel {
 
 	public void refresh() {
 		repaint();
-
 	}
 
 	public void updatePanels(String frontText, String backText) {

@@ -14,7 +14,6 @@ public class ProgrammableAction extends AbstractAction {
 
 	@Override
 	public void actionPerformed(ActionEvent ae) {
-		Thread thread = new Thread(m_action);
-		thread.start();
+		m_action.run();
 	}
 }

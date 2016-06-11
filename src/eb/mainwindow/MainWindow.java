@@ -78,6 +78,8 @@ public class MainWindow extends JFrame implements Listener {
 
 	private ReviewPanel m_reviewPanel;
 
+	private Timer m_messageUpdater;
+
 	/**
 	 * MainWindow constructor.
 	 */
@@ -150,18 +152,34 @@ public class MainWindow extends JFrame implements Listener {
 			reviewButtonText = "Review now";
 		}
 		m_startReviewingButton.setText(reviewButtonText);
-
+		// this.getContentPane().repaint();
 		// postconditions: none (well, the label should have some text, but I'm
 		// willing to trust that that happens.
 	}
 
-	void updateWindow() {
-		MainWindowState programState = m_state;
-		if (programState == MainWindowState.REACTIVE) {
+	void showCorrectPanel() {
+		switch (m_state) {
+		case REACTIVE:
 			showReactivePanel();
-		} else if (programState == MainWindowState.INFORMATIONAL) {
+			break;
+		case INFORMATIONAL:
 			showInformationPanel();
+			break;
+		case REVIEWING:
+			showReviewingPanel();
+			break;
+		case SUMMARIZING:
+			showSummarizingPanel();
+			break;
+		case WAITING_FOR_TIMER_START:
+			switchToPanel(TIMED_REVIEW_START_PANEL_ID);
+			break;
+		default:
+			Utilities.require(false, "MainWindow.respondToProgramStateChange "
+			    + "error: receiving wrong program state.");
+			break;
 		}
+
 	}
 
 	private boolean mustReviewNow() {
@@ -277,7 +295,7 @@ public class MainWindow extends JFrame implements Listener {
 
 		setNameOfLastReviewedDeck();
 
-		updateWindow();
+		showCorrectPanel();
 
 		// now show the window itself.
 		setSize(1000, 700);
@@ -289,11 +307,11 @@ public class MainWindow extends JFrame implements Listener {
 		addWindowListener(EventHandler.create(WindowListener.class, this,
 		    "saveAndQuit", null, "windowClosing"));
 		setVisible(true);
-		BlackBoard.register(this, UpdateType.DECK_SWAPPED);
-		BlackBoard.register(this, UpdateType.DECK_CHANGED);
+		// BlackBoard.register(this, UpdateType.DECK_SWAPPED);
+		// BlackBoard.register(this, UpdateType.DECK_CHANGED);
 		BlackBoard.register(this, UpdateType.PROGRAMSTATE_CHANGED);
-		Timer messageUpdater = new Timer(100, e -> updateWindow());
-		messageUpdater.start();
+		m_messageUpdater = new Timer(100, e -> showCorrectPanel());
+		m_messageUpdater.start();
 		updateMessageLabel();
 		// postconditions: none
 	}
@@ -355,22 +373,40 @@ public class MainWindow extends JFrame implements Listener {
 			String deckName = JOptionPane.showInputDialog(null,
 			    "Please give name for deck to be loaded");
 			if (deckName == null) {
-				// cancel button has been pressed
+				// Cancel button pressed
 				return;
-			} else {
-				if (!Utilities.isStringValidIdentifier(deckName)) {
-					JOptionPane.showMessageDialog(null, "Sorry, \"" + deckName
-					    + "\" is not a valid name for a deck. Please choose another name.");
-				} else if (!Deck.exists(deckName)) {
-					JOptionPane.showMessageDialog(null,
-					    "Sorry, the deck \"" + deckName + "\" does not exist yet.");
-				} else {
-					// we have a valid deck here
-					Deck.loadDeck(deckName);
-					return;
-				}
+			}
+			if (canDeckBeLoaded(deckName)) {
+				m_messageUpdater.stop();
+				Deck.loadDeck(deckName);
+				// reset window
+				m_state = MainWindowState.REACTIVE;
+				updateMessageLabel();
+				m_messageUpdater.start();
+				return;
 			}
 		} while (true);
+	}
+
+	private boolean canDeckBeLoaded(String deckName) {
+		if (!Utilities.isStringValidIdentifier(deckName)) {
+			JOptionPane.showMessageDialog(null, "Sorry, \"" + deckName
+			    + "\" is not a valid name for a deck. Please choose another name.");
+		} else if (!Deck.exists(deckName)) {
+			JOptionPane.showMessageDialog(null,
+			    "Sorry, the deck \"" + deckName + "\" does not exist yet.");
+		} else {
+			// we have a valid deck here
+			if (Deck.canLoadDeck(deckName)) {
+				// the only 'happy path' - otherwise false should be returned.
+				return true;
+			} else {
+				JOptionPane.showMessageDialog(null,
+				    "An error occurred while loading the deck \"" + deckName
+				        + "\". It may be an invalid file; possibly try restore it from an archive file?");
+			}
+		}
+		return false;
 	}
 
 	private JPanel createInformationPanel() {
@@ -427,7 +463,9 @@ public class MainWindow extends JFrame implements Listener {
 	}
 
 	private void showReviewingPanel() {
-		Reviewer.start(m_reviewPanel);
+		if (m_state == MainWindowState.REACTIVE) {
+			Reviewer.start(m_reviewPanel);
+		}
 		switchToPanel(REVIEW_PANEL_ID);
 	}
 
@@ -439,12 +477,11 @@ public class MainWindow extends JFrame implements Listener {
 	private void showReactivePanel() {
 		if (mustReviewNow()) {
 			if (Deck.getStudyOptions().isTimed()) {
-				BlackBoard.post(new Update(UpdateType.PROGRAMSTATE_CHANGED,
-				    MainWindowState.WAITING_FOR_TIMER_START.name()));
+				m_state = MainWindowState.WAITING_FOR_TIMER_START;
 			} else {
-				BlackBoard.post(new Update(UpdateType.PROGRAMSTATE_CHANGED,
-				    MainWindowState.REVIEWING.name()));
+
 				showReviewingPanel();
+				m_state = MainWindowState.REVIEWING;
 			}
 		} else {
 			showInformationPanel();
@@ -453,35 +490,17 @@ public class MainWindow extends JFrame implements Listener {
 
 	public void respondToUpdate(Update update) {
 		if (update.getType() == UpdateType.DECK_CHANGED) {
-			updateWindow();
+			showCorrectPanel();
 		} else if (update.getType() == UpdateType.PROGRAMSTATE_CHANGED) {
 			m_state = MainWindowState.valueOf(update.getContents());
 			m_reviewPanel.refresh(); // there may be new cards to refresh
-			updateWindow();
 			updateMessageLabel();
-			switch (m_state) {
-			case INFORMATIONAL:
-				showInformationPanel();
-				break;
-			case REACTIVE:
-				showReactivePanel();
-				break;
-			case REVIEWING:
-				showReviewingPanel();
-				break;
-			case SUMMARIZING:
-				showSummarizingPanel();
-				break;
-			case WAITING_FOR_TIMER_START:
-				switchToPanel(TIMED_REVIEW_START_PANEL_ID);
-				break;
-			default:
-				Utilities.require(false, "MainWindow.respondToProgramStateChange "
-				    + "error: receiving wrong program state.");
-			}
+			showCorrectPanel();
 		} else if (update.getType() == UpdateType.DECK_SWAPPED) {
-			BlackBoard.post(new Update(UpdateType.PROGRAMSTATE_CHANGED,
-			    MainWindowState.REACTIVE.name()));
+			MainWindowState newState = (mustReviewNow()) ? MainWindowState.REVIEWING
+			    : MainWindowState.REACTIVE;
+			BlackBoard
+			    .post(new Update(UpdateType.PROGRAMSTATE_CHANGED, newState.name()));
 		}
 	}
 

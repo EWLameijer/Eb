@@ -63,9 +63,12 @@ public class Reviewer {
 	}
 
 	public static void start(ReviewPanel reviewPanel) {
-		c_reviewPanel = reviewPanel;
-		c_session = new ReviewSession(reviewPanel);
-		c_currentDeck = Deck.getContents();
+		if (reviewPanel != null) {
+			c_reviewPanel = reviewPanel;
+			c_session = new ReviewSession(reviewPanel);
+			c_currentDeck = Deck.getContents();
+		}
+
 	}
 
 	private static void ensureReviewSessionIsValid() {

@@ -2,6 +2,8 @@ package eb.mainwindow;
 
 import java.awt.CardLayout;
 import java.awt.Graphics;
+import java.awt.event.ComponentListener;
+import java.beans.EventHandler;
 import java.util.List;
 import java.util.OptionalDouble;
 
@@ -9,6 +11,8 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
+
+import com.sun.glass.events.KeyEvent;
 
 import eb.data.Deck;
 import eb.data.Review;
@@ -33,26 +37,65 @@ public class SummarizingPanel extends JPanel {
 	private static final String REVIEWS_COMPLETED_MODE = "reviews completed";
 	private static final String STILL_REVIEWS_TODO_MODE = "still reviews to do";
 
+	private void makeKeystrokeActivateRunnable(JButton button,
+	    KeyStroke keyStroke, String actionName, Runnable runnable) {
+		button.getInputMap(WHEN_IN_FOCUSED_WINDOW).put(keyStroke, actionName);
+		button.getActionMap().put(actionName, new ProgrammableAction(runnable));
+	}
+
+	private void makeButtonAndKeystrokeActivateRunnable(JButton button,
+	    KeyStroke keyStroke, String actionName, Runnable runnable) {
+		button.addActionListener(e -> runnable.run());
+		makeKeystrokeActivateRunnable(button, keyStroke, actionName, runnable);
+	}
+
+	private void backToInformationMode() {
+		BlackBoard.post(new Update(UpdateType.PROGRAMSTATE_CHANGED,
+		    MainWindowState.INFORMATIONAL.name()));
+	}
+
+	private void backToReviewingMode() {
+		BlackBoard.post(new Update(UpdateType.PROGRAMSTATE_CHANGED,
+		    MainWindowState.REVIEWING.name()));
+	}
+
 	SummarizingPanel() {
 		super();
-
+		this.addComponentListener(EventHandler.create(ComponentListener.class, this,
+		    "requestFocusInWindow", null, "componentShown"));
 		m_reviewsCompletedBPanel = new JPanel();
-		m_backToReactiveModeButton.getInputMap(WHEN_IN_FOCUSED_WINDOW)
-		    .put(KeyStroke.getKeyStroke("pressed ENTER"), "back to reactive mode");
-		m_backToReactiveModeButton.getActionMap().put("back to reactive mode",
-		    new ProgrammableAction(() -> toReactiveMode()));
-		m_backToReactiveModeButton.addActionListener(e -> toReactiveMode());
+		m_reviewsCompletedBPanel
+		    .addComponentListener(EventHandler.create(ComponentListener.class, this,
+		        "requestFocusInWindow", null, "componentShown"));
+		// m_backToReactiveModeButton.getInputMap(WHEN_IN_FOCUSED_WINDOW)
+		// .put(KeyStroke.getKeyStroke("pressed ENTER"), "back to reactive mode");
+		// m_backToReactiveModeButton.getActionMap().put("back to reactive mode",
+		// new ProgrammableAction(() -> toReactiveMode()));
+		// m_backToReactiveModeButton.addActionListener(e -> toReactiveMode());
+		makeButtonAndKeystrokeActivateRunnable(m_backToReactiveModeButton,
+		    KeyStroke.getKeyStroke("pressed ENTER"), "back to reactive mode",
+		    () -> toReactiveMode());
 		m_reviewsCompletedBPanel.add(m_backToReactiveModeButton);
 
 		m_stillReviewsToDoBPanel = new JPanel();
-		m_backToInformationModeButton.addActionListener(
-		    e -> BlackBoard.post(new Update(UpdateType.PROGRAMSTATE_CHANGED,
-		        MainWindowState.INFORMATIONAL.name())));
-		m_stillReviewsToDoBPanel.add(m_backToInformationModeButton);
-		m_backToReviewing.addActionListener(
-		    e -> BlackBoard.post(new Update(UpdateType.PROGRAMSTATE_CHANGED,
-		        MainWindowState.REVIEWING.name())));
+		m_stillReviewsToDoBPanel
+		    .addComponentListener(EventHandler.create(ComponentListener.class, this,
+		        "requestFocusInWindow", null, "componentShown"));
+
+		m_backToReviewing.setMnemonic(KeyEvent.VK_G);
+		// m_backToReviewing.addActionListener(e -> backToReviewingMode());
+		makeButtonAndKeystrokeActivateRunnable(m_backToReviewing,
+		    KeyStroke.getKeyStroke('G'), "back to reviewing",
+		    () -> backToReviewingMode());
 		m_stillReviewsToDoBPanel.add(m_backToReviewing);
+
+		m_backToInformationModeButton.setMnemonic(KeyEvent.VK_B);
+		// m_backToInformationModeButton
+		// .addActionListener(e -> backToInformationMode());
+		makeButtonAndKeystrokeActivateRunnable(m_backToInformationModeButton,
+		    KeyStroke.getKeyStroke('B'), "back to information mode",
+		    () -> backToInformationMode());
+		m_stillReviewsToDoBPanel.add(m_backToInformationModeButton);
 
 		m_buttonPanel = new JPanel();
 		m_buttonPanel.setLayout(new CardLayout());

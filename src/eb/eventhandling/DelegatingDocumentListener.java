@@ -13,8 +13,7 @@ public class DelegatingDocumentListener implements DocumentListener {
 	}
 
 	private void processUpdate() {
-		Thread t = new Thread(m_handler);
-		t.start();
+		m_handler.run();
 	}
 
 	@Override

@@ -3,27 +3,58 @@ phase 2, switch Programming to it
 + start Chinese [5 min per 120 min non-maintenance]. 
 Otherwise, debug until 4x10 continuously sufficiently satisfied with performance
 
-Archive to random directory:
-Text field can now grow in size appropriately
-But actually, a label would be enough, one should not need to/be able to change the directory by editing. Only one way to do something...
+[Note: duolingo: investigate new courses only start of month. Investigated 0106, Vietnamese. Klingon still hatching (25%) Next: 0107 or further]
+
+MCV
+
+Deck switch: why not good effect? Well, the Review.start() only changes some settings. Okay, it also constructs a ReviewSession
+
+Okay. What happens if deck is swapped? First, the data structure should be updated.
+
+Then:  UpdateType.DECK_SWAPPED should update the title, refresh the main window, and check whether there are new reviews.
+
+
+Okay. Wat is the problem? Basically that the reviewsession needs a panel.
+
+
+
+[m/p] 
+1) Add button between cancel and okay (if card added): show card add settings
+2) if the show card add settings is pressed, extend the adding window with a side panel.
+3) Put on top of the side window a "hide card add settings" button 
+4) deactivate the show card add settings 
+5) under the hide card add settings, have a combobox with options "show 2 cards" and "show 3 cards"
+6) show label explaining #1 [m]->#2 creates a card with the front of the first field to which " [m]" is added, on the back of the card the contents as shown in the second field. 
+7) Add a text area in which (for 2 cards) the default is 
+
 
 
 
 
 Current projects:
-Bugs (urgent) [after again tolerating the new version] Mon/Tue/Wed/Thu
-	Summarizing panel shows up empty!
+Bugs (urgent) 
+	-second round goes wrong!
+	-add version number to output!
+	-mnemonics do not work for summarizing panel!
+	-Problems when editing top of card! Change not shown.
+	-[Solved?050616] Summary shows after adding card.
+	-[Solved?050616] 5 when adding cards, summary screen gives 4 reviewed
+	-[Solved?050616]Summarizing panel shows up empty!
 	
 Core features:
 	-1.4: [m] [p] easy to make
 	-1.5: make deck list and add command to go to next deck
 	-2.0: get timer working 
-	-2.1: ?
+	-2.1: Different words - shrink/grow interval?
 	-3.0: get delayed review working 
 	-4.0: get perceptual learning working
 	-4.1: Add an Eb icon
+	-5.0: sentences?
 Small features
-	?
+	?-Go to next round - > shortcut => TEST (nope!) => TEST (3/6) (nope!)
+	-let deck be saved in same directory as archive?
+	-show number of cards to go yet
+	-allow deleting cards
 Larger features (consider carefully)
 	?
 Refactorings:
@@ -430,6 +461,10 @@ R1.3
 	-name of deck is now also shown on top of card editing window.
 	-the ArchivingSettings window can now also be closed by pressing "escape"
 	-a deck can now be restored from a text file by the Ctrl+H option.
+	
+R1.4
+	-You can now create a new archiving directory while setting the archiving directory (so you do not need to create the archiving directory externally anymore).
+	-solved a bug that gave trouble when swapping decks.
 
 
 

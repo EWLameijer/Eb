@@ -28,6 +28,9 @@ public class ArchivingSettings implements Serializable {
 	}
 
 	public void setDirectory(File directory) {
+		if (!directory.exists()) {
+			directory.mkdir();
+		}
 		m_archivingDirectory = directory;
 	}
 

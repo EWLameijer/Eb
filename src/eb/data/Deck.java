@@ -17,6 +17,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import eb.eventhandling.BlackBoard;
 import eb.eventhandling.Update;
 import eb.eventhandling.UpdateType;
+import eb.mainwindow.reviewing.Reviewer;
 import eb.subwindow.StudyOptions;
 import eb.utilities.Utilities;
 
@@ -98,12 +99,12 @@ public class Deck {
 		if (!deckHasBeenLoaded()) {
 			// No deck has been loaded yet - try to load the default deck,
 			// or else create it.
-			final boolean deckLoadedSuccessfully = loadDeck(getLastDeck());
-
-			// If loading the deck failed, try to create it.
-			// Note that createDeckWithName cannot return null; it will exit
-			// with an error message instead.
-			if (!deckLoadedSuccessfully) {
+			if (canLoadDeck(getLastDeck())) {
+				loadDeck(getLastDeck());
+			} else {
+				// If loading the deck failed, try to create it.
+				// Note that createDeckWithName cannot return null; it will exit
+				// with an error message instead.
 				createDeckWithName(DEFAULT_DECKNAME);
 			}
 		}
@@ -148,15 +149,50 @@ public class Deck {
 	 * @return a boolean indicating whether the requested deck was successfully
 	 *         loaded
 	 */
-	public static boolean loadDeck(String name) {
+	public static void loadDeck(String name) {
 
 		// checking preconditions
-		Utilities.require(Utilities.isStringValidIdentifier(name),
-		    "Deck.loadDeck: name must be a valid identifier, "
-		        + "meaning that it exists and contains non-whitespace "
-		        + "characters.");
+		Utilities.require(canLoadDeck(name),
+		    "Deck.loadDeck() error: deck cannot be loaded. "
+		        + "Was canLoadDeck called?");
 
 		final File deckFile = LogicalDeck.getDeckFileHandle(name);
+		save();
+		try (ObjectInputStream objInStream = new ObjectInputStream(
+		    new FileInputStream(deckFile))) {
+			LogicalDeck loadedDeck = (LogicalDeck) objInStream.readObject();
+			if (loadedDeck != null) {
+				m_contents = loadedDeck;
+				m_contents.fixNewFields();
+				swapDeck();
+			} else {
+				Utilities.require(false,
+				    "Deck.loadDeck() error: the requested deck " + "cannot be loaded.");
+			}
+		} catch (final Exception e) {
+			// something goes wrong with deserializing the deck; so
+			// you also can't read the file
+			Logger.getGlobal()
+			    .info(e + "Deck.loadDeck() error: could not load deck from file");
+		}
+		// postconditions: none
+	}
+
+	/**
+	 * Returns whether a deck with this name can be loaded (it exists and is of
+	 * the proper file format)
+	 * 
+	 * @param deckName
+	 *          the name of the deck can be loaded.
+	 * @return true if the deck can be loaded from disk, false if it cannot.
+	 */
+	public static boolean canLoadDeck(String deckName) {
+		// checking preconditions
+		if (!Utilities.isStringValidIdentifier(deckName)) {
+			return false;
+		}
+
+		final File deckFile = LogicalDeck.getDeckFileHandle(deckName);
 
 		// case A: the file does not exist
 		if (!deckFile.isFile()) {
@@ -165,25 +201,18 @@ public class Deck {
 
 		// so the file must exist. But does it contain a valid deck?
 		// anyway, first save the old deck to be safe.
-		save();
 		try (ObjectInputStream objInStream = new ObjectInputStream(
 		    new FileInputStream(deckFile))) {
 			LogicalDeck loadedDeck = (LogicalDeck) objInStream.readObject();
-			if (loadedDeck != null) {
-				m_contents = loadedDeck;
-				m_contents.fixNewFields();
-				BlackBoard.post(new Update(UpdateType.DECK_SWAPPED));
-			}
 			return loadedDeck != null;
 		} catch (final Exception e) {
 			// something goes wrong with deserializing the deck; so
 			// you also can't read the file
 			Logger.getGlobal()
-			    .info(e + "Deck.loadDeckWithName: could not load deck from file");
+			    .info(e + "Deck.loadDeck() error: could not load deck from file");
 			return false;
 		}
-
-		// postconditions: none: boolean returned
+		// postconditions: none
 	}
 
 	/**
@@ -214,7 +243,19 @@ public class Deck {
 		    + "problem creating and/or writing the new deck.");
 
 		// The deck has been changed. So ensure depending GUI-elements know that.
-		BlackBoard.post(new Update(UpdateType.DECK_SWAPPED));
+		swapDeck();
+
+	}
+
+	/**
+	 * To do after the deck is swapped.
+	 */
+	private static void swapDeck() {
+		// phase 1: update the data structure/model.
+		Reviewer.start(null);
+
+		// phase 2: update the view(s)
+		// BlackBoard.post(new Update(UpdateType.DECK_SWAPPED));
 	}
 
 	/**
