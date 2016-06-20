@@ -422,11 +422,21 @@ public class Deck {
 		return m_contents.getArchivingDirectoryName();
 	}
 
-	public static void createCardFromLine(String line) {
+	/**
+	 * Creates a deck based on an archive file.
+	 * 
+	 * @param selectedFile
+	 *          the archive file (text file) to base the new deck on.
+	 */
+	public static void createDeckFromArchive(File selectedFile) {
+		String fileName = selectedFile.getName();
+		int sizeOfFileName = fileName.length();
+		int sizeOfEnd = "_DDMMYY_HHMM.txt".length();
+		String deckName = fileName.substring(0, sizeOfFileName - sizeOfEnd);
+		createDeckWithName(deckName);
 		ensureDeckExists();
-		Card card = new Card(line);
-		Utilities.require(canAddCard(card), "Deck.createCardFromLine() error: "
-		    + "the card from line '" + line + "' cannot be added.");
-		addCard(card);
+
+		m_contents.extractCardsFromArchiveFile(selectedFile);
 	}
+
 }

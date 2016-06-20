@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.Writer;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoField;
@@ -15,6 +17,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
+import eb.Eb;
+import eb.disk_io.CardConverter;
 import eb.subwindow.ArchivingSettings;
 import eb.subwindow.StudyOptions;
 import eb.utilities.TimeInterval;
@@ -34,6 +38,9 @@ public class LogicalDeck implements Serializable {
 
 	// The file extension of a deck.
 	private static final String DECKFILE_EXTENSION = ".deck";
+
+	// when writing the deck to a text file.
+	private static final String HEADER_BODY_SEPARATOR = "\t\t";
 
 	// The name of the deck (like "Spanish"). Does not include the ".deck"
 	// extension.
@@ -86,7 +93,8 @@ public class LogicalDeck implements Serializable {
 
 	private void writeLine(Writer writer, Card card) {
 		try {
-			writer.write(card.getFront() + "\t\t" + card.getBack() + Utilities.EOL);
+			writer.write(card.getFront() + HEADER_BODY_SEPARATOR + card.getBack()
+			    + Utilities.EOL);
 		} catch (IOException e) {
 			Logger.getGlobal().info(e + "");
 		}
@@ -106,7 +114,9 @@ public class LogicalDeck implements Serializable {
 		    + formatToTwoDigits(now.get(ChronoField.MINUTE_OF_HOUR)) + ".txt";
 		try (BufferedWriter outputFile = new BufferedWriter(
 		    new OutputStreamWriter(new FileOutputStream(textFileName), "UTF-8"));) {
+			outputFile.write("Eb version " + Eb.VERSION_STRING + Utilities.EOL);
 			outputFile.write("Number of cards is: " + m_cards.size() + Utilities.EOL);
+			outputFile.write("\t\t" + Utilities.EOL);
 			m_cards.stream()
 			    .sorted(
 			        (first, second) -> first.getFront().compareTo(second.getFront()))
@@ -336,5 +346,30 @@ public class LogicalDeck implements Serializable {
 
 	public String getArchivingDirectoryName() {
 		return m_archivingSettings.getDirectoryName();
+	}
+
+	void extractCardsFromArchiveFile(File selectedFile) {
+		try {
+			List<String> lines = Files.readAllLines(selectedFile.toPath(),
+			    Charset.forName("UTF-8"));
+
+			// find out which line contains the first card (skip version data and
+			// such for now)
+			int currentLine = 0;
+			while ((currentLine < lines.size())
+			    && !lines.get(currentLine).equals(HEADER_BODY_SEPARATOR)) {
+				currentLine++;
+			}
+			// now skip the separator line
+			currentLine++;
+			// now read in the cards
+			for (; currentLine < lines.size(); currentLine++) {
+				Card newCard = CardConverter.lineToCard(lines.get(currentLine));
+				addCard(newCard);
+			}
+		} catch (IOException e) {
+			Logger.getGlobal().info(e + "");
+			e.printStackTrace();
+		}
 	}
 }

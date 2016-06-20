@@ -28,7 +28,7 @@ public class CardConverter {
 	 *          the card.
 	 * @return the card
 	 */
-	Card lineToCard(String line) {
+	public static Card lineToCard(String line) {
 
 		// preconditions: the input line cannot be null
 		Utilities.require(line != null, "CardConverter.lineToCard() error: "

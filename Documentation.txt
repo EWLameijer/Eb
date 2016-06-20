@@ -7,6 +7,8 @@ Otherwise, debug until 4x10 continuously sufficiently satisfied with performance
 
 MCV
 
+Okay. The problem is that pressing the Goto should not merely show the review panel, it should also activate a new reviewing session.
+
 Deck switch: why not good effect? Well, the Review.start() only changes some settings. Okay, it also constructs a ReviewSession
 
 Okay. What happens if deck is swapped? First, the data structure should be updated.
@@ -33,12 +35,10 @@ Okay. Wat is the problem? Basically that the reviewsession needs a panel.
 
 Current projects:
 Bugs (urgent) 
-	-
-	-second round goes wrong!
-	-add version number to output!
+	-problems after deleting card - not going back to show front mode 
 	-mnemonics do not work for summarizing panel!
 	-Problems when editing top of card! Change not shown.
-	-[Solved?050616] Summary shows after adding card.
+	-Summary shows after adding card.
 	-[Solved?050616] 5 when adding cards, summary screen gives 4 reviewed
 	-[Solved?050616]Summarizing panel shows up empty!
 	
@@ -56,6 +56,7 @@ Small features
 	-let deck be saved in same directory as archive?
 	-show number of cards to go yet
 	-allow deleting cards
+	-go back to previously added card
 Larger features (consider carefully)
 	?
 Refactorings:
@@ -467,6 +468,8 @@ R1.4
 	-You can now create a new archiving directory while setting the archiving directory (so you do not need to create the archiving directory externally anymore).
 	-solved a bug that gave trouble when swapping decks.
 	-solved a bug that gave trouble when creating a new deck (the screen did not swap properly)
+	-solved a bug that caused problems when going to the next round of reviews.
+	-the output now has a version number
 
 
 

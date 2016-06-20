@@ -9,6 +9,8 @@ import eb.mainwindow.MainWindow;
  */
 public class Eb {
 
+	public static String VERSION_STRING = "1.3";
+
 	/**
 	 * Hide the implicit public constructor.
 	 */

@@ -22,16 +22,16 @@ public class Card implements Serializable {
 	// Automatically generated ID for serialization.
 	private static final long serialVersionUID = -2746012998758766327L;
 
-	// The text/contents of the front of the card.
+	// The text/contents of the front of the card. Should never be null.
 	private String m_textOnFront;
 
-	// The text/contents of the back of the card.
+	// The text/contents of the back of the card. Should never be null.
 	private String m_textOnBack;
 
 	// The time/instant when this card was created.
 	private Instant m_creationInstant;
 
-	// The reviews of the cards.
+	// The reviews of the cards. Should never be null.
 	private List<Review> m_reviews;
 
 	/**
@@ -48,15 +48,6 @@ public class Card implements Serializable {
 	 *          not be null.
 	 */
 	public Card(String textOnFront, String textOnBack) {
-		init(textOnFront, textOnBack);
-	}
-
-	public Card(String line) {
-		String[] strings = line.split("\\t\\t");
-		init(strings[0], strings[1]);
-	}
-
-	private void init(String textOnFront, String textOnBack) {
 		// preconditions: textOnFront and textOnBack should not be null,
 		// as that is likely due to a logic error somewhere and at least is
 		// rather untidy
@@ -113,7 +104,8 @@ public class Card implements Serializable {
 	 *         negative.
 	 */
 	public Duration getTimeUntilNextReview() {
-		// case 1: the card has never been reviewed yet.
+		// case 1: the card has never been reviewed yet. So take the creation
+		// instant and add the user-specified initial interval.
 		if (!hasBeenReviewed()) {
 			return Duration.between(Instant.now(),
 			    Deck.getInitialInterval().addTo(m_creationInstant));
@@ -127,8 +119,8 @@ public class Card implements Serializable {
 			} else {
 				waitTime = Deck.getForgottenCardInterval();
 			}
-			Temporal officialReview = waitTime.addTo(lastReviewInstant);
-			return Duration.between(Instant.now(), officialReview);
+			Temporal officialReviewTime = waitTime.addTo(lastReviewInstant);
+			return Duration.between(Instant.now(), officialReviewTime);
 		}
 	}
 
@@ -160,7 +152,7 @@ public class Card implements Serializable {
 	public Review getLastReview() {
 		// preconditions: a review must have taken place, one should not call this
 		// on a freshly created card.
-		Utilities.require(!m_reviews.isEmpty(), "History.getLastReview() "
+		Utilities.require(hasBeenReviewed(), "History.getLastReview() "
 		    + "error: no review has taken place yet. Please only call this method "
 		    + "after checking the existence of a review with 'hasBeenReviewed'.");
 		int indexOfLastReview = m_reviews.size() - 1;
@@ -202,6 +194,14 @@ public class Card implements Serializable {
 		reportReviews();
 	}
 
+	/**
+	 * Sets the front of the card to a new value, which must be a valid identifier
+	 * (cannot be null or the empty string, or a string containing only whitespace
+	 * characters).
+	 * 
+	 * @param front
+	 *          the new front of the card.
+	 */
 	public void setFront(String front) {
 		Utilities.require(Utilities.isStringValidIdentifier(front),
 		    "Card.setFront() error: "
@@ -209,6 +209,14 @@ public class Card implements Serializable {
 		m_textOnFront = front;
 	}
 
+	/**
+	 * Sets the back of the card to a new value, which must be a valid identifier
+	 * (cannot be null or the empty string, or a string containing only whitespace
+	 * characters).
+	 * 
+	 * @param back
+	 *          the new back of the card.
+	 */
 	public void setBack(String back) {
 		Utilities.require(Utilities.isStringValidIdentifier(back),
 		    "Card.setBack() error: " + "the given back is not a valid identifier");

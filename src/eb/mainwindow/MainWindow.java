@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -329,20 +328,7 @@ public class MainWindow extends JFrame implements Listener {
 			return;
 		} else {
 			File selectedFile = chooser.getSelectedFile();
-			String fileName = selectedFile.getName();
-			int sizeOfFileName = fileName.length();
-			int sizeOfEnd = "_DDMMYY_HHMM.txt".length();
-			String deckName = fileName.substring(0, sizeOfFileName - sizeOfEnd);
-			System.out.println(deckName);
-			Deck.createDeckWithName(deckName);
-			try (Stream<String> lines = Files.lines(selectedFile.toPath(),
-			    Charset.forName("UTF-8"))) {
-				lines.skip(1).forEachOrdered(Deck::createCardFromLine);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			System.out.println(selectedFile.getAbsolutePath());
+			Deck.createDeckFromArchive(selectedFile);
 		}
 	}
 
@@ -469,8 +455,9 @@ public class MainWindow extends JFrame implements Listener {
 	}
 
 	private void showReviewingPanel() {
-		if (m_state == MainWindowState.REACTIVE) {
+		if (m_state != MainWindowState.REVIEWING) {
 			Reviewer.start(m_reviewPanel);
+			m_state = MainWindowState.REVIEWING;
 		}
 		switchToPanel(REVIEW_PANEL_ID);
 	}
@@ -487,7 +474,7 @@ public class MainWindow extends JFrame implements Listener {
 			} else {
 
 				showReviewingPanel();
-				m_state = MainWindowState.REVIEWING;
+
 			}
 		} else {
 			showInformationPanel();

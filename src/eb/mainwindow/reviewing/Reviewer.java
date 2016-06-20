@@ -50,9 +50,9 @@ class FirstTimer {
  */
 public class Reviewer {
 
-	static ReviewSession c_session;
-	static ReviewPanel c_reviewPanel;
-	static LogicalDeck c_currentDeck;
+	private static ReviewSession c_session;
+	private static ReviewPanel c_reviewPanel;
+	private static LogicalDeck c_currentDeck;
 
 	/**
 	 * To hide implicit public reviewer
