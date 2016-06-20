@@ -154,8 +154,7 @@ public class ReviewPanel extends JPanel {
 
 	private void editCard() {
 		Card currentCard = Deck.getCardWithFront(Reviewer.getCurrentFront()).get();
-		CardEditingManager editingManager = new CardEditingManager(currentCard);
-		editingManager.activateCardEditingWindow(currentCard);
+		new CardEditingManager(currentCard);
 	}
 
 	private void remembered(boolean wasRemembered) {
@@ -182,9 +181,11 @@ public class ReviewPanel extends JPanel {
 		repaint();
 	}
 
-	public void updatePanels(String frontText, String backText) {
+	public void updatePanels(String frontText, String backText,
+	    boolean showAnswer) {
 		m_frontOfCardPanel.setText(frontText);
 		m_backOfCardPanel.setText(backText);
+
 	}
 
 }

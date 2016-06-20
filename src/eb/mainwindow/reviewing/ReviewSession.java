@@ -31,7 +31,8 @@ class ReviewSession implements Listener {
 		int totalNumberOfReviewableCards = reviewableCards.size();
 		Logger.getGlobal()
 		    .info("Number of reviewable cards is " + totalNumberOfReviewableCards);
-		m_counter = Math.min(maxNumReviews, totalNumberOfReviewableCards);
+		int numCardsToBeReviewed = Math.min(maxNumReviews,
+		    totalNumberOfReviewableCards);
 		// now, for best effect, those cards which have expired more recently should
 		// be rehearsed first, as other cards probably need to be relearned anyway,
 		// and we should try to contain the damage.
@@ -39,11 +40,13 @@ class ReviewSession implements Listener {
 		    .sort((firstCard, secondCard) -> secondCard.getTimeUntilNextReview()
 		        .compareTo(firstCard.getTimeUntilNextReview()));
 		// get the first n for the review
-		m_cardCollection = new ArrayList<>(reviewableCards.subList(0, m_counter));
+		m_cardCollection = new ArrayList<>(
+		    reviewableCards.subList(0, numCardsToBeReviewed));
 		Collections.shuffle(m_cardCollection);
 		BlackBoard.register(this, UpdateType.CARD_CHANGED);
 		BlackBoard.register(this, UpdateType.DECK_CHANGED);
 		BlackBoard.register(this, UpdateType.DECK_SWAPPED);
+		m_counter = 0;
 		startCardReview();
 	}
 
@@ -63,14 +66,16 @@ class ReviewSession implements Listener {
 
 	private void startCardReview() {
 		m_showAnswer = false;
+		m_startTimer.reset();
+		m_stopTimer.reset();
 		m_startTimer.press();
 		updatePanels();
 	}
 
 	private Card getCurrentCard() {
-		Utilities.require(m_counter > 0,
-		    "ReviewSession.getCurrentCard() error: " + "there is no current card.");
-		return m_cardCollection.get(m_counter - 1);
+		Utilities.require(activeCardExists(),
+		    "ReviewSession.getCurrentCard() error: there is no current card.");
+		return m_cardCollection.get(m_counter);
 	}
 
 	public String getCurrentFront() {
@@ -90,7 +95,7 @@ class ReviewSession implements Listener {
 	}
 
 	private boolean activeCardExists() {
-		return m_counter > 0;
+		return m_counter < m_cardCollection.size();
 	}
 
 	/**
@@ -108,36 +113,37 @@ class ReviewSession implements Listener {
 		Logger.getGlobal().info(m_counter + " " + duration_in_s);
 		Review review = new Review(duration, remembered);
 		getCurrentCard().addReview(review);
-		m_startTimer.reset();
-		m_stopTimer.reset();
+		moveToNextReviewOrEnd();
+	}
 
-		m_counter--;
-		if (m_counter <= 0) {
-			// clean up
+	private void moveToNextReviewOrEnd() {
+
+		m_counter++;
+		if (hasNextCard()) {
+			m_counter++;
+			startCardReview();
+		} else {
 			cleanUp();
 			BlackBoard.post(new Update(UpdateType.PROGRAMSTATE_CHANGED,
 			    MainWindowState.SUMMARIZING.name()));
-		} else {
-			startCardReview();
 		}
 	}
 
 	public boolean hasNextCard() {
-		return m_counter > 1;
+		return m_counter + 1 < m_cardCollection.size();
 	}
 
 	public List<Review> getReviewResults() {
 		List<Review> listOfReviews = new ArrayList<>();
-		for (int index = m_cardCollection.size() - 1; index > m_counter
-		    - 1; index--) {
-			listOfReviews.add(m_cardCollection.get(index).getLastReview());
+		for (Card card : m_cardCollection) {
+			listOfReviews.add(card.getLastReview());
 		}
 		return listOfReviews;
 	}
 
 	public void updatePanels() {
 		String currentBack = m_showAnswer ? getCurrentBack() : "";
-		m_reviewPanel.updatePanels(getCurrentFront(), currentBack);
+		m_reviewPanel.updatePanels(getCurrentFront(), currentBack, m_showAnswer);
 	}
 
 	public void showAnswer() {
@@ -154,16 +160,22 @@ class ReviewSession implements Listener {
 		for (int cardIndex = 0; cardIndex < m_cardCollection.size(); cardIndex++) {
 			Card currentCard = m_cardCollection.get(cardIndex);
 			if (!Deck.contains(currentCard)) {
-				if (cardIndex == m_counter - 1) {
-					// current card must be removed
-					m_stopTimer.press(); // to handle the wasRemembered well.
+				m_cardCollection.remove(cardIndex);
+				boolean deletingCurrentCard = (cardIndex == m_counter);
+				if (cardIndex <= m_counter) {
+					m_counter--;
+				}
+				if (deletingCurrentCard) {
+
+				}
+
+				if (cardIndex == m_counter) {
+					// active card must be removed
+					showAnswer(); // to handle the wasRemembered well.
 					wasRemembered(false); // or true. Doesn't matter if the card is
 					                      // removed anyway.
 				}
-				if (cardIndex <= m_counter - 1) {
-					m_counter--;
-				}
-				m_cardCollection.remove(cardIndex);
+
 			}
 		}
 		updatePanels();

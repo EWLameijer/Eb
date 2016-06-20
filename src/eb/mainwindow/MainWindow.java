@@ -265,10 +265,7 @@ public class MainWindow extends JFrame implements Listener {
 		final JMenuItem addCardItem = new JMenuItem("Add Card");
 		addCardItem.setAccelerator(
 		    KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
-		addCardItem.addActionListener(e -> {
-			CardEditingManager editingManager = new CardEditingManager();
-			editingManager.activateCardCreationWindow();
-		});
+		addCardItem.addActionListener(e -> new CardEditingManager());
 		deckManagementMenu.add(addCardItem);
 		final JMenuItem studyOptionsItem = new JMenuItem("Study Options");
 		studyOptionsItem.setAccelerator(

@@ -12,6 +12,7 @@ import eb.data.Deck;
 import eb.eventhandling.BlackBoard;
 import eb.eventhandling.Update;
 import eb.eventhandling.UpdateType;
+import eb.utilities.Utilities;
 
 /**
  * CardEditingManager coordinates the flow of information from the window that
@@ -31,21 +32,24 @@ public class CardEditingManager {
 	private static Set<Card> c_cardsBeingEdited = new HashSet<>();
 
 	/**
-	 * Stores which card is to me modified. If card is null, this means that we
-	 * are in the process of creating a new card.
+	 * Stores which card is to me modified.
 	 * 
 	 * @param card
-	 *          the card to be edited, null in the case that a new card is being
-	 *          created.
+	 *          the card to be edited
 	 */
 	public CardEditingManager(Card card) {
-
+		Utilities.require(card != null, "CardEditingManager constructor error: "
+		    + "the card to be edited should not be null.");
 		m_cardToBeModified = card;
-		// also open the window with front and back.
+		activateCardEditingWindow(card);
 	}
 
+	/**
+	 * Creates a CardEditingManager that allows the user to create a new card.
+	 */
 	public CardEditingManager() {
 		m_cardToBeModified = null;
+		activateCardCreationWindow();
 	}
 
 	private void closeOptionPane() {
@@ -54,16 +58,24 @@ public class CardEditingManager {
 
 	public boolean inCardCreatingMode() {
 		return m_cardToBeModified == null;
+
 	}
 
-	public void activateCardEditingWindow(Card card) {
+	/**
+	 * Shows the card editing window; however, has a guard that prevents the same
+	 * card from being edited in two different windows.
+	 * 
+	 * @param card
+	 *          the card to be edited.
+	 */
+	private void activateCardEditingWindow(Card card) {
 		if (!c_cardsBeingEdited.contains(card)) {
 			m_cardEditingWindow = CardEditingWindow.display(card.getFront(),
 			    card.getBack(), this);
 		}
 	}
 
-	public void activateCardCreationWindow() {
+	private void activateCardCreationWindow() {
 		m_cardEditingWindow = CardEditingWindow.display("", "", this);
 	}
 
@@ -133,6 +145,7 @@ public class CardEditingManager {
 				m_cardEditingWindow.updateContents("", "");
 			} else {
 				Deck.removeCard(m_cardToBeModified);
+				@@@
 				endEditing();
 			}
 		});
