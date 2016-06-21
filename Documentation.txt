@@ -36,6 +36,8 @@ Okay. Wat is the problem? Basically that the reviewsession needs a panel.
 Current projects:
 Bugs (urgent) 
 	-problems after deleting card - not going back to show front mode 
+		The basic extra problem (or opportunity?) here is that the card that is being edited may not be the currently reviewed card.
+	
 	-mnemonics do not work for summarizing panel!
 	-Problems when editing top of card! Change not shown.
 	-Summary shows after adding card.

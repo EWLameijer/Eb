@@ -8,7 +8,7 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
 import eb.data.Card;
-import eb.data.Deck;
+import eb.data.DeckManager;
 import eb.eventhandling.BlackBoard;
 import eb.eventhandling.Update;
 import eb.eventhandling.UpdateType;
@@ -107,7 +107,7 @@ public class CardEditingManager {
 			// Case 2 of 3: the front of the card is new or the front is the same
 			// as the old front (when editing). Add the card and be done with it.
 			// (well, when adding cards one should not close the new card window)
-			Optional<Card> currentCardWithThisFront = Deck
+			Optional<Card> currentCardWithThisFront = DeckManager
 			    .getCardWithFront(frontText);
 			if (frontText.equals(getCurrentFront())
 			    || !currentCardWithThisFront.isPresent()) {
@@ -135,7 +135,7 @@ public class CardEditingManager {
 			String newBack = currentBack + "; " + otherBack;
 			closeOptionPane();
 			m_cardEditingWindow.updateContents(frontText, newBack);
-			Deck.removeCard(duplicate);
+			DeckManager.removeCard(duplicate);
 
 		});
 		JButton deleteThisButton = new JButton("Delete this card");
@@ -144,14 +144,13 @@ public class CardEditingManager {
 			if (inCardCreatingMode()) {
 				m_cardEditingWindow.updateContents("", "");
 			} else {
-				Deck.removeCard(m_cardToBeModified);
-				@@@
+				DeckManager.removeCard(m_cardToBeModified);
 				endEditing();
 			}
 		});
 		JButton deleteOtherButton = new JButton("Delete the other card");
 		deleteOtherButton.addActionListener(e -> {
-			Deck.removeCard(duplicate);
+			DeckManager.removeCard(duplicate);
 			closeOptionPane();
 			submitCardContents(frontText, backText);
 		});
@@ -174,7 +173,7 @@ public class CardEditingManager {
 	private void submitCardContents(String frontText, String backText) {
 		if (inCardCreatingMode()) {
 			final Card candidateCard = new Card(frontText, backText);
-			Deck.addCard(candidateCard);
+			DeckManager.addCard(candidateCard);
 			m_cardEditingWindow.updateContents("", "");
 			m_cardEditingWindow.focusFront();
 		} else {

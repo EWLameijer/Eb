@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import eb.data.Card;
-import eb.data.Deck;
+import eb.data.DeckManager;
 import eb.data.Review;
 import eb.eventhandling.BlackBoard;
 import eb.eventhandling.Listener;
@@ -26,8 +26,8 @@ class ReviewSession implements Listener {
 
 	ReviewSession(ReviewPanel reviewPanel) {
 		m_reviewPanel = reviewPanel;
-		int maxNumReviews = Deck.getStudyOptions().getReviewSessionSize();
-		List<Card> reviewableCards = Deck.getReviewableCardList();
+		int maxNumReviews = DeckManager.getStudyOptions().getReviewSessionSize();
+		List<Card> reviewableCards = DeckManager.getReviewableCardList();
 		int totalNumberOfReviewableCards = reviewableCards.size();
 		Logger.getGlobal()
 		    .info("Number of reviewable cards is " + totalNumberOfReviewableCards);
@@ -159,23 +159,15 @@ class ReviewSession implements Listener {
 	public void updateCollection() {
 		for (int cardIndex = 0; cardIndex < m_cardCollection.size(); cardIndex++) {
 			Card currentCard = m_cardCollection.get(cardIndex);
-			if (!Deck.contains(currentCard)) {
+			if (!DeckManager.contains(currentCard)) {
 				m_cardCollection.remove(cardIndex);
 				boolean deletingCurrentCard = (cardIndex == m_counter);
 				if (cardIndex <= m_counter) {
 					m_counter--;
 				}
 				if (deletingCurrentCard) {
-
+					moveToNextReviewOrEnd();
 				}
-
-				if (cardIndex == m_counter) {
-					// active card must be removed
-					showAnswer(); // to handle the wasRemembered well.
-					wasRemembered(false); // or true. Doesn't matter if the card is
-					                      // removed anyway.
-				}
-
 			}
 		}
 		updatePanels();

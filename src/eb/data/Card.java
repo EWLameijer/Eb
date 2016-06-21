@@ -108,7 +108,7 @@ public class Card implements Serializable {
 		// instant and add the user-specified initial interval.
 		if (!hasBeenReviewed()) {
 			return Duration.between(Instant.now(),
-			    Deck.getInitialInterval().addTo(m_creationInstant));
+			    DeckManager.getInitialInterval().addTo(m_creationInstant));
 		} else {
 			// other cases: there have been previous reviews.
 			Review lastReview = getLastReview();
@@ -117,7 +117,7 @@ public class Card implements Serializable {
 			if (lastReview.wasSuccess()) {
 				waitTime = getIntervalAfterSuccessfulReview();
 			} else {
-				waitTime = Deck.getForgottenCardInterval();
+				waitTime = DeckManager.getForgottenCardInterval();
 			}
 			Temporal officialReviewTime = waitTime.addTo(lastReviewInstant);
 			return Duration.between(Instant.now(), officialReviewTime);
@@ -131,8 +131,8 @@ public class Card implements Serializable {
 	 * @return the time to wait for the next review
 	 */
 	private Duration getIntervalAfterSuccessfulReview() {
-		Duration waitTime = Deck.getRememberedCardInterval();
-		double lengtheningFactor = Deck.getLengtheningFactor();
+		Duration waitTime = DeckManager.getRememberedCardInterval();
+		double lengtheningFactor = DeckManager.getLengtheningFactor();
 		int numberOfReviews = m_reviews.size();
 		// if there are older reviews, loop over them
 		int ancestorReviewIndex = numberOfReviews - 2;
@@ -150,6 +150,8 @@ public class Card implements Serializable {
 	 * @return the most recent review.
 	 */
 	public Review getLastReview() {
+		// needs to be public; is required by ReviewSession
+
 		// preconditions: a review must have taken place, one should not call this
 		// on a freshly created card.
 		Utilities.require(hasBeenReviewed(), "History.getLastReview() "

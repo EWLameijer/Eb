@@ -12,7 +12,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.KeyStroke;
 
-import eb.data.Deck;
+import eb.data.DeckManager;
 import eb.utilities.ProgrammableAction;
 
 @SuppressWarnings("serial")
@@ -23,7 +23,7 @@ public class ArchivingSettingsWindow extends JFrame {
 
 	ArchivingSettingsWindow() {
 		super("Deck archiving settings");
-		String archivingDirectoryName = Deck.getArchivingDirectoryName();
+		String archivingDirectoryName = DeckManager.getArchivingDirectoryName();
 		String displayedDirectoryName;
 		if (archivingDirectoryName.isEmpty()) {
 			displayedDirectoryName = "[default]";
@@ -44,7 +44,7 @@ public class ArchivingSettingsWindow extends JFrame {
 			return;
 		} else {
 			File selectedDirectory = chooser.getSelectedFile();
-			Deck.setArchivingDirectory(selectedDirectory);
+			DeckManager.setArchivingDirectory(selectedDirectory);
 			m_archivingLocation.setText(selectedDirectory.getAbsolutePath());
 		}
 

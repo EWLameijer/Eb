@@ -14,7 +14,7 @@ import javax.swing.KeyStroke;
 
 import com.sun.glass.events.KeyEvent;
 
-import eb.data.Deck;
+import eb.data.DeckManager;
 import eb.data.Review;
 import eb.eventhandling.BlackBoard;
 import eb.eventhandling.Update;
@@ -154,7 +154,7 @@ public class SummarizingPanel extends JPanel {
 		text.append("</html>");
 		m_report.setText(text.toString());
 		CardLayout cardLayout = (CardLayout) m_buttonPanel.getLayout();
-		if (Deck.getReviewableCardList().isEmpty()) {
+		if (DeckManager.getReviewableCardList().isEmpty()) {
 			cardLayout.show(m_buttonPanel, REVIEWS_COMPLETED_MODE);
 		} else {
 			cardLayout.show(m_buttonPanel, STILL_REVIEWS_TODO_MODE);

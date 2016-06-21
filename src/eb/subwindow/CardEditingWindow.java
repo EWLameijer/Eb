@@ -15,7 +15,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextPane;
 
-import eb.data.Deck;
+import eb.data.DeckManager;
 import eb.utilities.Utilities;
 
 /**
@@ -66,7 +66,7 @@ public class CardEditingWindow extends JFrame {
 
 		m_manager = manager;
 		String operation = m_manager.inCardCreatingMode() ? "add" : "edit";
-		this.setTitle(Deck.getName() + ": " + operation + " card");
+		this.setTitle(DeckManager.getName() + ": " + operation + " card");
 
 		// Create the panel to edit the front of the card, and make enter
 		// and tab transfer focus to the panel for editing the back of the card.

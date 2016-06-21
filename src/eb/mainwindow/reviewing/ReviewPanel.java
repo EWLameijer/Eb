@@ -15,7 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
 import eb.data.Card;
-import eb.data.Deck;
+import eb.data.DeckManager;
 import eb.subwindow.CardEditingManager;
 import eb.utilities.ProgrammableAction;
 
@@ -153,22 +153,25 @@ public class ReviewPanel extends JPanel {
 	}
 
 	private void editCard() {
-		Card currentCard = Deck.getCardWithFront(Reviewer.getCurrentFront()).get();
+		Card currentCard = DeckManager.getCardWithFront(Reviewer.getCurrentFront()).get();
 		new CardEditingManager(currentCard);
 	}
 
 	private void remembered(boolean wasRemembered) {
-		CardLayout cardLayout = (CardLayout) (m_situationalButtonPanel.getLayout());
-		cardLayout.show(m_situationalButtonPanel, HIDDEN_ANSWER);
+		showPanel(HIDDEN_ANSWER);
 		Reviewer.wasRemembered(wasRemembered);
 		repaint();
 	}
 
 	private void showAnswer() {
-		CardLayout cardLayout = (CardLayout) (m_situationalButtonPanel.getLayout());
-		cardLayout.show(m_situationalButtonPanel, SHOWN_ANSWER);
+		showPanel(SHOWN_ANSWER);
 		Reviewer.showAnswer();
 		repaint();
+	}
+
+	private void showPanel(String panelName) {
+		CardLayout cardLayout = (CardLayout) (m_situationalButtonPanel.getLayout());
+		cardLayout.show(m_situationalButtonPanel, panelName);
 	}
 
 	@Override
@@ -185,6 +188,7 @@ public class ReviewPanel extends JPanel {
 	    boolean showAnswer) {
 		m_frontOfCardPanel.setText(frontText);
 		m_backOfCardPanel.setText(backText);
+		showPanel(showAnswer ? SHOWN_ANSWER : HIDDEN_ANSWER);
 
 	}
 

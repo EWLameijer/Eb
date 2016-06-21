@@ -3,8 +3,8 @@ package eb.mainwindow.reviewing;
 import java.time.Instant;
 import java.util.List;
 
+import eb.data.DeckManager;
 import eb.data.Deck;
-import eb.data.LogicalDeck;
 import eb.data.Review;
 import eb.utilities.Utilities;
 
@@ -52,7 +52,7 @@ public class Reviewer {
 
 	private static ReviewSession c_session;
 	private static ReviewPanel c_reviewPanel;
-	private static LogicalDeck c_currentDeck;
+	private static Deck c_currentDeck;
 
 	/**
 	 * To hide implicit public reviewer
@@ -66,14 +66,14 @@ public class Reviewer {
 		if (reviewPanel != null) {
 			c_reviewPanel = reviewPanel;
 			c_session = new ReviewSession(reviewPanel);
-			c_currentDeck = Deck.getContents();
+			c_currentDeck = DeckManager.getContents();
 		}
 
 	}
 
 	private static void ensureReviewSessionIsValid() {
-		if (c_currentDeck != Deck.getContents() || c_session == null) {
-			c_currentDeck = Deck.getContents();
+		if (c_currentDeck != DeckManager.getContents() || c_session == null) {
+			c_currentDeck = DeckManager.getContents();
 			c_session = new ReviewSession(c_reviewPanel);
 		}
 	}

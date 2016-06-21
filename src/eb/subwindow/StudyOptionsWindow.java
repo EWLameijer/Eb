@@ -12,7 +12,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
-import eb.data.Deck;
+import eb.data.DeckManager;
 import eb.eventhandling.BlackBoard;
 import eb.eventhandling.Listener;
 import eb.eventhandling.Update;
@@ -75,7 +75,7 @@ public class StudyOptionsWindow extends JFrame implements Listener {
 	private StudyOptionsWindow() {
 		// preconditions: none (default constructor...)
 		super();
-		StudyOptions studyOptions = Deck.getStudyOptions();
+		StudyOptions studyOptions = DeckManager.getStudyOptions();
 		m_initialIntervalBox = TimeInputElement.createInstance(
 		    "Initial review after", studyOptions.getInitialInterval());
 		m_sizeOfReview = new LabelledTextField(
@@ -114,7 +114,7 @@ public class StudyOptionsWindow extends JFrame implements Listener {
 		// has been constructed already.
 		StudyOptions guiStudyOptions = gatherUIDataIntoStudyOptionsObject();
 		String title = "Study Options";
-		StudyOptions deckStudyOptions = Deck.getStudyOptions();
+		StudyOptions deckStudyOptions = DeckManager.getStudyOptions();
 		if (guiStudyOptions.equals(deckStudyOptions)) {
 			title += " - no unsaved changes";
 		} else {
@@ -162,7 +162,7 @@ public class StudyOptionsWindow extends JFrame implements Listener {
 	 */
 	private void loadCurrentDeckSettings() {
 		// preconditions: none
-		loadSettings(Deck.getStudyOptions());
+		loadSettings(DeckManager.getStudyOptions());
 		// postconditions: none
 	}
 
@@ -188,7 +188,7 @@ public class StudyOptionsWindow extends JFrame implements Listener {
 	 */
 	private void saveSettingsToDeck() {
 		StudyOptions guiStudyOptions = gatherUIDataIntoStudyOptionsObject();
-		Deck.setStudyOptions(guiStudyOptions);
+		DeckManager.setStudyOptions(guiStudyOptions);
 		updateFrame(); // Should be set to 'no unsaved changes' again.
 	}
 
@@ -230,11 +230,11 @@ public class StudyOptionsWindow extends JFrame implements Listener {
 		settingsBox.add(m_timeToWaitAfterCorrectReview);
 		settingsBox.add(m_lengtheningFactor);
 		settingsBox.add(m_timeToWaitAfterIncorrectReview);
-		TimedModus timedModus = Deck.getStudyOptions().getTimedModus();
+		TimedModus timedModus = DeckManager.getStudyOptions().getTimedModus();
 		m_timedModus.setTo(timedModus.getName());
 		settingsBox.add(m_timedModus);
 		settingsBox.add(m_timeForTimer);
-		m_timeForTimer.setVisible(Deck.getStudyOptions().isTimed());
+		m_timeForTimer.setVisible(DeckManager.getStudyOptions().isTimed());
 		settingsPane.add(settingsBox, BorderLayout.NORTH);
 
 		buttonsPane.add(m_cancelButton);
