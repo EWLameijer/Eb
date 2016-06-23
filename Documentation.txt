@@ -5,6 +5,8 @@ Otherwise, debug until 4x10 continuously sufficiently satisfied with performance
 
 [Note: duolingo: investigate new courses only start of month. Investigated 0106, Vietnamese. Klingon still hatching (25%) Next: 0107 or further]
 
+
+
 MCV
 
 Okay. The problem is that pressing the Goto should not merely show the review panel, it should also activate a new reviewing session.

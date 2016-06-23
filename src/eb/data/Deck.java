@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
-import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.time.Duration;
@@ -49,7 +48,7 @@ public class Deck implements Serializable {
 	// The location where the archive file will be stored
 	private ArchivingSettings m_archivingSettings;
 
-	private CardCollection m_cards = new CardCollection();
+	private CardCollection m_cardCollection;
 
 	// The study options of this deck (interval increase between reviews etc.)
 	private StudyOptions m_studyOptions;
@@ -68,7 +67,7 @@ public class Deck implements Serializable {
 
 		// code
 		m_name = name;
-		m_cards.m_cards = new ArrayList<>();
+		m_cardCollection = new CardCollection();
 		m_studyOptions = StudyOptions.getDefault();
 		m_archivingSettings = ArchivingSettings.getDefault();
 
@@ -76,26 +75,11 @@ public class Deck implements Serializable {
 		// everything should work
 	}
 
-	public boolean contains(Card card) {
-		Utilities.require(card != null,
-		    "LogicalDeck.contains() error: card can not be null.");
-		return m_cards.m_cards.contains(card);
-	}
-
 	private String formatToTwoDigits(int input) {
 		if (input < 10) {
 			return "0" + input;
 		} else {
 			return Integer.toString(input);
-		}
-	}
-
-	private void writeLine(Writer writer, Card card) {
-		try {
-			writer.write(card.getFront() + HEADER_BODY_SEPARATOR + card.getBack()
-			    + Utilities.EOL);
-		} catch (IOException e) {
-			Logger.getGlobal().info(e + "");
 		}
 	}
 
@@ -114,12 +98,10 @@ public class Deck implements Serializable {
 		try (BufferedWriter outputFile = new BufferedWriter(
 		    new OutputStreamWriter(new FileOutputStream(textFileName), "UTF-8"));) {
 			outputFile.write("Eb version " + Eb.VERSION_STRING + Utilities.EOL);
-			outputFile.write("Number of cards is: " + m_cards.m_cards.size() + Utilities.EOL);
+			outputFile.write(
+			    "Number of cards is: " + m_cardCollection.getSize() + Utilities.EOL);
 			outputFile.write("\t\t" + Utilities.EOL);
-			m_cards.m_cards.stream()
-			    .sorted(
-			        (first, second) -> first.getFront().compareTo(second.getFront()))
-			    .forEach(e -> writeLine(outputFile, e));
+			m_cardCollection.writeCards(outputFile);
 
 		} catch (Exception e) {
 			Logger.getGlobal().info(e + "");
@@ -170,19 +152,6 @@ public class Deck implements Serializable {
 		    + " error: problem creating file handle for deck.");
 
 		return deckFileHandle;
-	}
-
-	/**
-	 * Returns the number of cards in this deck.
-	 *
-	 * @return the number of cards in this deck
-	 */
-	public int getCardCount() {
-		// preconditions: none, as we initialize the list of cards at construction.
-
-		// postconditions: none (I assume that the standard size() method works
-		// properly)
-		return m_cards.m_cards.size();
 	}
 
 	/**
@@ -237,7 +206,7 @@ public class Deck implements Serializable {
 		        + "method has to be invoked first to check the possibility of the "
 		        + "current method.");
 
-		final boolean cardAddSuccessful = m_cards.m_cards.add(card);
+		final boolean cardAddSuccessful = m_cardCollection.m_cards.add(card);
 
 		// postconditions: the deck should have been grown by one.
 		Utilities.require(cardAddSuccessful, "LogicalDeck.addCard() error: "
@@ -271,12 +240,12 @@ public class Deck implements Serializable {
 	 * @return how long it will be until the next review.
 	 */
 	public Duration getTimeUntilNextReview() {
-		Utilities.require(!m_cards.m_cards.isEmpty(),
+		Utilities.require(!m_cardCollection.m_cards.isEmpty(),
 		    "LogicalDeck.getTimeUntilNextReview()) error: the time till next "
 		        + "review is undefined for an empty deck.");
-		Duration minimumTimeUntilNextReview = m_cards.m_cards.get(0)
+		Duration minimumTimeUntilNextReview = m_cardCollection.m_cards.get(0)
 		    .getTimeUntilNextReview();
-		for (Card card : m_cards.m_cards) {
+		for (Card card : m_cardCollection.m_cards) {
 			if (card.getTimeUntilNextReview()
 			    .compareTo(minimumTimeUntilNextReview) < 0) {
 				minimumTimeUntilNextReview = card.getTimeUntilNextReview();
@@ -292,7 +261,7 @@ public class Deck implements Serializable {
 
 	public List<Card> getReviewableCardList() {
 		List<Card> reviewableCards = new ArrayList<>();
-		for (Card card : m_cards.m_cards) {
+		for (Card card : m_cardCollection.m_cards) {
 			if (card.getTimeUntilNextReview().isNegative()) {
 				reviewableCards.add(card);
 			}
@@ -311,7 +280,7 @@ public class Deck implements Serializable {
 		        + "card needs to be a valid identifier, not null or a string with "
 		        + "only whitespace characters.");
 
-		for (final Card card : m_cards.m_cards) {
+		for (final Card card : m_cardCollection.m_cards) {
 			if (card.getFront().equals(frontText)) {
 				return Optional.of(card); // a card with the same front IS present in
 				                          // the deck.
@@ -325,7 +294,7 @@ public class Deck implements Serializable {
 	}
 
 	public void removeCard(Card card) {
-		m_cards.m_cards.remove(card);
+		m_cardCollection.m_cards.remove(card);
 
 	}
 
