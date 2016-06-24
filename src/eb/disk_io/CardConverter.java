@@ -1,10 +1,15 @@
 package eb.disk_io;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.util.List;
 import java.util.logging.Logger;
 
 import eb.data.Card;
+import eb.data.DeckManager;
 import eb.utilities.Utilities;
 
 /**
@@ -82,6 +87,31 @@ public class CardConverter {
 			writer.write(cardToLine(card));
 		} catch (IOException e) {
 			Logger.getGlobal().info(e + "");
+		}
+	}
+
+	public static void extractCardsFromArchiveFile(File selectedFile) {
+		try {
+			List<String> lines = Files.readAllLines(selectedFile.toPath(),
+			    Charset.forName("UTF-8"));
+
+			// find out which line contains the first card (skip version data and
+			// such for now)
+			int currentLine = 0;
+			while ((currentLine < lines.size())
+			    && !lines.get(currentLine).equals(SEPARATOR)) {
+				currentLine++;
+			}
+			// now skip the separator line
+			currentLine++;
+			// now read in the cards
+			for (; currentLine < lines.size(); currentLine++) {
+				Card newCard = CardConverter.lineToCard(lines.get(currentLine));
+				DeckManager.getCurrentDeck().getCards().addCard(newCard);
+			}
+		} catch (IOException e) {
+			Logger.getGlobal().info(e + "");
+			e.printStackTrace();
 		}
 	}
 

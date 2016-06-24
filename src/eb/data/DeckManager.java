@@ -6,17 +6,13 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.time.Duration;
-import java.util.List;
-import java.util.Optional;
 import java.util.logging.Logger;
 
 import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import eb.eventhandling.BlackBoard;
-import eb.eventhandling.Update;
-import eb.eventhandling.UpdateType;
+import eb.disk_io.CardConverter;
 import eb.mainwindow.reviewing.Reviewer;
 import eb.subwindow.StudyOptions;
 import eb.utilities.Utilities;
@@ -44,7 +40,7 @@ public class DeckManager {
 
 	// The "singleton" pointer to the logical deck managed by the Deck.
 	@Nullable
-	private static Deck m_contents;
+	private static Deck m_deck;
 
 	// The name of the default deck
 	private static final String DEFAULT_DECKNAME = "default";
@@ -59,19 +55,6 @@ public class DeckManager {
 	}
 
 	/**
-	 * Returns the number of cards in this deck.
-	 *
-	 * @return the number of cards in the currently active deck
-	 */
-	public static int getCardCount() {
-		// preconditions: the deck should have been initialized
-		ensureDeckExists();
-
-		// postconditions: none (I assume getCardCount works properly)
-		return m_contents.getCardCount();
-	}
-
-	/**
 	 * Returns whether a deck / the contents of a deck have been loaded.
 	 *
 	 * @return whether a deck has been loaded into this "deck-container"
@@ -80,7 +63,7 @@ public class DeckManager {
 	private static boolean deckHasBeenLoaded() {
 		// preconditions: none - this method is checking a condition
 		// postconditions: none: a normal boolean is returned.
-		return m_contents != null;
+		return m_deck != null;
 	}
 
 	/**
@@ -117,7 +100,7 @@ public class DeckManager {
 
 		// next line is necessary to satisfy the nullness checker; after all,
 		// if m_contents is really null, we would have exited the program by now.
-		assert m_contents != null : "@AssumeAssertion(nullness)";
+		assert m_deck != null : "@AssumeAssertion(nullness)";
 	}
 
 	private static String getLastDeck() {
@@ -126,19 +109,6 @@ public class DeckManager {
 		} else {
 			return c_nameOfLastReviewedDeck;
 		}
-	}
-
-	/**
-	 * Returns the time until the next review
-	 *
-	 * @return the time until the next card is to be reviewed
-	 */
-	public static Duration getTimeTillNextReview() {
-		// preconditions: the deck should have been initialized
-		ensureDeckExists();
-
-		// postconditions: none (further checks are done by the LogicalDeck object)
-		return m_contents.getTimeUntilNextReview();
 	}
 
 	/**
@@ -162,8 +132,8 @@ public class DeckManager {
 		    new FileInputStream(deckFile))) {
 			Deck loadedDeck = (Deck) objInStream.readObject();
 			if (loadedDeck != null) {
-				m_contents = loadedDeck;
-				m_contents.fixNewFields();
+				m_deck = loadedDeck;
+				m_deck.fixNewFields();
 				swapDeck();
 			} else {
 				Utilities.require(false,
@@ -234,7 +204,7 @@ public class DeckManager {
 		if (deckHasBeenLoaded()) {
 			save();
 		}
-		m_contents = new Deck(name);
+		m_deck = new Deck(name);
 		save();
 
 		// postconditions: the deck should exist (deck.save handles any errors
@@ -272,9 +242,9 @@ public class DeckManager {
 		}
 		ensureDeckExists();
 		try (ObjectOutputStream objOutStream = new ObjectOutputStream(
-		    new FileOutputStream(m_contents.getFileHandle()))) {
-			objOutStream.writeObject(m_contents);
-			m_contents.saveDeckToTextfile();
+		    new FileOutputStream(m_deck.getFileHandle()))) {
+			objOutStream.writeObject(m_deck);
+			m_deck.saveDeckToTextfile();
 		} catch (final Exception e) {
 			// Something goes wrong with serializing the deck; so
 			// you cannot create the file.
@@ -288,42 +258,6 @@ public class DeckManager {
 	}
 
 	/**
-	 * Adds a card to the deck. Should only be called after the card-adding
-	 * validity is ensured using 'canAddCard' - if that is erroneously forgotten,
-	 * this function will crash hard to prevent worse programming problems to crop
-	 * up later.
-	 *
-	 * @param card
-	 *          the card to be added to the deck
-	 */
-	public static void addCard(Card card) {
-		// preconditions: a deck should have been loaded/created
-		ensureDeckExists();
-		// for the rest, delegate everything (preconditions, postconditions and
-		// error handling) to the logical deck itself (the contents)
-		m_contents.addCard(card);
-		BlackBoard.post(new Update(UpdateType.DECK_CHANGED));
-	}
-
-	/**
-	 * Checks if a certain card can be added to the deck. In practice, this means
-	 * that the front is a valid identifier that is not already present in the
-	 * deck, and the back is not a null pointer. Note: this method delegates the
-	 * call to the logical deck.
-	 *
-	 * @param card
-	 *          the candidate card to be added.
-	 * @return whether the card can legally be added to the deck.
-	 */
-	public static boolean canAddCard(Card card) {
-		// preconditions: a deck should have been loaded/created
-		ensureDeckExists();
-		// for the rest, delegate everything (preconditions, postconditions and
-		// error handling) to the logical deck itself (the contents)
-		return m_contents.canAddCard(card);
-	}
-
-	/**
 	 * Returns the StudyOptions object of the current deck.
 	 * 
 	 * @return
@@ -332,7 +266,7 @@ public class DeckManager {
 		// preconditions: outside ensuring that there is a deck, preconditions
 		// should be handled by the relevant method in the logical deck
 		ensureDeckExists();
-		return m_contents.getStudyOptions();
+		return m_deck.getStudyOptions();
 		// postconditions: handled by callee.
 	}
 
@@ -346,18 +280,13 @@ public class DeckManager {
 		// preconditions: outside ensuring that there is a deck, preconditions
 		// should be handled by the relevant method in the logical deck
 		ensureDeckExists();
-		m_contents.setStudyOptions(studyOptions);
+		m_deck.setStudyOptions(studyOptions);
 		// postconditions: handled by callee.
 	}
 
 	public static Duration getInitialInterval() {
 		ensureDeckExists();
-		return m_contents.getInitialInterval();
-	}
-
-	public static List<Card> getReviewableCardList() {
-		ensureDeckExists();
-		return m_contents.getReviewableCardList();
+		return m_deck.getInitialInterval();
 	}
 
 	public static boolean exists(String deckName) {
@@ -367,59 +296,41 @@ public class DeckManager {
 
 	public static String getName() {
 		ensureDeckExists();
-		return m_contents.getName();
+		return m_deck.getName();
 	}
 
 	public static Duration getForgottenCardInterval() {
 		ensureDeckExists();
-		return m_contents.getStudyOptions().getForgottenCardInterval().asDuration();
+		return m_deck.getStudyOptions().getForgottenCardInterval().asDuration();
 	}
 
 	public static Duration getRememberedCardInterval() {
 		ensureDeckExists();
-		return m_contents.getStudyOptions().getRememberedCardInterval()
-		    .asDuration();
+		return m_deck.getStudyOptions().getRememberedCardInterval().asDuration();
 	}
 
 	public static double getLengtheningFactor() {
 		ensureDeckExists();
-		return m_contents.getStudyOptions().getLengtheningFactor();
+		return m_deck.getStudyOptions().getLengtheningFactor();
 	}
 
 	public static void setNameOfLastReviewedDeck(String nameOfLastReviewedDeck) {
 		c_nameOfLastReviewedDeck = nameOfLastReviewedDeck;
 	}
 
-	public static Optional<Card> getCardWithFront(String frontText) {
-		ensureDeckExists();
-		return m_contents.getCardWithFront(frontText);
-
-	}
-
-	public static void removeCard(Card card) {
-		ensureDeckExists();
-		m_contents.removeCard(card);
-		BlackBoard.post(new Update(UpdateType.DECK_CHANGED));
-	}
-
-	public static boolean contains(Card card) {
-		ensureDeckExists();
-		return m_contents.contains(card);
-	}
-
 	public static Deck getContents() {
 		ensureDeckExists();
-		return m_contents;
+		return m_deck;
 	}
 
 	public static void setArchivingDirectory(File directory) {
 		ensureDeckExists();
-		m_contents.setArchivingDirectory(directory);
+		m_deck.setArchivingDirectory(directory);
 	}
 
 	public static String getArchivingDirectoryName() {
 		ensureDeckExists();
-		return m_contents.getArchivingDirectoryName();
+		return m_deck.getArchivingDirectoryName();
 	}
 
 	/**
@@ -436,7 +347,18 @@ public class DeckManager {
 		createDeckWithName(deckName);
 		ensureDeckExists();
 
-		m_contents.extractCardsFromArchiveFile(selectedFile);
+		CardConverter.extractCardsFromArchiveFile(selectedFile);
+	}
+
+	/**
+	 * Returns the current deck (loads the default deck or creates a deck if none
+	 * exists yet)
+	 * 
+	 * @return the current deck.
+	 */
+	public static Deck getCurrentDeck() {
+		ensureDeckExists();
+		return m_deck;
 	}
 
 }

@@ -153,7 +153,8 @@ public class ReviewPanel extends JPanel {
 	}
 
 	private void editCard() {
-		Card currentCard = DeckManager.getCardWithFront(Reviewer.getCurrentFront()).get();
+		Card currentCard = DeckManager.getCurrentDeck().getCards()
+		    .getCardWithFront(Reviewer.getCurrentFront()).get();
 		new CardEditingManager(currentCard);
 	}
 

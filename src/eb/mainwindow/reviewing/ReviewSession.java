@@ -159,7 +159,7 @@ class ReviewSession implements Listener {
 	public void updateCollection() {
 		for (int cardIndex = 0; cardIndex < m_cardCollection.size(); cardIndex++) {
 			Card currentCard = m_cardCollection.get(cardIndex);
-			if (!DeckManager.contains(currentCard)) {
+			if (!DeckManager.getCurrentDeck().getCards().contains(currentCard)) {
 				m_cardCollection.remove(cardIndex);
 				boolean deletingCurrentCard = (cardIndex == m_counter);
 				if (cardIndex <= m_counter) {
