@@ -18,6 +18,11 @@ import eb.utilities.Utilities;
  * deck (so what is stored, what should be learned, not how it should be learned
  * or the file system logistics).
  * 
+ * Note that while Cards themselves are considered unique/distinctive if they
+ * have either different fronts or different backs, a CardCollection has the
+ * additional requirement that all fronts should be unique in the collection (so
+ * the number of cards equals the the size of the set of fronts).
+ * 
  * @author Eric-Wubbo Lameijer
  */
 public class CardCollection {
