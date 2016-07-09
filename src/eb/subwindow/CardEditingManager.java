@@ -107,8 +107,8 @@ public class CardEditingManager {
 			// Case 2 of 3: the front of the card is new or the front is the same
 			// as the old front (when editing). Add the card and be done with it.
 			// (well, when adding cards one should not close the new card window)
-			Optional<Card> currentCardWithThisFront = DeckManager
-			    .getCardWithFront(frontText);
+			Optional<Card> currentCardWithThisFront = DeckManager.getCurrentDeck()
+			    .getCards().getCardWithFront(frontText);
 			if (frontText.equals(getCurrentFront())
 			    || !currentCardWithThisFront.isPresent()) {
 				submitCardContents(frontText, backText);
@@ -135,7 +135,7 @@ public class CardEditingManager {
 			String newBack = currentBack + "; " + otherBack;
 			closeOptionPane();
 			m_cardEditingWindow.updateContents(frontText, newBack);
-			DeckManager.removeCard(duplicate);
+			DeckManager.getCurrentDeck().getCards().removeCard(duplicate);
 
 		});
 		JButton deleteThisButton = new JButton("Delete this card");
@@ -144,13 +144,13 @@ public class CardEditingManager {
 			if (inCardCreatingMode()) {
 				m_cardEditingWindow.updateContents("", "");
 			} else {
-				DeckManager.removeCard(m_cardToBeModified);
+				DeckManager.getCurrentDeck().getCards().removeCard(m_cardToBeModified);
 				endEditing();
 			}
 		});
 		JButton deleteOtherButton = new JButton("Delete the other card");
 		deleteOtherButton.addActionListener(e -> {
-			DeckManager.removeCard(duplicate);
+			DeckManager.getCurrentDeck().getCards().removeCard(duplicate);
 			closeOptionPane();
 			submitCardContents(frontText, backText);
 		});
@@ -173,7 +173,7 @@ public class CardEditingManager {
 	private void submitCardContents(String frontText, String backText) {
 		if (inCardCreatingMode()) {
 			final Card candidateCard = new Card(frontText, backText);
-			DeckManager.addCard(candidateCard);
+			DeckManager.getCurrentDeck().getCards().addCard(candidateCard);
 			m_cardEditingWindow.updateContents("", "");
 			m_cardEditingWindow.focusFront();
 		} else {

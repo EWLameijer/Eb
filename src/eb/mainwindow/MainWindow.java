@@ -112,7 +112,8 @@ public class MainWindow extends JFrame implements Listener {
 	 */
 	private String getDeckSizeMessage() {
 		// preconditions: none
-		return "The current deck contains " + DeckManager.getCardCount() + " cards.";
+		return "The current deck contains "
+		    + DeckManager.getCurrentDeck().getCards().getSize() + " cards.";
 		// postconditions: none
 	}
 
@@ -125,9 +126,10 @@ public class MainWindow extends JFrame implements Listener {
 		message.append("<html>");
 		message.append(getDeckSizeMessage());
 		message.append("<br>");
-		if (DeckManager.getCardCount() > 0) {
+		if (DeckManager.getCurrentDeck().getCards().getSize() > 0) {
 			message.append("Time till next review: ");
-			Duration timeUntilNextReviewAsDuration = DeckManager.getTimeTillNextReview();
+			Duration timeUntilNextReviewAsDuration = DeckManager.getCurrentDeck()
+			    .getCards().getTimeUntilNextReview();
 			String timeUntilNextReviewAsText = Utilities
 			    .durationToString(timeUntilNextReviewAsDuration);
 			message.append(timeUntilNextReviewAsText);
@@ -144,7 +146,8 @@ public class MainWindow extends JFrame implements Listener {
 		this.setTitle("Eb: " + DeckManager.getName());
 		String reviewButtonText;
 		if (DeckManager.getStudyOptions().isTimed()) {
-			TimeInterval timeInterval = DeckManager.getStudyOptions().getTimerInterval();
+			TimeInterval timeInterval = DeckManager.getStudyOptions()
+			    .getTimerInterval();
 			reviewButtonText = "Review now (timed, " + timeInterval.getScalar() + " "
 			    + timeInterval.getUnit().getUserInterfaceName() + ")";
 		} else {
@@ -183,10 +186,11 @@ public class MainWindow extends JFrame implements Listener {
 
 	private boolean mustReviewNow() {
 		// case 1: there are no cards in the deck - so nothing to review either
-		if (DeckManager.getCardCount() == 0) {
+		if (DeckManager.getCurrentDeck().getCards().getSize() == 0) {
 			return false;
 		} else {
-			Duration timeUntilNextReviewAsDuration = DeckManager.getTimeTillNextReview();
+			Duration timeUntilNextReviewAsDuration = DeckManager.getCurrentDeck()
+			    .getCards().getTimeUntilNextReview();
 			return timeUntilNextReviewAsDuration.isNegative();
 		}
 	}

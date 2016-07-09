@@ -1,5 +1,6 @@
 package eb.data;
 
+import java.io.Serializable;
 import java.io.Writer;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ import eb.utilities.Utilities;
  * 
  * @author Eric-Wubbo Lameijer
  */
-public class CardCollection {
+public class CardCollection implements Serializable {
 	private List<Card> m_cards;
 
 	/**
@@ -86,7 +87,7 @@ public class CardCollection {
 	 *
 	 * @return whether the card can legally be added to the deck.
 	 */
-	protected boolean canAddCard(Card card) {
+	private boolean canAddCard(Card card) {
 		// preconditions: the card should not be null. Otherwise, all cards,
 		// even invalid ones, should be able to be handled by this method.
 		Utilities.require(card != null, "LogicalDeck.canAddCard() error: "
@@ -173,16 +174,6 @@ public class CardCollection {
 			}
 		}
 		return reviewableCards;
-	}
-
-	/**
-	 * Returns whether this CardCollection contains the sought-after card
-	 * 
-	 * @param card
-	 * @return
-	 */
-	public boolean contains(Card card) {
-
 	}
 
 }

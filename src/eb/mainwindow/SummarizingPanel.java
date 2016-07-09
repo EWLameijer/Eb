@@ -154,7 +154,8 @@ public class SummarizingPanel extends JPanel {
 		text.append("</html>");
 		m_report.setText(text.toString());
 		CardLayout cardLayout = (CardLayout) m_buttonPanel.getLayout();
-		if (DeckManager.getReviewableCardList().isEmpty()) {
+		if (DeckManager.getCurrentDeck().getCards().getReviewableCardList()
+		    .isEmpty()) {
 			cardLayout.show(m_buttonPanel, REVIEWS_COMPLETED_MODE);
 		} else {
 			cardLayout.show(m_buttonPanel, STILL_REVIEWS_TODO_MODE);

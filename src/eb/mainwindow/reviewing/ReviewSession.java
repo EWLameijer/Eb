@@ -27,7 +27,8 @@ class ReviewSession implements Listener {
 	ReviewSession(ReviewPanel reviewPanel) {
 		m_reviewPanel = reviewPanel;
 		int maxNumReviews = DeckManager.getStudyOptions().getReviewSessionSize();
-		List<Card> reviewableCards = DeckManager.getReviewableCardList();
+		List<Card> reviewableCards = DeckManager.getCurrentDeck().getCards()
+		    .getReviewableCardList();
 		int totalNumberOfReviewableCards = reviewableCards.size();
 		Logger.getGlobal()
 		    .info("Number of reviewable cards is " + totalNumberOfReviewableCards);
@@ -159,7 +160,7 @@ class ReviewSession implements Listener {
 	public void updateCollection() {
 		for (int cardIndex = 0; cardIndex < m_cardCollection.size(); cardIndex++) {
 			Card currentCard = m_cardCollection.get(cardIndex);
-			if (!DeckManager.getCurrentDeck().getCards().contains(currentCard)) {
+			if (!deckContainsCardWithThisFront(currentCard.getFront())) {
 				m_cardCollection.remove(cardIndex);
 				boolean deletingCurrentCard = (cardIndex == m_counter);
 				if (cardIndex <= m_counter) {
@@ -171,5 +172,20 @@ class ReviewSession implements Listener {
 			}
 		}
 		updatePanels();
+	}
+
+	/**
+	 * Returns whether this deck contains a card with this front. This sounds a
+	 * lot like whether the deck contains a card, but since by definition each
+	 * card in a deck has a unique front, just checking fronts simplifies things.
+	 * 
+	 * 
+	 * @param front
+	 *          the front which may or may not be present on a card in the deck.
+	 * @return whether the deck contains a card with the given front.
+	 */
+	private boolean deckContainsCardWithThisFront(String front) {
+		return DeckManager.getCurrentDeck().getCards().getCardWithFront(front)
+		    .isPresent();
 	}
 }
