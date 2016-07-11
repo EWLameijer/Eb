@@ -22,11 +22,18 @@ import eb.utilities.Utilities;
  * Note that while Cards themselves are considered unique/distinctive if they
  * have either different fronts or different backs, a CardCollection has the
  * additional requirement that all fronts should be unique in the collection (so
- * the number of cards equals the the size of the set of fronts).
+ * the number of cards equals the the size of the set of fronts) and there
+ * should not be any "empty" fronts.
  * 
  * @author Eric-Wubbo Lameijer
  */
 public class CardCollection implements Serializable {
+
+	// the proper auto-generated serialVersionUID as CardCollection should be
+	// serializable.
+	private static final long serialVersionUID = -6526056675010032709L;
+
+	// the cards in this collection
 	private List<Card> m_cards;
 
 	/**
@@ -55,10 +62,9 @@ public class CardCollection implements Serializable {
 	 */
 	public void writeCards(Writer writer) {
 		m_cards.stream()
-		    .sorted(
-		        (first, second) -> first.getFront().compareTo(second.getFront()))
-		    .forEach(e -> CardConverter.writeLine(writer, e));
-
+		    .sorted((firstCard, secondCard) -> firstCard.getFront()
+		        .compareTo(secondCard.getFront()))
+		    .forEach(card -> CardConverter.writeLine(writer, card));
 	}
 
 	/**
@@ -121,6 +127,17 @@ public class CardCollection implements Serializable {
 		BlackBoard.post(new Update(UpdateType.DECK_CHANGED));
 	}
 
+	/**
+	 * Returns an optional that contains the card with the given front text - if
+	 * such a card exists in the collection, or an empty optional if no card with
+	 * such front is present.
+	 * 
+	 * @param frontText
+	 *          the text on the front of the card that is sought
+	 * @return an optional that is empty if there is no card with the given front
+	 *         in the current collection; and which is 'present' when such a card
+	 *         actually exists.
+	 */
 	public Optional<Card> getCardWithFront(String frontText) {
 		// Preconditions: front is a valid identifier.
 		Utilities.require(Utilities.isStringValidIdentifier(frontText),
@@ -141,9 +158,20 @@ public class CardCollection implements Serializable {
 		// Postconditions: none, really. Simple return of a boolean.
 	}
 
+	/**
+	 * Removes a given card from the collection.
+	 * 
+	 * @param card
+	 *          the card to be removed from the collection
+	 */
 	public void removeCard(Card card) {
-		m_cards.remove(card);
-		BlackBoard.post(new Update(UpdateType.DECK_CHANGED));
+		boolean collectionContainedCard = m_cards.remove(card);
+		if (collectionContainedCard) {
+			BlackBoard.post(new Update(UpdateType.DECK_CHANGED));
+		} else {
+			Utilities.require(false, "CardCollection.removeCard() error: "
+			    + "the card cannot be removed, as it is not in the deck!");
+		}
 	}
 
 	/**
@@ -166,6 +194,13 @@ public class CardCollection implements Serializable {
 		return minimumTimeUntilNextReview;
 	}
 
+	/**
+	 * Returns a list of all the cards which should be reviewed at the current
+	 * moment and study settings.
+	 * 
+	 * @return a list of all the cards which should be reviewed, given the current
+	 *         card collection and study settings.
+	 */
 	public List<Card> getReviewableCardList() {
 		List<Card> reviewableCards = new ArrayList<>();
 		for (Card card : m_cards) {

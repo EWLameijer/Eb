@@ -41,7 +41,7 @@ Current projects:
 Bugs (urgent) 
 	-problems after deleting card - not going back to show front mode 
 		The basic extra problem (or opportunity?) here is that the card that is being edited may not be the currently reviewed card.
-	
+	-top card: if full, bottom part of text not shown.
 	-mnemonics do not work for summarizing panel!
 	-Problems when editing top of card! Change not shown.
 	-Summary shows after adding card.
@@ -66,7 +66,15 @@ Small features
 Larger features (consider carefully)
 	?
 Refactorings:
-	?
+	~ The time interval methods in Card - should they not be placed elsewhere?
+	
+Refactoring 
+	data 
+		Card OK 
+		CardCollection OK
+		
+		
+
 
 
 ?3field: so [m]/[p] automatically
