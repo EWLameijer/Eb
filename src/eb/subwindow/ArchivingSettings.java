@@ -11,7 +11,7 @@ public class ArchivingSettings implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private File m_archivingDirectory;
 
-	private ArchivingSettings() {
+	public ArchivingSettings() {
 		m_archivingDirectory = null;
 	}
 

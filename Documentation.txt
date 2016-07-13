@@ -72,6 +72,7 @@ Refactoring
 	data 
 		Card OK 
 		CardCollection OK
+		Deck OK
 		
 		
 

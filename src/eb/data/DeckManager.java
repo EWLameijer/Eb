@@ -286,7 +286,7 @@ public class DeckManager {
 
 	public static Duration getInitialInterval() {
 		ensureDeckExists();
-		return m_deck.getInitialInterval();
+		return m_deck.getStudyOptions().getInitialInterval().asDuration();
 	}
 
 	public static boolean exists(String deckName) {
@@ -325,12 +325,12 @@ public class DeckManager {
 
 	public static void setArchivingDirectory(File directory) {
 		ensureDeckExists();
-		m_deck.setArchivingDirectory(directory);
+		m_deck.getArchivingSettings().setDirectory(directory);
 	}
 
 	public static String getArchivingDirectoryName() {
 		ensureDeckExists();
-		return m_deck.getArchivingDirectoryName();
+		return m_deck.getArchivingSettings().getDirectoryName();
 	}
 
 	/**

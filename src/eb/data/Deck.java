@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoField;
 import java.util.logging.Logger;
@@ -13,7 +12,6 @@ import java.util.logging.Logger;
 import eb.Eb;
 import eb.subwindow.ArchivingSettings;
 import eb.subwindow.StudyOptions;
-import eb.utilities.TimeInterval;
 import eb.utilities.Utilities;
 
 /**
@@ -71,32 +69,36 @@ public class Deck implements Serializable {
 		// everything should work
 	}
 
-	private String formatToTwoDigits(int input) {
-		if (input < 10) {
-			return "0" + input;
-		} else {
-			return Integer.toString(input);
-		}
-	}
-
+	/**
+	 * Saves the deck to a text file (helpful for recovery), though it deletes all
+	 * repetition data...
+	 */
 	public void saveDeckToTextfile() {
 		// Phase 1: get proper filename for deck
 		LocalDateTime now = LocalDateTime.now();
 		String nameOfArchivingDirectory = m_archivingSettings.getDirectoryName();
 		String textFileDirectory = nameOfArchivingDirectory.isEmpty() ? ""
 		    : nameOfArchivingDirectory + File.separator;
+		String twoDigitFormat = "%02d"; // format numbers as 01, 02...99
+
 		String textFileName = textFileDirectory + getName() + "_"
-		    + formatToTwoDigits(now.get(ChronoField.DAY_OF_MONTH))
-		    + formatToTwoDigits(now.get(ChronoField.MONTH_OF_YEAR))
-		    + formatToTwoDigits(now.get(ChronoField.YEAR) % 100) + "_"
-		    + formatToTwoDigits(now.get(ChronoField.HOUR_OF_DAY))
-		    + formatToTwoDigits(now.get(ChronoField.MINUTE_OF_HOUR)) + ".txt";
+		    + String.format(twoDigitFormat, now.get(ChronoField.DAY_OF_MONTH))
+		    + String.format(twoDigitFormat, now.get(ChronoField.MONTH_OF_YEAR))
+		    + String.format(twoDigitFormat, now.get(ChronoField.YEAR) % 100) + "_"
+		    + String.format(twoDigitFormat, now.get(ChronoField.HOUR_OF_DAY))
+		    + String.format(twoDigitFormat, now.get(ChronoField.MINUTE_OF_HOUR))
+		    + ".txt";
+
+		// Phase 2: write the deck itself
 		try (BufferedWriter outputFile = new BufferedWriter(
 		    new OutputStreamWriter(new FileOutputStream(textFileName), "UTF-8"));) {
+			// Phase 2a: write the header.
 			outputFile.write("Eb version " + Eb.VERSION_STRING + Utilities.EOL);
 			outputFile.write(
 			    "Number of cards is: " + m_cardCollection.getSize() + Utilities.EOL);
-			outputFile.write("\t\t" + Utilities.EOL);
+			outputFile.write(HEADER_BODY_SEPARATOR + Utilities.EOL);
+
+			// Phase 2b: write the card data
 			m_cardCollection.writeCards(outputFile);
 
 		} catch (Exception e) {
@@ -114,7 +116,7 @@ public class Deck implements Serializable {
 	 *          the name of the deck
 	 * @return the File object belonging to this deck.
 	 */
-	static File getDeckFileHandle(String deckName) {
+	static File getDeckFileHandle(String deckName) { // package private access
 		// preconditions: m_cards is a valid identifier
 		Utilities.require(Utilities.isStringValidIdentifier(deckName),
 		    "LogicalDeck.getDeckFileHandle() error: deck name is invalid.");
@@ -135,7 +137,7 @@ public class Deck implements Serializable {
 	 *
 	 * @return the handle (File object) to the file which stores this deck
 	 */
-	File getFileHandle() {
+	File getFileHandle() { // package private access
 		// preconditions: none (the deck should exist, of course, but since this
 		// function can only be called if the deck already exists...
 
@@ -171,31 +173,34 @@ public class Deck implements Serializable {
 		m_studyOptions = studyOptions;
 	}
 
-	public Duration getInitialInterval() {
-		TimeInterval initialInterval = m_studyOptions.getInitialInterval();
-		return initialInterval.asDuration();
-	}
-
-	public String getName() {
+	/**
+	 * Returns the name of the deck (like "Chinese")
+	 * 
+	 * @return the name of the deck, for example "Chinese"
+	 */
+	String getName() { // package private method
 		return m_name;
-	}
-
-	public void setArchivingDirectory(File directory) {
-		m_archivingSettings.setDirectory(directory);
 	}
 
 	/**
 	 * Helps avoid problems when deserializing after a code update.
 	 */
-	public void fixNewFields() {
+	void fixNewFields() { // package-private (used by DeckManager)
 		if (m_archivingSettings == null) {
 			m_archivingSettings = ArchivingSettings.getDefault();
 		}
-
 	}
 
-	public String getArchivingDirectoryName() {
-		return m_archivingSettings.getDirectoryName();
+	/**
+	 * Returns the archiving settings of this deck.
+	 * 
+	 * @return the archiving settings of this deck
+	 */
+	ArchivingSettings getArchivingSettings() { // package private access.
+		if (m_archivingSettings == null) {
+			m_archivingSettings = new ArchivingSettings();
+		}
+		return m_archivingSettings;
 	}
 
 	/**
