@@ -126,7 +126,10 @@ public class MainWindow extends JFrame implements Listener {
 		message.append("<html>");
 		message.append(getDeckSizeMessage());
 		message.append("<br>");
-		if (DeckManager.getCurrentDeck().getCards().getSize() > 0) {
+		int numCards = DeckManager.getCurrentDeck().getCards().getSize();
+		int numReviewableCards = DeckManager.getCurrentDeck().getCards()
+		    .getReviewableCardList().size();
+		if (numCards > 0) {
 			message.append("Time till next review: ");
 			Duration timeUntilNextReviewAsDuration = DeckManager.getCurrentDeck()
 			    .getCards().getTimeUntilNextReview();
@@ -143,7 +146,18 @@ public class MainWindow extends JFrame implements Listener {
 		message.append(getUICommands());
 		message.append("</html>");
 		m_messageLabel.setText(message.toString());
-		this.setTitle("Eb: " + DeckManager.getName());
+
+		String title = "Eb: " + DeckManager.getName() + " (" + numCards + " "
+		    + Utilities.pluralize("card", numCards) + " in deck, "
+		    + numReviewableCards + " "
+		    + Utilities.pluralize("card", numReviewableCards) + " to be reviewed";
+		if (false) {
+			// title += ", " +
+		} else {
+			title += ")";
+		}
+
+		this.setTitle(title);
 		String reviewButtonText;
 		if (DeckManager.getStudyOptions().isTimed()) {
 			TimeInterval timeInterval = DeckManager.getStudyOptions()
@@ -469,13 +483,12 @@ public class MainWindow extends JFrame implements Listener {
 	 * reviewed.
 	 */
 	private void showReactivePanel() {
+		updateMessageLabel();
 		if (mustReviewNow()) {
 			if (DeckManager.getStudyOptions().isTimed()) {
 				m_state = MainWindowState.WAITING_FOR_TIMER_START;
 			} else {
-
 				showReviewingPanel();
-
 			}
 		} else {
 			showInformationPanel();

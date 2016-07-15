@@ -39,14 +39,22 @@ Okay. Wat is the problem? Basically that the reviewsession needs a panel.
 
 Current projects:
 Bugs (urgent) 
+	-show number of cards, reviewable cards and cards in reviewing session
+		=> when reviewing, add ("x cards to go in current session")
+	-allow deleting cards
+
 	-problems after deleting card - not going back to show front mode 
+		@ note: not nice to try out. First add improvements: show number of cards, reviewable cards and cards in reviewing session above deck.
+		@ note: then: add delete button
 		The basic extra problem (or opportunity?) here is that the card that is being edited may not be the currently reviewed card.
+		*reproduce: make card a 1; b 2; review; show answer, change card to [other 3]
 	-top card: if full, bottom part of text not shown.
 	-mnemonics do not work for summarizing panel!
 	-Problems when editing top of card! Change not shown.
 	-Summary shows after adding card.
 	-[Solved?050616] 5 when adding cards, summary screen gives 4 reviewed
 	-[Solved?050616]Summarizing panel shows up empty!
+	-when changing review settings, set of cards to be reviewed is not reevaluated...
 	
 Core features:
 	-1.4: [m] [p] easy to make

@@ -2,7 +2,6 @@ package eb.utilities.ui_elements;
 
 import java.awt.Dimension;
 import java.util.Optional;
-import java.util.logging.Logger;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
@@ -121,8 +120,10 @@ public class TimeInputElement extends JPanel {
 		        + "may not be null.");
 		m_scalarField.setText(
 		    Utilities.doubleToMaxPrecisionString(timeInterval.getScalar(), 2));
-		Logger.getGlobal().info(
-		    Utilities.doubleToMaxPrecisionString(timeInterval.getScalar(), 2));
+		/*
+		 * Logger.getGlobal().info(
+		 * Utilities.doubleToMaxPrecisionString(timeInterval.getScalar(), 2));
+		 */
 		m_unitComboBox
 		    .setSelectedItem(timeInterval.getUnit().getUserInterfaceName());
 		notifyDataFieldChangeListeners();

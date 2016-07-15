@@ -416,4 +416,22 @@ public class Utilities {
 		}
 	}
 
+	/**
+	 * Utility function: gives the right version (singular or plural) for a noun
+	 * given the number, so 0 cards, 1 card, 2 cards etc.
+	 * 
+	 * @param word
+	 *          the word that may need to be pluralized.
+	 * @param number
+	 *          the number of items.
+	 * @return the word in singular or plural form, whatever is appropriate.
+	 */
+	public static String pluralize(String word, int number) {
+		if (number == 1) {
+			return word;
+		} else {
+			return word + "s";
+		}
+	}
+
 }
