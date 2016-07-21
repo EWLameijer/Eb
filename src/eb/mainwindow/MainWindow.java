@@ -150,12 +150,14 @@ public class MainWindow extends JFrame implements Listener {
 		String title = "Eb: " + DeckManager.getName() + " (" + numCards + " "
 		    + Utilities.pluralize("card", numCards) + " in deck, "
 		    + numReviewableCards + " "
-		    + Utilities.pluralize("card", numReviewableCards) + " to be reviewed";
-		if (false) {
-			// title += ", " +
-		} else {
-			title += ")";
+		    + Utilities.pluralize("card", numReviewableCards)
+		    + " to be reviewed in total";
+		if (m_state == MainWindowState.REVIEWING) {
+			title += ", " + Reviewer.getSession().cardsToGoYet() + " "
+			    + Utilities.pluralize("card", numReviewableCards)
+			    + " yet to be reviewed in the current session";
 		}
+		title += ")";
 
 		this.setTitle(title);
 		String reviewButtonText;
@@ -473,8 +475,10 @@ public class MainWindow extends JFrame implements Listener {
 		if (m_state != MainWindowState.REVIEWING) {
 			Reviewer.start(m_reviewPanel);
 			m_state = MainWindowState.REVIEWING;
+
 		}
 		switchToPanel(REVIEW_PANEL_ID);
+		updateMessageLabel();
 	}
 
 	/**

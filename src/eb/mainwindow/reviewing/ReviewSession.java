@@ -16,7 +16,7 @@ import eb.eventhandling.UpdateType;
 import eb.mainwindow.MainWindowState;
 import eb.utilities.Utilities;
 
-class ReviewSession implements Listener {
+public class ReviewSession implements Listener {
 	private List<Card> m_cardCollection;
 	private int m_counter;
 	private FirstTimer m_startTimer = new FirstTimer();
@@ -118,7 +118,6 @@ class ReviewSession implements Listener {
 	}
 
 	private void moveToNextReviewOrEnd() {
-
 		m_counter++;
 		if (hasNextCard()) {
 			m_counter++;
@@ -132,6 +131,15 @@ class ReviewSession implements Listener {
 
 	public boolean hasNextCard() {
 		return m_counter + 1 < m_cardCollection.size();
+	}
+
+	/**
+	 * Returns the number of cards that still need to be reviewed in this session
+	 * 
+	 * @return the number of cards that still must be reviewed in this session.
+	 */
+	public int cardsToGoYet() {
+		return m_cardCollection.size() - m_counter;
 	}
 
 	public List<Review> getReviewResults() {

@@ -3,8 +3,8 @@ package eb.mainwindow.reviewing;
 import java.time.Instant;
 import java.util.List;
 
-import eb.data.DeckManager;
 import eb.data.Deck;
+import eb.data.DeckManager;
 import eb.data.Review;
 import eb.utilities.Utilities;
 
@@ -96,5 +96,16 @@ public class Reviewer {
 	public static void showAnswer() {
 		ensureReviewSessionIsValid();
 		c_session.showAnswer();
+	}
+
+	/**
+	 * Returns the review session (which can yield data like on how many cards
+	 * still need to be reviewed in the current session).
+	 * 
+	 * @return the current review session
+	 */
+	public static ReviewSession getSession() {
+		ensureReviewSessionIsValid();
+		return c_session;
 	}
 }
