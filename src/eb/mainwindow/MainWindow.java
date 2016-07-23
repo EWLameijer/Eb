@@ -425,7 +425,7 @@ public class MainWindow extends JFrame implements Listener {
 		m_startReviewingButton.setVisible(false);
 		m_startReviewingButton.addActionListener(
 		    e -> BlackBoard.post(new Update(UpdateType.PROGRAMSTATE_CHANGED,
-		        MainWindowState.REVIEWING.name())));
+		        MainWindowState.REACTIVE.name())));
 		informationPanel.add(m_startReviewingButton, BorderLayout.SOUTH);
 		return informationPanel;
 	}

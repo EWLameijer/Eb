@@ -39,10 +39,12 @@ Okay. Wat is the problem? Basically that the reviewsession needs a panel.
 
 Current projects:
 Bugs (urgent) 
-	-show number of cards, reviewable cards and cards in reviewing session
-		=> when reviewing, add ("x cards to go in current session")
+	
+	If the card that is deleted is the only (remaining?) card in this session, an error occurs.
+	
 	-allow deleting cards
-
+	WORKS! Outside bug...
+		
 	-problems after deleting card - not going back to show front mode 
 		@ note: not nice to try out. First add improvements: show number of cards, reviewable cards and cards in reviewing session above deck.
 		@ note: then: add delete button

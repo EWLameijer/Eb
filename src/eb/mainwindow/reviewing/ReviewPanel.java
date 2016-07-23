@@ -11,6 +11,7 @@ import java.awt.event.KeyEvent;
 import java.beans.EventHandler;
 
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
@@ -124,6 +125,14 @@ public class ReviewPanel extends JPanel {
 		    new ProgrammableAction(() -> editCard()));
 		editButton.addActionListener(e -> editCard());
 
+		JButton deleteButton = new JButton("Delete card");
+		deleteButton.setMnemonic(KeyEvent.VK_D);
+		deleteButton.getInputMap(WHEN_IN_FOCUSED_WINDOW)
+		    .put(KeyStroke.getKeyStroke('d'), "delete");
+		deleteButton.getActionMap().put("delete",
+		    new ProgrammableAction(() -> deleteCard()));
+		deleteButton.addActionListener(e -> deleteCard());
+
 		// the fixed button panel contains buttons that need to be visible always
 		GridBagConstraints fixedButtonPanelConstraints = new GridBagConstraints();
 		fixedButtonPanelConstraints.gridx = 3;
@@ -135,6 +144,7 @@ public class ReviewPanel extends JPanel {
 		fixedButtonPanelConstraints.fill = GridBagConstraints.BOTH;
 		m_fixedButtonPanel = new JPanel();
 		m_fixedButtonPanel.add(editButton);
+		m_fixedButtonPanel.add(deleteButton);
 		add(m_fixedButtonPanel, fixedButtonPanelConstraints);
 
 		// panel, to be used in future to show successful/unsuccessful cards.
@@ -153,9 +163,22 @@ public class ReviewPanel extends JPanel {
 	}
 
 	private void editCard() {
+		Card currentCard = getCurrentCard();
+		new CardEditingManager(currentCard);
+	}
+
+	private Card getCurrentCard() {
 		Card currentCard = DeckManager.getCurrentDeck().getCards()
 		    .getCardWithFront(Reviewer.getCurrentFront()).get();
-		new CardEditingManager(currentCard);
+		return currentCard;
+	}
+
+	private void deleteCard() {
+		int choice = JOptionPane.showConfirmDialog(m_backOfCardPanel,
+		    "Delete this card?", "Delete this card?", JOptionPane.OK_CANCEL_OPTION);
+		if (choice == JOptionPane.OK_OPTION) {
+			DeckManager.getCurrentDeck().getCards().removeCard(getCurrentCard());
+		}
 	}
 
 	private void remembered(boolean wasRemembered) {

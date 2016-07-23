@@ -118,7 +118,6 @@ public class ReviewSession implements Listener {
 	}
 
 	private void moveToNextReviewOrEnd() {
-		m_counter++;
 		if (hasNextCard()) {
 			m_counter++;
 			startCardReview();
@@ -129,8 +128,22 @@ public class ReviewSession implements Listener {
 		}
 	}
 
+	/**
+	 * Returns the index of the last card in the session.
+	 * 
+	 * @return the index of the last card in the session.
+	 */
+	private int indexOfLastCard() {
+		return m_cardCollection.size() - 1;
+	}
+
+	/**
+	 * Returns whether there is a next card to study
+	 * 
+	 * @return whether there is a next card to study.
+	 */
 	public boolean hasNextCard() {
-		return m_counter + 1 < m_cardCollection.size();
+		return m_counter + 1 <= indexOfLastCard();
 	}
 
 	/**

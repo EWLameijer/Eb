@@ -55,7 +55,7 @@ public class SummarizingPanel extends JPanel {
 	}
 
 	private void backToReviewingMode() {
-		// note that REACTIVE is used instead of reviewing, as REACTIVE ensures tha
+		// note that REACTIVE is used instead of reviewing, as REACTIVE ensures that
 		// a new review session is created.
 		BlackBoard.post(new Update(UpdateType.PROGRAMSTATE_CHANGED,
 		    MainWindowState.REACTIVE.name()));
