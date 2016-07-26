@@ -179,20 +179,22 @@ public class ReviewSession implements Listener {
 	 * that the card also disappears from the list of cards to be reviewed
 	 */
 	public void updateCollection() {
+		boolean deletingCurrentCard = false;
 		for (int cardIndex = 0; cardIndex < m_cardCollection.size(); cardIndex++) {
 			Card currentCard = m_cardCollection.get(cardIndex);
 			if (!deckContainsCardWithThisFront(currentCard.getFront())) {
 				m_cardCollection.remove(cardIndex);
-				boolean deletingCurrentCard = (cardIndex == m_counter);
+				deletingCurrentCard = (cardIndex == m_counter);
 				if (cardIndex <= m_counter) {
 					m_counter--;
 				}
-				if (deletingCurrentCard) {
-					moveToNextReviewOrEnd();
-				}
 			}
 		}
-		updatePanels();
+		if (deletingCurrentCard) {
+			moveToNextReviewOrEnd();
+		} else {
+			updatePanels();
+		}
 	}
 
 	/**

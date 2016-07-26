@@ -69,11 +69,6 @@ public class SummarizingPanel extends JPanel {
 		m_reviewsCompletedBPanel
 		    .addComponentListener(EventHandler.create(ComponentListener.class, this,
 		        "requestFocusInWindow", null, "componentShown"));
-		// m_backToReactiveModeButton.getInputMap(WHEN_IN_FOCUSED_WINDOW)
-		// .put(KeyStroke.getKeyStroke("pressed ENTER"), "back to reactive mode");
-		// m_backToReactiveModeButton.getActionMap().put("back to reactive mode",
-		// new ProgrammableAction(() -> toReactiveMode()));
-		// m_backToReactiveModeButton.addActionListener(e -> toReactiveMode());
 		makeButtonAndKeystrokeActivateRunnable(m_backToReactiveModeButton,
 		    KeyStroke.getKeyStroke("pressed ENTER"), "back to reactive mode",
 		    () -> toReactiveMode());

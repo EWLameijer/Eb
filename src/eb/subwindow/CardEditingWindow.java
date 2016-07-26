@@ -48,6 +48,9 @@ public class CardEditingWindow extends JFrame {
 	// the managing object to send the resulting texts to.
 	private final CardEditingManager m_manager;
 
+	// the pane that houses the buttons (and more, in the case of a
+	// CardCreatingWindow)
+
 	/**
 	 * Creates a <code>CardEditingWindow</code> to add cards to the current deck.
 	 */

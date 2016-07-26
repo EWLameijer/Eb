@@ -25,13 +25,7 @@ Okay. Wat is the problem? Basically that the reviewsession needs a panel.
 
 
 [m/p] 
-1) Add button between cancel and okay (if card added): show card add settings
-2) if the show card add settings is pressed, extend the adding window with a side panel.
-3) Put on top of the side window a "hide card add settings" button 
-4) deactivate the show card add settings 
-5) under the hide card add settings, have a combobox with options "show 2 cards" and "show 3 cards"
-6) show label explaining #1 [m]->#2 creates a card with the front of the first field to which " [m]" is added, on the back of the card the contents as shown in the second field. 
-7) Add a text area in which (for 2 cards) the default is 
+
 
 
 
@@ -39,40 +33,56 @@ Okay. Wat is the problem? Basically that the reviewsession needs a panel.
 
 Current projects:
 Bugs (urgent) 
-	
-	If the card that is deleted is the only (remaining?) card in this session, an error occurs.
-	
-	-allow deleting cards
-	WORKS! Outside bug...
-		
-	-problems after deleting card - not going back to show front mode 
-		@ note: not nice to try out. First add improvements: show number of cards, reviewable cards and cards in reviewing session above deck.
-		@ note: then: add delete button
-		The basic extra problem (or opportunity?) here is that the card that is being edited may not be the currently reviewed card.
-		*reproduce: make card a 1; b 2; review; show answer, change card to [other 3]
-	-top card: if full, bottom part of text not shown.
-	-mnemonics do not work for summarizing panel!
-	-Problems when editing top of card! Change not shown.
-	-Summary shows after adding card.
-	-[Solved?050616] 5 when adding cards, summary screen gives 4 reviewed
-	-[Solved?050616]Summarizing panel shows up empty!
-	-when changing review settings, set of cards to be reviewed is not reevaluated...
-	
+	-mnemonics do not work for summarizing panel! [5 per dag]
+		Reproduce: Can reproduce. (2 cards, but session size 1)
+		Go to next /  Back to information screen don't work.
+
 Core features:
-	-1.4: [m] [p] easy to make
-	-1.5: make deck list and add command to go to next deck
-	-2.0: get timer working 
-	-2.1: Different words - shrink/grow interval?
+	-1.4: [m] [p] easy to make. Value: 500. Hours 10 => 50/h
+		1) add combobox below OK/Cancel. 2 mode (normal), below: add mode/remove mode/ change default mode. Bv Spanish->English, of Spanish->English, English->Spanish, of [default] kanji,kana,meaning => kanji [p]-> meaning
+		1) Add button between cancel and okay (if card added): show card add settings
+		2) if the show card add settings is pressed, extend the adding window with a side panel.
+		3) Put on top of the side window a "hide card add settings" button 
+		4) deactivate the show card add settings 
+		5) under the hide card add settings, have a combobox with options "show 2 sides" and "show 3 sides"
+		6) if show 3 sides 
+		6) show label explaining #1 [m]->#2 creates a card with the front of the first field to which " [m]" is added, on the back of the card the contents as shown in the second field. 
+		7) Add a text area in which (for 2 cards) the default is #1->#2
+		8) 
+	
+	-1.5: make deck list and add command to go to next deck Value 400 h 3 => 133/h
+	-1.6: add deck analysis: interval * 1, 1.2 1.4 correct? Perhaps split for 1, 5, 25 etc. days
+		Value 1000 hours 10 100/h
+	-2.0: get timer working
+		Value 500 (can't often time) hours 5 100/h
+	-2.1: Different words - shrink/grow interval? 
+		Value 1000 hours 3 333/h
 	-3.0: get delayed review working 
+		Value 5000 hours 8 625/h
 	-4.0: get perceptual learning working
+		Value 10000 hours 6 1666/h => 656/h* (met advanced create)
+		Normal repetition, outside
+		1) getFront shows front + 3 possible answers. Tricky: in mixed deck, answers must be of same category. But how to catalogize categories?
+		Basically, every card addition obeys a rule (a string) as well as a subrule (an index to the string). For example, a regular Japanese grammar card has the #1->#2 rule, index 1.
+		So 1.1 (the rules need to be stated in the deck, preferably also in the text)
+		tatta/only is #1->#2,#2->#1, or 2.1, while only/tatta is 2.2 
+		同人 -> doujin -> clique has #1 [p]->#2, #1 [m]->#3, #2->#3, #3->#2 (#1). So 同人 [m] -> clique = 3.2
+		NEE: S->R heeft altijd een combinatie: bv kanji / kana / meaning. Bv kanji->meaning
+		OK. Dus na 2 tabs 3e aan eind van kaart: kanji->meaning, bijvoorbeeld.
+		Hoe dan ook, dat wil zeggen dat het netjes saven van kaarttypes eerst komt. Dus 10000+500 / 10+6 = 656/h*
+		
+		
 	-4.1: Add an Eb icon
+		Value 40 hours 2 = 20/h
 	-5.0: sentences?
+		Value 45 hours 16 = 3/h
 Small features
 	?-Go to next round - > shortcut => TEST (nope!) => TEST (3/6) (nope!)
 	-let deck be saved in same directory as archive?
 	-show number of cards to go yet
 	-allow deleting cards
 	-go back to previously added card
+	-link m and p and such => so correcting one typo will correct it everywhere?
 Larger features (consider carefully)
 	?
 Refactorings:
@@ -494,7 +504,10 @@ R1.4
 	-solved a bug that gave trouble when swapping decks.
 	-solved a bug that gave trouble when creating a new deck (the screen did not swap properly)
 	-solved a bug that caused problems when going to the next round of reviews.
-	-the output now has a version number
+	-the textual output file now has a version number
+	-added a button that allows deleting cards
+	-now showing number of cards in deck and number of cards to yet be reviewed on top of window
+	-B of "Back to information screen" in summarizing panel now correctly underlined.
 
 
 

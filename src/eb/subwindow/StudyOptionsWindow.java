@@ -17,6 +17,7 @@ import eb.eventhandling.BlackBoard;
 import eb.eventhandling.Listener;
 import eb.eventhandling.Update;
 import eb.eventhandling.UpdateType;
+import eb.mainwindow.MainWindowState;
 import eb.utilities.ProgrammableAction;
 import eb.utilities.Utilities;
 import eb.utilities.ui_elements.LabelledComboBox;
@@ -189,6 +190,8 @@ public class StudyOptionsWindow extends JFrame implements Listener {
 	private void saveSettingsToDeck() {
 		StudyOptions guiStudyOptions = gatherUIDataIntoStudyOptionsObject();
 		DeckManager.setStudyOptions(guiStudyOptions);
+		BlackBoard.post(new Update(UpdateType.PROGRAMSTATE_CHANGED,
+		    MainWindowState.REACTIVE.name()));
 		updateFrame(); // Should be set to 'no unsaved changes' again.
 	}
 
