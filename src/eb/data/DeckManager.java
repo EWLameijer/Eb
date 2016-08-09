@@ -8,50 +8,40 @@ import java.io.ObjectOutputStream;
 import java.time.Duration;
 import java.util.logging.Logger;
 
-import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
-import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import eb.disk_io.CardConverter;
 import eb.mainwindow.reviewing.Reviewer;
 import eb.subwindow.StudyOptions;
 import eb.utilities.Utilities;
 
 /**
- * Logically, a Deck is a collection of cards (usually all belonging to a
- * specific subject, like Spanish) that can be studied by the user. Practically,
- * as there are all kinds of ugly housekeeping aspects of any application that
- * have nothing to do with the contents of a deck, the "Deck" class in Eb is
- * actually more of a DeckManager or DeckHandler, which encapsulates the pure,
- * data-oriented deck (the LogicalDeck) into an envelope that can successfully
- * interact with the GUI, keeping its capabilities even when a deck is swapped.
- * Basically, one could regard the situation as if "Deck" is the interface that
- * the rest of the program deals with (Deck.getCardCount(), Deck.addCard(card)
- * etc.) However, the contents of the Deck is a different story. Intuitively,
- * there could be a "Chinese" deck, a "Java" deck etc. Those all are 'bare'
- * data, which should not know anything about the UI, and should be changed
- * without resetting all UI links to the new deck. So one should probably split
- * the Deck as the global instance of the one and only deck in Eb from the
- * 'deck'(='LogicalDeck'), that manages the contents of a normal SRS deck.
+ * The DeckManager class concerns itself with all the housekeeping (such as
+ * interacting with the GUI) that the deck itself (which only concerns itself
+ * with the logical content) should not need to bother about.
  *
  * @author Eric-Wubbo Lameijer
  */
 public class DeckManager {
 
-	// The "singleton" pointer to the logical deck managed by the Deck.
-	@Nullable
+	// The deck managed by the DeckManager.
 	private static Deck m_deck;
+
+	// the name of the deck that has been reviewed previously
+	// TODO: basically, is only important when starting up Eb; why does this need
+	// to be a field?
+	private static String c_nameOfLastReviewedDeck = "";
 
 	// The name of the default deck
 	private static final String DEFAULT_DECKNAME = "default";
 
-	private static String c_nameOfLastReviewedDeck = "";
-
 	/**
-	 * Private constructor: should not be called as this is more of a static
-	 * utility class, a wrapper around the LogicalDeck.
+	 * Private constructor: should not be called as DeckManager is basically a
+	 * static utility class, a wrapper around the Deck itself.
 	 */
 	private DeckManager() {
+		// TODO: in principle, DeckManager could be initialized to contain the name
+		// of the lastReviewedDeck
+		Utilities.require(false, "DeckManager constructor error: one should "
+		    + "not try to construct an instance of a static utility class.");
 	}
 
 	/**
@@ -59,7 +49,6 @@ public class DeckManager {
 	 *
 	 * @return whether a deck has been loaded into this "deck-container"
 	 */
-	@EnsuresNonNullIf(expression = { "m_contents" }, result = true)
 	private static boolean deckHasBeenLoaded() {
 		// preconditions: none - this method is checking a condition
 		// postconditions: none: a normal boolean is returned.
@@ -73,8 +62,6 @@ public class DeckManager {
 	 * @return whether the deck has been initialized, meaning it can be used for
 	 *         things like counting the number of cards in it.
 	 */
-
-	@EnsuresNonNull({ "m_contents" })
 	private static void ensureDeckExists() {
 		// preconditions: none. After all, this is itself a kind of
 		// precondition-checking method.
@@ -82,8 +69,8 @@ public class DeckManager {
 		if (!deckHasBeenLoaded()) {
 			// No deck has been loaded yet - try to load the default deck,
 			// or else create it.
-			if (canLoadDeck(getLastDeck())) {
-				loadDeck(getLastDeck());
+			if (canLoadDeck(getNameOfLastDeck())) {
+				loadDeck(getNameOfLastDeck());
 			} else {
 				// If loading the deck failed, try to create it.
 				// Note that createDeckWithName cannot return null; it will exit
@@ -97,13 +84,15 @@ public class DeckManager {
 		// a deck cannot be created.
 		Utilities.require(deckHasBeenLoaded(),
 		    "Deck.ensureDeckExists() error: there is no valid deck.");
-
-		// next line is necessary to satisfy the nullness checker; after all,
-		// if m_contents is really null, we would have exited the program by now.
-		assert m_deck != null : "@AssumeAssertion(nullness)";
 	}
 
-	private static String getLastDeck() {
+	/**
+	 * Returns the name of the deck studied previously (ideal when starting a new
+	 * session of Eb).
+	 * 
+	 * @return the name of the last deck studied
+	 */
+	private static String getNameOfLastDeck() {
 		if (c_nameOfLastReviewedDeck.isEmpty()) {
 			return DEFAULT_DECKNAME;
 		} else {
@@ -126,15 +115,15 @@ public class DeckManager {
 		    "Deck.loadDeck() error: deck cannot be loaded. "
 		        + "Was canLoadDeck called?");
 
-		final File deckFile = Deck.getDeckFileHandle(name);
 		save();
+		final File deckFile = Deck.getDeckFileHandle(name);
 		try (ObjectInputStream objInStream = new ObjectInputStream(
 		    new FileInputStream(deckFile))) {
 			Deck loadedDeck = (Deck) objInStream.readObject();
 			if (loadedDeck != null) {
 				m_deck = loadedDeck;
 				m_deck.fixNewFields();
-				swapDeck();
+				reportDeckChangeEvent();
 			} else {
 				Utilities.require(false,
 				    "Deck.loadDeck() error: the requested deck " + "cannot be loaded.");
@@ -170,7 +159,6 @@ public class DeckManager {
 		}
 
 		// so the file must exist. But does it contain a valid deck?
-		// anyway, first save the old deck to be safe.
 		try (ObjectInputStream objInStream = new ObjectInputStream(
 		    new FileInputStream(deckFile))) {
 			Deck loadedDeck = (Deck) objInStream.readObject();
@@ -198,14 +186,10 @@ public class DeckManager {
 		    "Deck.createDeckWithName() error: name cannot be null, and has to "
 		        + "contain non-whitespace characters.");
 
-		// code
-		// if there is already a deck loaded/constructed previously, save it to disk
-		// before creating the new deck
-		if (deckHasBeenLoaded()) {
-			save();
-		}
-		m_deck = new Deck(name);
+		// Save the current deck to disk before creating the new deck
 		save();
+
+		m_deck = new Deck(name);
 
 		// postconditions: the deck should exist (deck.save handles any errors
 		// occurring during saving the deck).
@@ -213,19 +197,17 @@ public class DeckManager {
 		    + "problem creating and/or writing the new deck.");
 
 		// The deck has been changed. So ensure depending GUI-elements know that.
-		swapDeck();
+		reportDeckChangeEvent();
 
 	}
 
 	/**
-	 * To do after the deck is swapped.
+	 * After the deck has been swapped, ensure anything not handled by the
+	 * GUI-element activating the deck swap itself is performed.
 	 */
-	private static void swapDeck() {
-		// phase 1: update the data structure/model.
+	private static void reportDeckChangeEvent() {
+		// A new review session is needed.
 		Reviewer.start(null);
-
-		// phase 2: update the view(s)
-		// BlackBoard.post(new Update(UpdateType.DECK_SWAPPED));
 	}
 
 	/**
@@ -260,7 +242,7 @@ public class DeckManager {
 	/**
 	 * Returns the StudyOptions object of the current deck.
 	 * 
-	 * @return
+	 * @return the object containing the study options of the current deck.
 	 */
 	public static StudyOptions getStudyOptions() {
 		// preconditions: outside ensuring that there is a deck, preconditions

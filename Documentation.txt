@@ -33,6 +33,11 @@ Okay. Wat is the problem? Basically that the reviewsession needs a panel.
 
 Current projects:
 Bugs (urgent) 
+	Well, prefer number of cards to go first (so 35 instead of 737)
+	Allow browsing functionality (to find/edit card)
+	!!! Points per word/score
+	?Avoid 2 copies of the same deck open at the same time...
+	-\n probleem met maken/lezen archives. Auto-remove?
 	-mnemonics do not work for summarizing panel! [5 per dag]
 		Reproduce: Can reproduce. (2 cards, but session size 1)
 		Go to next /  Back to information screen don't work.
@@ -93,6 +98,7 @@ Refactoring
 		Card OK 
 		CardCollection OK
 		Deck OK
+		DeckManager, busy with p5
 		
 		
 
