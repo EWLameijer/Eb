@@ -211,4 +211,21 @@ public class CardCollection implements Serializable {
 		return reviewableCards;
 	}
 
+	/**
+	 * Returns the number of reviewing points of a deck, being the sum of the
+	 * latest "success streaks" of all cards in the deck. For example a fresh deck
+	 * will have 0 points, a 100 card deck where each card has has 2 successful
+	 * reviews 200 points, failing a review would bring that back to 2x99=198
+	 * points, and so on.
+	 * 
+	 * @return the number of reviewing points of this deck.
+	 */
+	public int getReviewingPoints() {
+		int totalPoints = 0;
+		for (Card card : m_cards) {
+			totalPoints += card.streakSize();
+		}
+		return totalPoints;
+	}
+
 }

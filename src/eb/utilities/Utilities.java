@@ -434,4 +434,18 @@ public class Utilities {
 		}
 	}
 
+	/**
+	 * Produces a nicely formatted count of the number, for example (3, "point")
+	 * is converted into "3 points".
+	 * 
+	 * @param number
+	 *          the number to be formatted.
+	 * @param word
+	 *          the "unit" in which the number is expressed (like point)
+	 * @return a nicely formatted string like "1 dog" or "2 cats"
+	 */
+	public static String pluralText(int number, String word) {
+		return number + " " + pluralize(word, number);
+	}
+
 }

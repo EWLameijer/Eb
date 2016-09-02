@@ -225,4 +225,22 @@ public class Card implements Serializable {
 		m_textOnBack = back;
 	}
 
+	/**
+	 * How long the most recent streak is (2 uninterrupted successful reviews, 0
+	 * successful reviews (after a failure), and so on...)
+	 * 
+	 * @return the length of the current reviewing success streak (>=0)
+	 */
+	public int streakSize() {
+		int successfulReviewCount = 0;
+		int lastReviewIndex = m_reviews.size() - 1;
+		int currentReviewIndex = lastReviewIndex;
+		while (currentReviewIndex >= 0
+		    && m_reviews.get(currentReviewIndex).wasSuccess()) {
+			successfulReviewCount++;
+			currentReviewIndex--;
+		}
+		return successfulReviewCount;
+	}
+
 }

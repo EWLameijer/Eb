@@ -146,18 +146,19 @@ public class MainWindow extends JFrame implements Listener {
 		message.append(getUICommands());
 		message.append("</html>");
 		m_messageLabel.setText(message.toString());
+		int numReviewingPoints = DeckManager.getCurrentDeck().getCards()
+		    .getReviewingPoints();
 
-		String title = "Eb: " + DeckManager.getName() + " (" + numCards + " "
-		    + Utilities.pluralize("card", numCards) + " in deck, "
-		    + numReviewableCards + " "
-		    + Utilities.pluralize("card", numReviewableCards)
+		String title = "Eb: " + DeckManager.getName() + " ("
+		    + Utilities.pluralText(numReviewableCards, "card")
 		    + " to be reviewed in total";
 		if (m_state == MainWindowState.REVIEWING) {
-			title += ", " + Reviewer.getSession().cardsToGoYet() + " "
-			    + Utilities.pluralize("card", numReviewableCards)
+			title += ", "
+			    + Utilities.pluralText(Reviewer.getSession().cardsToGoYet(), "card")
 			    + " yet to be reviewed in the current session";
 		}
-		title += ")";
+		title += ", " + Utilities.pluralText(numCards, "card") + " in deck, "
+		    + Utilities.pluralText(numReviewingPoints, "point") + ")";
 
 		this.setTitle(title);
 		String reviewButtonText;

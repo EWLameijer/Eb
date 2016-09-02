@@ -33,6 +33,9 @@ Okay. Wat is the problem? Basically that the reviewsession needs a panel.
 
 Current projects:
 Bugs (urgent) 
+	-General: write down time spent on design - looking for place to modify - coding - debugging
+	Adding cards - seems to go awry (does not clear editing fields after OK)
+	Can you check whether other Eb instance is running?
 	Well, prefer number of cards to go first (so 35 instead of 737)
 	Allow browsing functionality (to find/edit card)
 	!!! Points per word/score
