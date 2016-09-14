@@ -69,7 +69,8 @@ public class CardEditingWindow extends JFrame {
 
 		m_manager = manager;
 		String operation = m_manager.inCardCreatingMode() ? "add" : "edit";
-		this.setTitle(DeckManager.getName() + ": " + operation + " card");
+		this.setTitle(
+		    DeckManager.getCurrentDeck().getName() + ": " + operation + " card");
 
 		// Create the panel to edit the front of the card, and make enter
 		// and tab transfer focus to the panel for editing the back of the card.

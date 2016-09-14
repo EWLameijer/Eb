@@ -240,19 +240,6 @@ public class DeckManager {
 	}
 
 	/**
-	 * Returns the StudyOptions object of the current deck.
-	 * 
-	 * @return the object containing the study options of the current deck.
-	 */
-	public static StudyOptions getStudyOptions() {
-		// preconditions: outside ensuring that there is a deck, preconditions
-		// should be handled by the relevant method in the logical deck
-		ensureDeckExists();
-		return m_deck.getStudyOptions();
-		// postconditions: handled by callee.
-	}
-
-	/**
 	 * Sets the study options of the current deck to a new value.
 	 * 
 	 * @param studyOptions
@@ -266,27 +253,7 @@ public class DeckManager {
 		// postconditions: handled by callee.
 	}
 
-	public static Duration getInitialInterval() {
-		ensureDeckExists();
-		return m_deck.getStudyOptions().getInitialInterval().asDuration();
-	}
-
-	public static boolean exists(String deckName) {
-		File deckFile = Deck.getDeckFileHandle(deckName);
-		return deckFile.exists();
-	}
-
-	public static String getName() {
-		ensureDeckExists();
-		return m_deck.getName();
-	}
-
-	public static Duration getForgottenCardInterval() {
-		ensureDeckExists();
-		return m_deck.getStudyOptions().getForgottenCardInterval().asDuration();
-	}
-
-	public static Duration getRememberedCardInterval() {
+	public static Duration agetRememberedCardInterval() {
 		ensureDeckExists();
 		return m_deck.getStudyOptions().getRememberedCardInterval().asDuration();
 	}

@@ -30,6 +30,7 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
 
+import eb.data.Deck;
 import eb.data.DeckManager;
 import eb.eventhandling.BlackBoard;
 import eb.eventhandling.Listener;
@@ -149,7 +150,7 @@ public class MainWindow extends JFrame implements Listener {
 		int numReviewingPoints = DeckManager.getCurrentDeck().getCards()
 		    .getReviewingPoints();
 
-		String title = "Eb: " + DeckManager.getName() + " ("
+		String title = "Eb: " + DeckManager.getCurrentDeck().getName() + " ("
 		    + Utilities.pluralText(numReviewableCards, "card")
 		    + " to be reviewed in total";
 		if (m_state == MainWindowState.REVIEWING) {
@@ -237,7 +238,7 @@ public class MainWindow extends JFrame implements Listener {
 				if (!Utilities.isStringValidIdentifier(deckName)) {
 					JOptionPane.showMessageDialog(null, "Sorry, \"" + deckName
 					    + "\" is not a valid name for a deck. Please choose another name.");
-				} else if (DeckManager.exists(deckName)) {
+				} else if (Deck.getDeckFileHandle(deckName).exists()) {
 					JOptionPane.showMessageDialog(null, "Sorry, the deck \"" + deckName
 					    + "\" already exists. Please choose another name.");
 				} else {
@@ -402,7 +403,7 @@ public class MainWindow extends JFrame implements Listener {
 		if (!Utilities.isStringValidIdentifier(deckName)) {
 			JOptionPane.showMessageDialog(null, "Sorry, \"" + deckName
 			    + "\" is not a valid name for a deck. Please choose another name.");
-		} else if (!DeckManager.exists(deckName)) {
+		} else if (!Deck.getDeckFileHandle(deckName).exists()) {
 			JOptionPane.showMessageDialog(null,
 			    "Sorry, the deck \"" + deckName + "\" does not exist yet.");
 		} else {
@@ -453,7 +454,8 @@ public class MainWindow extends JFrame implements Listener {
 
 	private void saveEbStatus() {
 		List<String> lines = new ArrayList<>();
-		lines.add("most_recently_reviewed_deck: " + DeckManager.getName());
+		lines.add("most_recently_reviewed_deck: "
+		    + DeckManager.getCurrentDeck().getName());
 		Path statusFilePath = Paths.get(EB_STATUS_FILE);
 		try {
 			Files.write(statusFilePath, lines, Charset.forName("UTF-8"));

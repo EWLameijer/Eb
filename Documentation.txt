@@ -7,6 +7,13 @@ Otherwise, debug until 4x10 continuously sufficiently satisfied with performance
 
 
 Philosophical question: 
+Ideally, the card should know the settings? Basically, what happens if something needs data from different leaves of the tree? Well, then ideally it should be calculated in the root, based on data delivered by the leaves.
+
+Design decision time.
+
+Alternative 1: you make a backpointer from Card to CardCollection, and from CardCollection to Deck. => Backpointers are really inelegant. Duplication of data, please do not.
+Alternative 2: pointer from Card to StudyOptions object => needs to be duplicated over every card. Please do not.
+
 
 
 MCV
@@ -94,7 +101,7 @@ Small features
 Larger features (consider carefully)
 	?
 Refactorings:
-	~ The time interval methods in Card - should they not be placed elsewhere?
+	~ The time interval methods in Card - should they not be placed elsewhere? => Yes, probably in Deck itself.
 	
 Refactoring 
 	data 

@@ -5,8 +5,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoField;
+import java.time.temporal.Temporal;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
 import eb.Eb;
@@ -116,7 +122,8 @@ public class Deck implements Serializable {
 	 *          the name of the deck
 	 * @return the File object belonging to this deck.
 	 */
-	static File getDeckFileHandle(String deckName) { // package private access
+	public static File getDeckFileHandle(String deckName) { // package private
+	                                                        // access
 		// preconditions: m_cards is a valid identifier
 		Utilities.require(Utilities.isStringValidIdentifier(deckName),
 		    "LogicalDeck.getDeckFileHandle() error: deck name is invalid.");
@@ -178,7 +185,7 @@ public class Deck implements Serializable {
 	 * 
 	 * @return the name of the deck, for example "Chinese"
 	 */
-	String getName() { // package private method
+	public String getName() { // package private method
 		return m_name;
 	}
 
@@ -210,6 +217,102 @@ public class Deck implements Serializable {
 	 */
 	public CardCollection getCards() {
 		return m_cardCollection;
+	}
+
+	/**
+	 * Returns the time till the next review of the given card. The time can be
+	 * negative, as that information can help deprioritize 'over-ripe' cards which
+	 * likely have to be learned anew anyway.
+	 * 
+	 * @return the time till the next planned review of this card. Can be
+	 *         negative.
+	 */
+	public Duration getTimeUntilNextReview(Card card) {
+		// case 1: the card has never been reviewed yet. So take the creation
+		// instant and add the user-specified initial interval.
+		if (!card.hasBeenReviewed()) {
+			return Duration.between(Instant.now(), m_studyOptions.getInitialInterval()
+			    .asDuration().addTo(card.getCreationInstant()));
+		} else {
+			// other cases: there have been previous reviews.
+			Review lastReview = card.getLastReview();
+			Instant lastReviewInstant = lastReview.getInstant();
+			Duration waitTime;
+			if (lastReview.wasSuccess()) {
+				waitTime = getIntervalAfterSuccessfulReview(card);
+			} else {
+				waitTime = m_studyOptions.getForgottenCardInterval().asDuration();
+			}
+			Temporal officialReviewTime = waitTime.addTo(lastReviewInstant);
+			return Duration.between(Instant.now(), officialReviewTime);
+		}
+	}
+
+	/**
+	 * Returns the time to wait for the next review (the previous review being a
+	 * success).
+	 * 
+	 * @return the time to wait for the next review
+	 */
+	private Duration getIntervalAfterSuccessfulReview(Card card) {
+		// the default wait time after a single successful review is given by the
+		// study options
+		Duration waitTime = m_studyOptions.getRememberedCardInterval().asDuration();
+
+		// However, if previous reviews also have been successful, the wait time
+		// should be longer (using exponential growth by default, though may want
+		// to do something more sophisticated in the future).
+		double lengtheningFactor = DeckManager.getLengtheningFactor();
+		int streakLength = card.streakSize();
+		int numberOfLengthenings = streakLength - 1; // 2 reviews = lengthen 1x.
+		for (int lengtheningIndex = 0; lengtheningIndex < numberOfLengthenings; lengtheningIndex++) {
+			waitTime = Utilities.multiplyDurationBy(waitTime, lengtheningFactor);
+		}
+		return waitTime;
+	}
+
+	/**
+	 * Returns a list of all the cards which should be reviewed at the current
+	 * moment and study settings.
+	 * 
+	 * @return a list of all the cards which should be reviewed, given the current
+	 *         card collection and study settings.
+	 */
+	public List<Card> getReviewableCardList() {
+		List<Card> reviewableCards = new ArrayList<>();
+		Iterator<Card> cardIterator = m_cardCollection.getIterator();
+		while (cardIterator.hasNext()) {
+			Card currentCard = cardIterator.next();
+			if (getTimeUntilNextReview(currentCard).isNegative()) {
+				reviewableCards.add(currentCard);
+			}
+		}
+		return reviewableCards;
+	}
+
+	/**
+	 * Returns the time that the user has to wait to the next review.
+	 * 
+	 * @return how long it will be until the next review.
+	 */
+	public Duration getTimeUntilNextReview() {
+		Utilities.require(m_cardCollection.getSize() > 0,
+		    "LogicalDeck.getTimeUntilNextReview()) error: the time till next "
+		        + "review is undefined for an empty deck.");
+		Iterator<Card> cardIterator = m_cardCollection.getIterator();
+
+		Card firstCard = cardIterator.next();
+		Duration minimumTimeUntilNextReview = getTimeUntilNextReview(firstCard);
+		while (cardIterator.hasNext()) {
+			Card card = cardIterator.next();
+			Duration timeUntilThisCardIsReviewed = getTimeUntilNextReview(card);
+
+			if (timeUntilThisCardIsReviewed
+			    .compareTo(minimumTimeUntilNextReview) < 0) {
+				minimumTimeUntilNextReview = timeUntilThisCardIsReviewed;
+			}
+		}
+		return minimumTimeUntilNextReview;
 	}
 
 }
