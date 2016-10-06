@@ -133,6 +133,7 @@ public class Card implements Serializable {
 
 	/**
 	 * Debugging function, helps check that the reviews have proceeded correctly.
+	 * Reports all reviews of this card performed so far.
 	 */
 	private void reportReviews() {
 		for (Review review : m_reviews) {

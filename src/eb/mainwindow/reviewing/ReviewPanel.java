@@ -169,7 +169,7 @@ public class ReviewPanel extends JPanel {
 
 	private Card getCurrentCard() {
 		Card currentCard = DeckManager.getCurrentDeck().getCards()
-		    .getCardWithFront(Reviewer.getCurrentFront()).get();
+		    .getCardWithFront(ReviewManager.getInstance().getCurrentFront()).get();
 		return currentCard;
 	}
 
@@ -183,13 +183,13 @@ public class ReviewPanel extends JPanel {
 
 	private void remembered(boolean wasRemembered) {
 		showPanel(HIDDEN_ANSWER);
-		Reviewer.wasRemembered(wasRemembered);
+		ReviewManager.getInstance().wasRemembered(wasRemembered);
 		repaint();
 	}
 
 	private void showAnswer() {
 		showPanel(SHOWN_ANSWER);
-		Reviewer.showAnswer();
+		ReviewManager.getInstance().showAnswer();
 		repaint();
 	}
 
@@ -201,7 +201,7 @@ public class ReviewPanel extends JPanel {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		m_frontOfCardPanel.setText(Reviewer.getCurrentFront());
+		m_frontOfCardPanel.setText(ReviewManager.getInstance().getCurrentFront());
 	}
 
 	public void refresh() {

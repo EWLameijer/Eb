@@ -19,7 +19,7 @@ import eb.data.Review;
 import eb.eventhandling.BlackBoard;
 import eb.eventhandling.Update;
 import eb.eventhandling.UpdateType;
-import eb.mainwindow.reviewing.Reviewer;
+import eb.mainwindow.reviewing.ReviewManager;
 import eb.utilities.ProgrammableAction;
 
 @SuppressWarnings("serial")
@@ -119,7 +119,7 @@ public class SummarizingPanel extends JPanel {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		List<Review> results = Reviewer.getReviewResults();
+		List<Review> results = ReviewManager.getInstance().getReviewResults();
 		StringBuilder text = new StringBuilder();
 		text.append("<html>");
 		text.append("<b>Summary</b><br><br>");
@@ -149,8 +149,7 @@ public class SummarizingPanel extends JPanel {
 		text.append("</html>");
 		m_report.setText(text.toString());
 		CardLayout cardLayout = (CardLayout) m_buttonPanel.getLayout();
-		if (DeckManager.getCurrentDeck().getCards().getReviewableCardList()
-		    .isEmpty()) {
+		if (DeckManager.getCurrentDeck().getReviewableCardList().isEmpty()) {
 			cardLayout.show(m_buttonPanel, REVIEWS_COMPLETED_MODE);
 		} else {
 			cardLayout.show(m_buttonPanel, STILL_REVIEWS_TODO_MODE);

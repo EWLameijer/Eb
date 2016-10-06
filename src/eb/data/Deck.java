@@ -122,8 +122,7 @@ public class Deck implements Serializable {
 	 *          the name of the deck
 	 * @return the File object belonging to this deck.
 	 */
-	public static File getDeckFileHandle(String deckName) { // package private
-	                                                        // access
+	public static File getDeckFileHandle(String deckName) {
 		// preconditions: m_cards is a valid identifier
 		Utilities.require(Utilities.isStringValidIdentifier(deckName),
 		    "LogicalDeck.getDeckFileHandle() error: deck name is invalid.");
@@ -185,7 +184,7 @@ public class Deck implements Serializable {
 	 * 
 	 * @return the name of the deck, for example "Chinese"
 	 */
-	public String getName() { // package private method
+	public String getName() {
 		return m_name;
 	}
 

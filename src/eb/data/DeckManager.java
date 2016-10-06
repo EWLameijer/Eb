@@ -9,7 +9,9 @@ import java.time.Duration;
 import java.util.logging.Logger;
 
 import eb.disk_io.CardConverter;
-import eb.mainwindow.reviewing.Reviewer;
+import eb.eventhandling.BlackBoard;
+import eb.eventhandling.Update;
+import eb.eventhandling.UpdateType;
 import eb.subwindow.StudyOptions;
 import eb.utilities.Utilities;
 
@@ -207,7 +209,7 @@ public class DeckManager {
 	 */
 	private static void reportDeckChangeEvent() {
 		// A new review session is needed.
-		Reviewer.start(null);
+		BlackBoard.post(new Update(UpdateType.DECK_CHANGED));
 	}
 
 	/**
@@ -253,7 +255,7 @@ public class DeckManager {
 		// postconditions: handled by callee.
 	}
 
-	public static Duration agetRememberedCardInterval() {
+	public static Duration getRememberedCardInterval() {
 		ensureDeckExists();
 		return m_deck.getStudyOptions().getRememberedCardInterval().asDuration();
 	}
