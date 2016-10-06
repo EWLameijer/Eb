@@ -1,9 +1,7 @@
 package eb.data;
 
 import java.io.Serializable;
-import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -96,55 +94,6 @@ public class Card implements Serializable {
 	}
 
 	/**
-	 * Returns the time till the next review of this card. The time can be
-	 * negative, as that information can help deprioritize 'over-ripe' cards which
-	 * likely have to be learned anew anyway.
-	 * 
-	 * @return the time till the next planned review of this card. Can be
-	 *         negative.
-	 */
-	public Duration getTimeUntilNextReview() {
-		// case 1: the card has never been reviewed yet. So take the creation
-		// instant and add the user-specified initial interval.
-		if (!hasBeenReviewed()) {
-			return Duration.between(Instant.now(),
-			    DeckManager.getInitialInterval().addTo(m_creationInstant));
-		} else {
-			// other cases: there have been previous reviews.
-			Review lastReview = getLastReview();
-			Instant lastReviewInstant = lastReview.getInstant();
-			Duration waitTime;
-			if (lastReview.wasSuccess()) {
-				waitTime = getIntervalAfterSuccessfulReview();
-			} else {
-				waitTime = DeckManager.getForgottenCardInterval();
-			}
-			Temporal officialReviewTime = waitTime.addTo(lastReviewInstant);
-			return Duration.between(Instant.now(), officialReviewTime);
-		}
-	}
-
-	/**
-	 * Returns the time to wait for the next review (the previous review being a
-	 * success).
-	 * 
-	 * @return the time to wait for the next review
-	 */
-	private Duration getIntervalAfterSuccessfulReview() {
-		Duration waitTime = DeckManager.getRememberedCardInterval();
-		double lengtheningFactor = DeckManager.getLengtheningFactor();
-		int numberOfReviews = m_reviews.size();
-		// if there are older reviews, loop over them
-		int ancestorReviewIndex = numberOfReviews - 2;
-		while (ancestorReviewIndex >= 0
-		    && m_reviews.get(ancestorReviewIndex).wasSuccess()) {
-			waitTime = Utilities.multiplyDurationBy(waitTime, lengtheningFactor);
-			ancestorReviewIndex--;
-		}
-		return waitTime;
-	}
-
-	/**
 	 * Returns the most recent review.
 	 * 
 	 * @return the most recent review.
@@ -167,14 +116,24 @@ public class Card implements Serializable {
 	 * @return true if the card has been reviewed at least once, false if the card
 	 *         has just been created.
 	 */
-	private boolean hasBeenReviewed() {
+	boolean hasBeenReviewed() {
 		// preconditions: none. Object exists
 		return !m_reviews.isEmpty();
 		// postconditions: none. Returns simple boolean.
 	}
 
 	/**
+	 * Returns the instant that this card was created.
+	 * 
+	 * @return the instant that this card was created
+	 */
+	Instant getCreationInstant() {
+		return m_creationInstant;
+	}
+
+	/**
 	 * Debugging function, helps check that the reviews have proceeded correctly.
+	 * Reports all reviews of this card performed so far.
 	 */
 	private void reportReviews() {
 		for (Review review : m_reviews) {
@@ -223,6 +182,24 @@ public class Card implements Serializable {
 		Utilities.require(Utilities.isStringValidIdentifier(back),
 		    "Card.setBack() error: " + "the given back is not a valid identifier");
 		m_textOnBack = back;
+	}
+
+	/**
+	 * How long the most recent streak is (2 uninterrupted successful reviews, 0
+	 * successful reviews (after a failure), and so on...)
+	 * 
+	 * @return the length of the current reviewing success streak (>=0)
+	 */
+	public int streakSize() {
+		int successfulReviewCount = 0;
+		int lastReviewIndex = m_reviews.size() - 1;
+		int currentReviewIndex = lastReviewIndex;
+		while (currentReviewIndex >= 0
+		    && m_reviews.get(currentReviewIndex).wasSuccess()) {
+			successfulReviewCount++;
+			currentReviewIndex--;
+		}
+		return successfulReviewCount;
 	}
 
 }

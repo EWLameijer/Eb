@@ -30,15 +30,17 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
 
+import eb.data.Deck;
 import eb.data.DeckManager;
 import eb.eventhandling.BlackBoard;
 import eb.eventhandling.Listener;
 import eb.eventhandling.Update;
 import eb.eventhandling.UpdateType;
+import eb.mainwindow.reviewing.ReviewManager;
 import eb.mainwindow.reviewing.ReviewPanel;
-import eb.mainwindow.reviewing.Reviewer;
 import eb.subwindow.ArchivingSettingsWindow;
 import eb.subwindow.CardEditingManager;
+import eb.subwindow.StudyOptions;
 import eb.subwindow.StudyOptionsWindow;
 import eb.utilities.TimeInterval;
 import eb.utilities.Utilities;
@@ -126,13 +128,15 @@ public class MainWindow extends JFrame implements Listener {
 		message.append("<html>");
 		message.append(getDeckSizeMessage());
 		message.append("<br>");
-		int numCards = DeckManager.getCurrentDeck().getCards().getSize();
-		int numReviewableCards = DeckManager.getCurrentDeck().getCards()
+		Deck currentDeck = DeckManager.getCurrentDeck();
+		StudyOptions currentStudyOptions = currentDeck.getStudyOptions();
+		int numCards = currentDeck.getCards().getSize();
+		int numReviewableCards = DeckManager.getCurrentDeck()
 		    .getReviewableCardList().size();
 		if (numCards > 0) {
 			message.append("Time till next review: ");
-			Duration timeUntilNextReviewAsDuration = DeckManager.getCurrentDeck()
-			    .getCards().getTimeUntilNextReview();
+			Duration timeUntilNextReviewAsDuration = currentDeck
+			    .getTimeUntilNextReview();
 			String timeUntilNextReviewAsText = Utilities
 			    .durationToString(timeUntilNextReviewAsDuration);
 			message.append(timeUntilNextReviewAsText);
@@ -146,24 +150,24 @@ public class MainWindow extends JFrame implements Listener {
 		message.append(getUICommands());
 		message.append("</html>");
 		m_messageLabel.setText(message.toString());
+		int numReviewingPoints = DeckManager.getCurrentDeck().getCards()
+		    .getReviewingPoints();
 
-		String title = "Eb: " + DeckManager.getName() + " (" + numCards + " "
-		    + Utilities.pluralize("card", numCards) + " in deck, "
-		    + numReviewableCards + " "
-		    + Utilities.pluralize("card", numReviewableCards)
+		String title = "Eb: " + DeckManager.getCurrentDeck().getName() + " ("
+		    + Utilities.pluralText(numReviewableCards, "card")
 		    + " to be reviewed in total";
 		if (m_state == MainWindowState.REVIEWING) {
-			title += ", " + Reviewer.getSession().cardsToGoYet() + " "
-			    + Utilities.pluralize("card", numReviewableCards)
+			title += ", " + Utilities
+			    .pluralText(ReviewManager.getInstance().cardsToGoYet(), "card")
 			    + " yet to be reviewed in the current session";
 		}
-		title += ")";
+		title += ", " + Utilities.pluralText(numCards, "card") + " in deck, "
+		    + Utilities.pluralText(numReviewingPoints, "point") + ")";
 
 		this.setTitle(title);
 		String reviewButtonText;
-		if (DeckManager.getStudyOptions().isTimed()) {
-			TimeInterval timeInterval = DeckManager.getStudyOptions()
-			    .getTimerInterval();
+		if (currentStudyOptions.isTimed()) {
+			TimeInterval timeInterval = currentStudyOptions.getTimerInterval();
 			reviewButtonText = "Review now (timed, " + timeInterval.getScalar() + " "
 			    + timeInterval.getUnit().getUserInterfaceName() + ")";
 		} else {
@@ -206,7 +210,7 @@ public class MainWindow extends JFrame implements Listener {
 			return false;
 		} else {
 			Duration timeUntilNextReviewAsDuration = DeckManager.getCurrentDeck()
-			    .getCards().getTimeUntilNextReview();
+			    .getTimeUntilNextReview();
 			return timeUntilNextReviewAsDuration.isNegative();
 		}
 	}
@@ -236,7 +240,7 @@ public class MainWindow extends JFrame implements Listener {
 				if (!Utilities.isStringValidIdentifier(deckName)) {
 					JOptionPane.showMessageDialog(null, "Sorry, \"" + deckName
 					    + "\" is not a valid name for a deck. Please choose another name.");
-				} else if (DeckManager.exists(deckName)) {
+				} else if (Deck.getDeckFileHandle(deckName).exists()) {
 					JOptionPane.showMessageDialog(null, "Sorry, the deck \"" + deckName
 					    + "\" already exists. Please choose another name.");
 				} else {
@@ -401,7 +405,7 @@ public class MainWindow extends JFrame implements Listener {
 		if (!Utilities.isStringValidIdentifier(deckName)) {
 			JOptionPane.showMessageDialog(null, "Sorry, \"" + deckName
 			    + "\" is not a valid name for a deck. Please choose another name.");
-		} else if (!DeckManager.exists(deckName)) {
+		} else if (!Deck.getDeckFileHandle(deckName).exists()) {
 			JOptionPane.showMessageDialog(null,
 			    "Sorry, the deck \"" + deckName + "\" does not exist yet.");
 		} else {
@@ -452,7 +456,8 @@ public class MainWindow extends JFrame implements Listener {
 
 	private void saveEbStatus() {
 		List<String> lines = new ArrayList<>();
-		lines.add("most_recently_reviewed_deck: " + DeckManager.getName());
+		lines.add("most_recently_reviewed_deck: "
+		    + DeckManager.getCurrentDeck().getName());
 		Path statusFilePath = Paths.get(EB_STATUS_FILE);
 		try {
 			Files.write(statusFilePath, lines, Charset.forName("UTF-8"));
@@ -473,7 +478,7 @@ public class MainWindow extends JFrame implements Listener {
 
 	private void showReviewingPanel() {
 		if (m_state != MainWindowState.REVIEWING) {
-			Reviewer.start(m_reviewPanel);
+			ReviewManager.getInstance().start(m_reviewPanel);
 			m_state = MainWindowState.REVIEWING;
 
 		}
@@ -489,7 +494,7 @@ public class MainWindow extends JFrame implements Listener {
 	private void showReactivePanel() {
 		updateMessageLabel();
 		if (mustReviewNow()) {
-			if (DeckManager.getStudyOptions().isTimed()) {
+			if (DeckManager.getCurrentDeck().getStudyOptions().isTimed()) {
 				m_state = MainWindowState.WAITING_FOR_TIMER_START;
 			} else {
 				showReviewingPanel();

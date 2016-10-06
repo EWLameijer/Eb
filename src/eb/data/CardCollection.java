@@ -2,8 +2,7 @@ package eb.data;
 
 import java.io.Serializable;
 import java.io.Writer;
-import java.time.Duration;
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -175,40 +174,30 @@ public class CardCollection implements Serializable {
 	}
 
 	/**
-	 * Returns the time that the user has to wait to the next review.
+	 * Returns the number of reviewing points of a deck, being the sum of the
+	 * latest "success streaks" of all cards in the deck. For example a fresh deck
+	 * will have 0 points, a 100 card deck where each card has has 2 successful
+	 * reviews 200 points, failing a review would bring that back to 2x99=198
+	 * points, and so on.
 	 * 
-	 * @return how long it will be until the next review.
+	 * @return the number of reviewing points of this deck.
 	 */
-	public Duration getTimeUntilNextReview() {
-		Utilities.require(!m_cards.isEmpty(),
-		    "LogicalDeck.getTimeUntilNextReview()) error: the time till next "
-		        + "review is undefined for an empty deck.");
-		Duration minimumTimeUntilNextReview = m_cards.get(0)
-		    .getTimeUntilNextReview();
+	public int getReviewingPoints() {
+		int totalPoints = 0;
 		for (Card card : m_cards) {
-			if (card.getTimeUntilNextReview()
-			    .compareTo(minimumTimeUntilNextReview) < 0) {
-				minimumTimeUntilNextReview = card.getTimeUntilNextReview();
-			}
+			totalPoints += card.streakSize();
 		}
-		return minimumTimeUntilNextReview;
+		return totalPoints;
 	}
 
 	/**
-	 * Returns a list of all the cards which should be reviewed at the current
-	 * moment and study settings.
+	 * Returns an iterator to the collection, so for example the Deck can loop
+	 * over the individual cards.
 	 * 
-	 * @return a list of all the cards which should be reviewed, given the current
-	 *         card collection and study settings.
+	 * @return an iterator to the cards.
 	 */
-	public List<Card> getReviewableCardList() {
-		List<Card> reviewableCards = new ArrayList<>();
-		for (Card card : m_cards) {
-			if (card.getTimeUntilNextReview().isNegative()) {
-				reviewableCards.add(card);
-			}
-		}
-		return reviewableCards;
+	public Iterator<Card> getIterator() {
+		return m_cards.iterator();
 	}
 
 }

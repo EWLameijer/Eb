@@ -7,6 +7,13 @@ Otherwise, debug until 4x10 continuously sufficiently satisfied with performance
 
 
 Philosophical question: 
+Ideally, the card should know the settings? Basically, what happens if something needs data from different leaves of the tree? Well, then ideally it should be calculated in the root, based on data delivered by the leaves.
+
+Design decision time.
+
+Alternative 1: you make a backpointer from Card to CardCollection, and from CardCollection to Deck. => Backpointers are really inelegant. Duplication of data, please do not.
+Alternative 2: pointer from Card to StudyOptions object => needs to be duplicated over every card. Please do not.
+
 
 
 MCV
@@ -26,13 +33,60 @@ Okay. Wat is the problem? Basically that the reviewsession needs a panel.
 
 [m/p] 
 
-
-
-
-
-
 Current projects:
 Bugs (urgent) 
+Problem: when swapping deck, the collection of reviewable cards is not necessarily reset
+
+Writing:
+
+I suppose now the loading event produces the blackboard
+Well, intuitively one possibility is that a deck swap event from the GUI goes to the blackboard, which then first updates the deck and then updates the reviewing stack. However, a listener is not the best way to deal with this as the sequence should in reality be fixed, which blackboards cannot guarantee.
+
+This means the second option, that the deck swap, which is dominant should start the event. Which happens.
+
+The only problem is that the reviewSession needs access to the Review Panel, which is an UI element - which is of course lacking. Why does it need the link to the review panel?
+
+Well, because it 
+
+Model View Controller 
+
+The ReviewPanel is the View.
+The ReviewSession is the Model 
+The ReviewManager is the Controller
+
+The Model should not know about the View.
+Ideally, the View should not know about the Model. It should send commands to the Controller.
+
+Okay. By making the reviewManager a singleton, I can turn it into a listener to all kinds of events. For example a deck swap.
+
+Let wel: een reviewSession: heeft cards, en hoe zit het met de timer?
+
+Je hebt basaal een collectie kaarten, waarvan een deel al gereviewd is, een ander deel niet.
+Wat neerkomt op een List met iets van een iterator (die de currentCard aangeeft)
+Wat leidt tot het fundamentele probleem: horen de timers e.d. bij de reviewSession?
+
+
+Wat is een natuurlijke manier?
+
+Begin bij het begin
+
+Bij het starten van Eb registreert de ReviewManager zich eerst als luisteraar. => OK
+BIj het starten van Eb wordt een Deck geladen. => OK
+Als het deck geladen wordt, wordt er een "deck swapped"-signaal afgegeven => OK
+De ReviewManager hoort het signaal, en bouwt een nieuwe ReviewSessie, gebaseerd op het Deck.
+
+
+
+
+
+	-General: write down time spent on design - looking for place to modify - coding - debugging
+	Bug (still) when reviewing - adding card, does not clear...
+	
+	
+	Can you check whether other Eb instance is running?
+	Allow browsing functionality (to find/edit card)
+	?Avoid 2 copies of the same deck open at the same time...
+	-\n probleem met maken/lezen archives. Auto-remove?
 	-mnemonics do not work for summarizing panel! [5 per dag]
 		Reproduce: Can reproduce. (2 cards, but session size 1)
 		Go to next /  Back to information screen don't work.
@@ -86,13 +140,14 @@ Small features
 Larger features (consider carefully)
 	?
 Refactorings:
-	~ The time interval methods in Card - should they not be placed elsewhere?
+	~ The time interval methods in Card - should they not be placed elsewhere? => Yes, probably in Deck itself.
 	
 Refactoring 
 	data 
 		Card OK 
 		CardCollection OK
 		Deck OK
+		DeckManager, busy with p5
 		
 		
 

@@ -1,6 +1,16 @@
 package eb;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
+
+//http://stackoverflow.com/questions/10508846/how-to-make-sure-that-only-a-single-instance-of-a-java-application-is-running
+
+import javax.swing.JOptionPane;
+
+import eb.eventhandling.BlackBoard;
+import eb.eventhandling.UpdateType;
 import eb.mainwindow.MainWindow;
+import eb.mainwindow.reviewing.ReviewManager;
 
 /**
  * Runs Eb.
@@ -24,6 +34,37 @@ public class Eb {
 	 *          not used
 	 */
 	public static void main(String[] args) {
-		MainWindow.display();
-	}
+		// Avoid multiple instances of Eb running at same time. From
+		// http://stackoverflow.com/questions/19082265/how-to-ensure-only-one-instance-of-a-java-program-can-be-executed
+
+		/*
+		 * The method ManagementFactory.getRuntimeMXBean() returns an identifier
+		 * with application PID in the Sun JVM, but each JVM may have you own
+		 * implementation. So in a JVM, other than Sun, this code may not work., :(
+		 */
+		RuntimeMXBean rt = ManagementFactory.getRuntimeMXBean();
+		final int runtimePid = Integer
+		    .parseInt(rt.getName().substring(0, rt.getName().indexOf("@")));
+
+		java.awt.EventQueue.invokeLater(new Runnable() {
+			public void run() {
+
+				// If exists another instance, show message and terminates the current
+				// instance.
+				// Otherwise starts application.
+
+				/* getMonitoredVMs(runtimePid) */
+				if (true) {
+					ReviewManager reviewManager = ReviewManager.getInstance();
+					BlackBoard.register(reviewManager, UpdateType.DECK_SWAPPED);
+					BlackBoard.register(reviewManager, UpdateType.CARD_CHANGED);
+					BlackBoard.register(reviewManager, UpdateType.DECK_CHANGED);
+					MainWindow.display();
+				} else
+					JOptionPane.showMessageDialog(null,
+					    "There is another instance of this application running.");
+
+			}
+		});
+	};
 }

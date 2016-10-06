@@ -76,7 +76,7 @@ public class StudyOptionsWindow extends JFrame implements Listener {
 	private StudyOptionsWindow() {
 		// preconditions: none (default constructor...)
 		super();
-		StudyOptions studyOptions = DeckManager.getStudyOptions();
+		StudyOptions studyOptions = DeckManager.getCurrentDeck().getStudyOptions();
 		m_initialIntervalBox = TimeInputElement.createInstance(
 		    "Initial review after", studyOptions.getInitialInterval());
 		m_sizeOfReview = new LabelledTextField(
@@ -115,7 +115,8 @@ public class StudyOptionsWindow extends JFrame implements Listener {
 		// has been constructed already.
 		StudyOptions guiStudyOptions = gatherUIDataIntoStudyOptionsObject();
 		String title = "Study Options";
-		StudyOptions deckStudyOptions = DeckManager.getStudyOptions();
+		StudyOptions deckStudyOptions = DeckManager.getCurrentDeck()
+		    .getStudyOptions();
 		if (guiStudyOptions.equals(deckStudyOptions)) {
 			title += " - no unsaved changes";
 		} else {
@@ -163,7 +164,7 @@ public class StudyOptionsWindow extends JFrame implements Listener {
 	 */
 	private void loadCurrentDeckSettings() {
 		// preconditions: none
-		loadSettings(DeckManager.getStudyOptions());
+		loadSettings(DeckManager.getCurrentDeck().getStudyOptions());
 		// postconditions: none
 	}
 
@@ -233,11 +234,13 @@ public class StudyOptionsWindow extends JFrame implements Listener {
 		settingsBox.add(m_timeToWaitAfterCorrectReview);
 		settingsBox.add(m_lengtheningFactor);
 		settingsBox.add(m_timeToWaitAfterIncorrectReview);
-		TimedModus timedModus = DeckManager.getStudyOptions().getTimedModus();
+		StudyOptions currentStudyOptions = DeckManager.getCurrentDeck()
+		    .getStudyOptions();
+		TimedModus timedModus = currentStudyOptions.getTimedModus();
 		m_timedModus.setTo(timedModus.getName());
 		settingsBox.add(m_timedModus);
 		settingsBox.add(m_timeForTimer);
-		m_timeForTimer.setVisible(DeckManager.getStudyOptions().isTimed());
+		m_timeForTimer.setVisible(currentStudyOptions.isTimed());
 		settingsPane.add(settingsBox, BorderLayout.NORTH);
 
 		buttonsPane.add(m_cancelButton);

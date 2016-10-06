@@ -10,6 +10,7 @@ public class CardCreatingWindow extends CardEditingWindow {
 	@Override
 	void init() {
 		super.init();
+
 	}
 
 }

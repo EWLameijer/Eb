@@ -1,12 +1,14 @@
 package eb.mainwindow.reviewing;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
 import eb.data.Card;
+import eb.data.Deck;
 import eb.data.DeckManager;
 import eb.data.Review;
 import eb.eventhandling.BlackBoard;
@@ -16,19 +18,151 @@ import eb.eventhandling.UpdateType;
 import eb.mainwindow.MainWindowState;
 import eb.utilities.Utilities;
 
-public class ReviewSession implements Listener {
+/**
+ * FirstTimer registers a time the first time it is activated (set). Subsequent
+ * settings do not change its value. Is useful if something has to happen
+ * multiple times (like repainting) but only the instant of first usage is
+ * important.
+ * 
+ * @author Eric-Wubbo Lameijer
+ */
+class FirstTimer {
+	Instant m_firstInstant;
+
+	FirstTimer() {
+		reset();
+	}
+
+	void press() {
+		if (m_firstInstant == null) {
+			m_firstInstant = Instant.now();
+		} // else: instant already recorded, no nothing
+	}
+
+	void reset() {
+		m_firstInstant = null;
+	}
+
+	Instant getInstant() {
+		Utilities.require(m_firstInstant != null, "FirstTimer.getInstant() "
+		    + "error: attempt to use time object before any time has been registered.");
+		return m_firstInstant;
+	}
+
+}
+
+/**
+ * Manages the review session much like Deck manages the LogicalDeck: there can
+ * only be one review at a time
+ * 
+ * @author Eric-Wubbo Lameijer
+ *
+ */
+public class ReviewManager implements Listener {
+
+	// the instance needed for the Singleton pattern
+	private static ReviewManager m_instance;
+
+	private ReviewPanel m_reviewPanel;
+	private Deck m_currentDeck;
 	private List<Card> m_cardCollection;
 	private int m_counter;
 	private FirstTimer m_startTimer = new FirstTimer();
 	private FirstTimer m_stopTimer = new FirstTimer();
-	private final ReviewPanel m_reviewPanel;
 	private boolean m_showAnswer;
 
-	ReviewSession(ReviewPanel reviewPanel) {
-		m_reviewPanel = reviewPanel;
-		int maxNumReviews = DeckManager.getStudyOptions().getReviewSessionSize();
-		List<Card> reviewableCards = DeckManager.getCurrentDeck().getCards()
-		    .getReviewableCardList();
+	/**
+	 * To disable implicit public constructor
+	 */
+	private ReviewManager() {
+	}
+
+	public static ReviewManager getInstance() {
+		if (m_instance == null) {
+			m_instance = new ReviewManager();
+		}
+		return m_instance;
+	}
+
+	public void start(ReviewPanel reviewPanel) {
+		if (reviewPanel != null) {
+			m_reviewPanel = reviewPanel;
+			m_currentDeck = DeckManager.getContents();
+		}
+	}
+
+	private void ensureReviewSessionIsValid() {
+		if (m_currentDeck != DeckManager.getContents()
+		    || m_cardCollection == null) {
+			m_currentDeck = DeckManager.getContents();
+			initializeReviewSession();
+		}
+	}
+
+	public List<Review> getReviewResults() {
+		ensureReviewSessionIsValid();
+		List<Review> listOfReviews = new ArrayList<>();
+		for (Card card : m_cardCollection) {
+			listOfReviews.add(card.getLastReview());
+		}
+		return listOfReviews;
+	}
+
+	public String getCurrentFront() {
+		ensureReviewSessionIsValid();
+		if (activeCardExists()) {
+			return getCurrentCard().getFront();
+		} else {
+			return "";
+		}
+	}
+
+	public void wasRemembered(boolean wasRemembered) {
+		ensureReviewSessionIsValid();
+		Duration duration = Duration.between(m_startTimer.getInstant(),
+		    m_stopTimer.getInstant());
+		double duration_in_s = duration.getNano() / 1000_000_000.0
+		    + duration.getSeconds();
+		Logger.getGlobal().info(m_counter + " " + duration_in_s);
+		Review review = new Review(duration, wasRemembered);
+		getCurrentCard().addReview(review);
+		moveToNextReviewOrEnd();
+	}
+
+	@Override
+	public void respondToUpdate(Update update) {
+		if (update.getType() == UpdateType.CARD_CHANGED) {
+			// updatePanels();
+		} else if (update.getType() == UpdateType.DECK_CHANGED) {
+			// It can be that the current card has been deleted, OR another card has
+			// been deleted.
+			initializeReviewSession();
+		} else if (update.getType() == UpdateType.DECK_SWAPPED) {
+			// cleanUp();
+		}
+	}
+
+	public void showAnswer() {
+		ensureReviewSessionIsValid();
+		m_stopTimer.press();
+		m_showAnswer = true;
+		updatePanels();
+	}
+
+	/**
+	 * Updates the panels
+	 */
+	public void updatePanels() {
+		if (activeCardExists()) {
+			String currentBack = m_showAnswer ? getCurrentBack() : "";
+			m_reviewPanel.updatePanels(getCurrentFront(), currentBack, m_showAnswer);
+		}
+	}
+
+	private void initializeReviewSession() {
+		Deck currentDeck = DeckManager.getCurrentDeck();
+		int maxNumReviews = currentDeck.getStudyOptions().getReviewSessionSize();
+		List<Card> reviewableCards = currentDeck.getReviewableCardList();
 		int totalNumberOfReviewableCards = reviewableCards.size();
 		Logger.getGlobal()
 		    .info("Number of reviewable cards is " + totalNumberOfReviewableCards);
@@ -37,32 +171,16 @@ public class ReviewSession implements Listener {
 		// now, for best effect, those cards which have expired more recently should
 		// be rehearsed first, as other cards probably need to be relearned anyway,
 		// and we should try to contain the damage.
-		reviewableCards
-		    .sort((firstCard, secondCard) -> secondCard.getTimeUntilNextReview()
-		        .compareTo(firstCard.getTimeUntilNextReview()));
+		reviewableCards.sort((firstCard, secondCard) -> currentDeck
+		    .getTimeUntilNextReview(secondCard)
+		    .compareTo(currentDeck.getTimeUntilNextReview(firstCard)));
 		// get the first n for the review
 		m_cardCollection = new ArrayList<>(
 		    reviewableCards.subList(0, numCardsToBeReviewed));
 		Collections.shuffle(m_cardCollection);
-		BlackBoard.register(this, UpdateType.CARD_CHANGED);
-		BlackBoard.register(this, UpdateType.DECK_CHANGED);
-		BlackBoard.register(this, UpdateType.DECK_SWAPPED);
+
 		m_counter = 0;
 		startCardReview();
-	}
-
-	@Override
-	public void respondToUpdate(Update update) {
-		if (update.getType() == UpdateType.CARD_CHANGED) {
-			updatePanels();
-		} else if (update.getType() == UpdateType.DECK_CHANGED) {
-			// It can be that the current card has been deleted, OR another card has
-			// been deleted.
-			updateCollection();
-		} else if (update.getType() == UpdateType.DECK_SWAPPED) {
-			cleanUp();
-		}
-
 	}
 
 	private void startCardReview() {
@@ -79,15 +197,7 @@ public class ReviewSession implements Listener {
 		return m_cardCollection.get(m_counter);
 	}
 
-	public String getCurrentFront() {
-		if (activeCardExists()) {
-			return getCurrentCard().getFront();
-		} else {
-			return "";
-		}
-	}
-
-	public String getCurrentBack() {
+	private String getCurrentBack() {
 		if (activeCardExists()) {
 			return getCurrentCard().getBack();
 		} else {
@@ -99,30 +209,11 @@ public class ReviewSession implements Listener {
 		return m_counter < m_cardCollection.size();
 	}
 
-	/**
-	 * Wipes the review session.
-	 */
-	private void cleanUp() {
-		BlackBoard.unRegister(this);
-	}
-
-	public void wasRemembered(boolean remembered) {
-		Duration duration = Duration.between(m_startTimer.getInstant(),
-		    m_stopTimer.getInstant());
-		double duration_in_s = duration.getNano() / 1000_000_000.0
-		    + duration.getSeconds();
-		Logger.getGlobal().info(m_counter + " " + duration_in_s);
-		Review review = new Review(duration, remembered);
-		getCurrentCard().addReview(review);
-		moveToNextReviewOrEnd();
-	}
-
 	private void moveToNextReviewOrEnd() {
 		if (hasNextCard()) {
 			m_counter++;
 			startCardReview();
 		} else {
-			cleanUp();
 			BlackBoard.post(new Update(UpdateType.PROGRAMSTATE_CHANGED,
 			    MainWindowState.SUMMARIZING.name()));
 		}
@@ -142,7 +233,7 @@ public class ReviewSession implements Listener {
 	 * 
 	 * @return whether there is a next card to study.
 	 */
-	public boolean hasNextCard() {
+	private boolean hasNextCard() {
 		return m_counter + 1 <= indexOfLastCard();
 	}
 
@@ -152,26 +243,8 @@ public class ReviewSession implements Listener {
 	 * @return the number of cards that still must be reviewed in this session.
 	 */
 	public int cardsToGoYet() {
+		ensureReviewSessionIsValid();
 		return m_cardCollection.size() - m_counter;
-	}
-
-	public List<Review> getReviewResults() {
-		List<Review> listOfReviews = new ArrayList<>();
-		for (Card card : m_cardCollection) {
-			listOfReviews.add(card.getLastReview());
-		}
-		return listOfReviews;
-	}
-
-	public void updatePanels() {
-		String currentBack = m_showAnswer ? getCurrentBack() : "";
-		m_reviewPanel.updatePanels(getCurrentFront(), currentBack, m_showAnswer);
-	}
-
-	public void showAnswer() {
-		m_stopTimer.press();
-		m_showAnswer = true;
-		updatePanels();
 	}
 
 	/**
@@ -211,4 +284,5 @@ public class ReviewSession implements Listener {
 		return DeckManager.getCurrentDeck().getCards().getCardWithFront(front)
 		    .isPresent();
 	}
+
 }
