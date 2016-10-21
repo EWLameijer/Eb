@@ -132,11 +132,12 @@ public class ReviewManager implements Listener {
 	@Override
 	public void respondToUpdate(Update update) {
 		if (update.getType() == UpdateType.CARD_CHANGED) {
-			// updatePanels();
+			updatePanels();
 		} else if (update.getType() == UpdateType.DECK_CHANGED) {
 			// It can be that the current card has been deleted, OR another card has
 			// been deleted.
-			initializeReviewSession();
+			// initializeReviewSession();
+			updateCollection();
 		} else if (update.getType() == UpdateType.DECK_SWAPPED) {
 			// cleanUp();
 		}

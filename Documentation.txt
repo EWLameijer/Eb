@@ -1,3 +1,6 @@
+-> edit card bug: card is not updated anymore after editing
+-> card insert bug: review set is reset after card insert, while it should only be affected (and minimally at that!) after card deletions.
+
 *Strategy: if 4x10 test works sufficiently AND saving project works to
 phase 2, switch Programming to it 
 + start Chinese [5 min per 120 min non-maintenance]. 
@@ -5,6 +8,7 @@ Otherwise, debug until 4x10 continuously sufficiently satisfied with performance
 
 [Note: duolingo: investigate new courses only start of month. Investigated 0106, Vietnamese. Klingon still hatching (25%) Next: 0107 or further]
 
+edit card bug: 
 
 Philosophical question: 
 Ideally, the card should know the settings? Basically, what happens if something needs data from different leaves of the tree? Well, then ideally it should be calculated in the root, based on data delivered by the leaves.
