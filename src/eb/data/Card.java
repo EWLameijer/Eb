@@ -203,8 +203,8 @@ public class Card implements Serializable {
 	}
 
 	public String getHistory() {
-		"TODO"@@@""
-		return null;
+		String output = String.valueOf(m_reviews.size());
+		return output;
 	}
 
 }

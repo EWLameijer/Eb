@@ -125,7 +125,7 @@ public class DeckManager {
 			if (loadedDeck != null) {
 				m_deck = loadedDeck;
 				m_deck.fixNewFields();
-				reportDeckChangeEvent();
+				BlackBoard.post(new Update(UpdateType.DECK_SWAPPED));
 			} else {
 				Utilities.require(false,
 				    "Deck.loadDeck() error: the requested deck " + "cannot be loaded.");
@@ -228,7 +228,7 @@ public class DeckManager {
 		try (ObjectOutputStream objOutStream = new ObjectOutputStream(
 		    new FileOutputStream(m_deck.getFileHandle()))) {
 			objOutStream.writeObject(m_deck);
-			m_deck.saveDeckToTextfile();
+			m_deck.saveDeckToTextfiles();
 		} catch (final Exception e) {
 			// Something goes wrong with serializing the deck; so
 			// you cannot create the file.

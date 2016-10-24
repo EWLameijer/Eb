@@ -139,6 +139,7 @@ public class ReviewManager implements Listener {
 			// initializeReviewSession();
 			updateCollection();
 		} else if (update.getType() == UpdateType.DECK_SWAPPED) {
+			initializeReviewSession();
 			// cleanUp();
 		}
 	}
@@ -284,6 +285,16 @@ public class ReviewManager implements Listener {
 	private boolean deckContainsCardWithThisFront(String front) {
 		return DeckManager.getCurrentDeck().getCards().getCardWithFront(front)
 		    .isPresent();
+	}
+
+	/**
+	 * Allows the GUI to initialize the panel that displays the reviews
+	 * 
+	 * @param reviewPanel
+	 *          the name of the panel in which the reviews are performed.
+	 */
+	public void setPanel(ReviewPanel reviewPanel) {
+		m_reviewPanel = reviewPanel;
 	}
 
 }

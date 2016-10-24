@@ -13,9 +13,11 @@ import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Function;
 import java.util.logging.Logger;
 
 import eb.Eb;
+import eb.disk_io.CardConverter;
 import eb.subwindow.ArchivingSettings;
 import eb.subwindow.StudyOptions;
 import eb.utilities.Utilities;
@@ -97,10 +99,12 @@ public class Deck implements Serializable {
 		String textFileName = baseFileName + ".txt";
 		String reviewFileName = baseFileName + "_reviews.txt";
 
-		createTextFile(textFileName);
+		createTextFile(textFileName, CardConverter::cardToLine);
+		createTextFile(reviewFileName, CardConverter::reviewHistoryToLine);
 	}
 
-	private void createTextFile(String fileName) {
+	private void createTextFile(String fileName,
+	    Function<Card, String> outputter) {
 		// Phase 2: write the deck itself
 		try (BufferedWriter outputFile = new BufferedWriter(
 		    new OutputStreamWriter(new FileOutputStream(fileName), "UTF-8"));) {
@@ -111,7 +115,7 @@ public class Deck implements Serializable {
 			outputFile.write(HEADER_BODY_SEPARATOR + Utilities.EOL);
 
 			// Phase 2b: write the card data
-			m_cardCollection.writeCards(outputFile);
+			m_cardCollection.writeCards(outputFile, outputter);
 
 		} catch (Exception e) {
 			Logger.getGlobal().info(e + "");

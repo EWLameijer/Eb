@@ -1,3 +1,5 @@
+Problem: deck loaded before Review panel is given to ReviewManager
+
 -> load deck bug: when a new deck is loaded that starts with a review, the first card is not shown correctly
 -> add card problem: again! (why???)
 

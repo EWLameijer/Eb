@@ -313,6 +313,7 @@ public class MainWindow extends JFrame implements Listener {
 		m_modesContainer.add(informationPanel, INFORMATION_PANEL_ID);
 		m_reviewPanel = new ReviewPanel();
 		m_modesContainer.add(m_reviewPanel, REVIEW_PANEL_ID);
+		ReviewManager.getInstance().setPanel(m_reviewPanel);
 		JPanel summarizingPanel = new SummarizingPanel();
 		m_modesContainer.add(summarizingPanel, SUMMARIZING_PANEL_ID);
 		TimedReviewStartPanel timedReviewStartPanel = new TimedReviewStartPanel();

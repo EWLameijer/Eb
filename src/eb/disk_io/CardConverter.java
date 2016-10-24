@@ -6,6 +6,7 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.function.Function;
 import java.util.logging.Logger;
 
 import eb.data.Card;
@@ -101,9 +102,10 @@ public class CardConverter {
 	 * @param card
 	 *          the card to write to the writer
 	 */
-	public static void writeLine(Writer writer, Card card) {
+	public static void writeLine(Writer writer, Card card,
+	    Function<Card, String> outputter) {
 		try {
-			writer.write(cardToLine(card));
+			writer.write(outputter.apply(card));
 		} catch (IOException e) {
 			Logger.getGlobal().info(e + "");
 		}

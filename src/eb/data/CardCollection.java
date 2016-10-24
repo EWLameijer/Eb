@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 import eb.disk_io.CardConverter;
 import eb.eventhandling.BlackBoard;
@@ -59,11 +60,11 @@ public class CardCollection implements Serializable {
 	 * @param writer
 	 *          the writer to which the cards have to be written.
 	 */
-	public void writeCards(Writer writer) {
+	public void writeCards(Writer writer, Function<Card, String> outputter) {
 		m_cards.stream()
 		    .sorted((firstCard, secondCard) -> firstCard.getFront()
 		        .compareTo(secondCard.getFront()))
-		    .forEach(card -> CardConverter.writeLine(writer, card));
+		    .forEach(card -> CardConverter.writeLine(writer, card, outputter));
 	}
 
 	/**
