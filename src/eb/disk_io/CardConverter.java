@@ -75,6 +75,25 @@ public class CardConverter {
 	}
 
 	/**
+	 * The reviewHistoryToLine method transforms the review data of a card to a
+	 * line, for purposes of saving it to a format that is easier to restore from
+	 * than Java's standard 'blobs'. (Note that I could also use GoogleProto here,
+	 * but my Java skills are not yet sufficient to handle that level of added
+	 * complexity)
+	 * 
+	 * @param card
+	 *          the card of which the review history must be saved.
+	 * @return a newline-terminated String containing the front and review history
+	 *         of the card.
+	 */
+	public static String reviewHistoryToLine(Card card) {
+		Utilities.require(card != null,
+		    "CardConverter.reviewHistoryToLine() error: "
+		        + "the card to be converted cannot be null.");
+		return card.getFront() + SEPARATOR + card.getHistory() + Utilities.EOL;
+	}
+
+	/**
 	 * Writes a single card, converted to a line, to the given writer.
 	 * 
 	 * @param writer

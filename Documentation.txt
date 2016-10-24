@@ -1,5 +1,5 @@
--> edit card bug: card is not updated anymore after editing
--> card insert bug: review set is reset after card insert, while it should only be affected (and minimally at that!) after card deletions.
+-> load deck bug: when a new deck is loaded that starts with a review, the first card is not shown correctly
+-> add card problem: again! (why???)
 
 *Strategy: if 4x10 test works sufficiently AND saving project works to
 phase 2, switch Programming to it 

@@ -202,4 +202,9 @@ public class Card implements Serializable {
 		return successfulReviewCount;
 	}
 
+	public String getHistory() {
+		"TODO"@@@""
+		return null;
+	}
+
 }
