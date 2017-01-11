@@ -1,3 +1,4 @@
+TEST!
 *Strategy: if 4x10 test works sufficiently AND saving project works to
 phase 2, switch Programming to it 
 + start Chinese [5 min per 120 min non-maintenance]. 
