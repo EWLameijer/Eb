@@ -63,26 +63,35 @@ public class MainWindow extends JFrame implements Listener {
 	// the regular "reviewing" window, which should be active most of the
 	// time.
 	private final JLabel m_messageLabel;
+	
+	// IDs of the various panels, necessary for adding them to the CardLayout of the main panel
 	private static final String REVIEW_PANEL_ID = "REVIEWING_PANEL";
 	private static final String INFORMATION_PANEL_ID = "INFORMATION_PANEL";
 	private static final String SUMMARIZING_PANEL_ID = "SUMMARIZING_PANEL";
 	private static final String TIMED_REVIEW_START_PANEL_ID = "TIMER_START_PANEL";
 
+	// the name of the file that contains which deck has been consulted last
 	private static final String EB_STATUS_FILE = "eb_status.txt";
 
+	// the initial state of the main window
 	private MainWindowState m_state = MainWindowState.REACTIVE;
 
+	// button the user can press to start reviewing. Only visible if the user for some reason
+	// decides to not review cards yet (usually by having one rounds of review, and then 
+	// stopping the reviewing)
 	private final JButton m_startReviewingButton = new JButton();
 
 	// Contains the REVIEWING_PANEL and the INFORMATION_PANEL, using a CardLayout.
 	private final JPanel m_modesContainer;
 
+	// The reviewing panel
 	private ReviewPanel m_reviewPanel;
 
+	// To regularly update how long it is until the next reviewing session
 	private Timer m_messageUpdater;
 
 	/**
-	 * MainWindow constructor.
+	 * MainWindow constructor. Sets title of the window, and creates some widgets.
 	 */
 	MainWindow() {
 		// preconditions: none
@@ -118,21 +127,16 @@ public class MainWindow extends JFrame implements Listener {
 		    + DeckManager.getCurrentDeck().getCards().getSize() + " cards.";
 		// postconditions: none
 	}
-
+	
 	/**
-	 * Gives the message label its correct (possibly updated) value.
+	 * Returns text indicating how long it will be to the next review
+	 * 
+	 * @return text indicating the time to the next review
 	 */
-	void updateMessageLabel() {
-		// preconditions: none
-		StringBuilder message = new StringBuilder("");
-		message.append("<html>");
-		message.append(getDeckSizeMessage());
-		message.append("<br>");
-		Deck currentDeck = DeckManager.getCurrentDeck();
-		StudyOptions currentStudyOptions = currentDeck.getStudyOptions();
+	String getTimeToNextReviewMessage() {
+		StringBuilder message = new StringBuilder();
+    Deck currentDeck = DeckManager.getCurrentDeck();	
 		int numCards = currentDeck.getCards().getSize();
-		int numReviewableCards = DeckManager.getCurrentDeck()
-		    .getReviewableCardList().size();
 		if (numCards > 0) {
 			message.append("Time till next review: ");
 			Duration timeUntilNextReviewAsDuration = currentDeck
@@ -147,13 +151,32 @@ public class MainWindow extends JFrame implements Listener {
 			// no cards
 			m_startReviewingButton.setVisible(false);
 		}
+		return message.toString();
+	}
+
+	/**
+	 * Updates the message label (the information inside the main window, like time to next review)
+	 */
+	void updateMessageLabel() {
+		StringBuilder message = new StringBuilder();
+		message.append("<html>");
+		message.append(getDeckSizeMessage());
+		message.append("<br>");
+		message.append(getTimeToNextReviewMessage());		
 		message.append(getUICommands());
 		message.append("</html>");
 		m_messageLabel.setText(message.toString());
-		int numReviewingPoints = DeckManager.getCurrentDeck().getCards()
-		    .getReviewingPoints();
+	}
+	
+	/**
+	 * Updates the title of the window, which contains information like the number of cards in the deck
+	 */
+	void updateWindowTitle() {
+		Deck currentDeck = DeckManager.getCurrentDeck();
+		int numReviewingPoints = currentDeck.getCards().getReviewingPoints();
 
-		String title = "Eb: " + DeckManager.getCurrentDeck().getName() + " ("
+		int numReviewableCards = currentDeck.getReviewableCardList().size();
+		String title = "Eb: " + currentDeck.getName() + " ("
 		    + Utilities.pluralText(numReviewableCards, "card")
 		    + " to be reviewed in total";
 		if (m_state == MainWindowState.REVIEWING) {
@@ -161,11 +184,19 @@ public class MainWindow extends JFrame implements Listener {
 			    .pluralText(ReviewManager.getInstance().cardsToGoYet(), "card")
 			    + " yet to be reviewed in the current session";
 		}
+		int numCards = currentDeck.getCards().getSize();
 		title += ", " + Utilities.pluralText(numCards, "card") + " in deck, "
 		    + Utilities.pluralText(numReviewingPoints, "point") + ")";
 
 		this.setTitle(title);
+	}
+	
+	/**
+	 * Updates the text on the review button
+	 */
+	void updateReviewButtonText() {
 		String reviewButtonText;
+		StudyOptions currentStudyOptions = DeckManager.getCurrentDeck().getStudyOptions();
 		if (currentStudyOptions.isTimed()) {
 			TimeInterval timeInterval = currentStudyOptions.getTimerInterval();
 			reviewButtonText = "Review now (timed, " + timeInterval.getScalar() + " "
@@ -174,9 +205,15 @@ public class MainWindow extends JFrame implements Listener {
 			reviewButtonText = "Review now";
 		}
 		m_startReviewingButton.setText(reviewButtonText);
-		// this.getContentPane().repaint();
-		// postconditions: none (well, the label should have some text, but I'm
-		// willing to trust that that happens.
+	}
+	
+	/**
+	 * Gives the message label its correct (possibly updated) value.
+	 */
+	void updateOnScreenInformation() {
+		updateMessageLabel();
+		updateWindowTitle();
+		updateReviewButtonText();
 	}
 
 	void showCorrectPanel() {
@@ -249,7 +286,7 @@ public class MainWindow extends JFrame implements Listener {
 					DeckManager.createDeckWithName(deckName);
 					// reset window
 					m_state = MainWindowState.REACTIVE;
-					updateMessageLabel();
+					updateOnScreenInformation();
 					m_messageUpdater.start();
 
 					return;
@@ -339,7 +376,7 @@ public class MainWindow extends JFrame implements Listener {
 		BlackBoard.register(this, UpdateType.PROGRAMSTATE_CHANGED);
 		m_messageUpdater = new Timer(100, e -> showCorrectPanel());
 		m_messageUpdater.start();
-		updateMessageLabel();
+		updateOnScreenInformation();
 		// postconditions: none
 	}
 
@@ -395,7 +432,7 @@ public class MainWindow extends JFrame implements Listener {
 				DeckManager.loadDeck(deckName);
 				// reset window
 				m_state = MainWindowState.REACTIVE;
-				updateMessageLabel();
+				updateOnScreenInformation();
 				m_messageUpdater.start();
 				return;
 			}
@@ -474,17 +511,19 @@ public class MainWindow extends JFrame implements Listener {
 
 	private void showInformationPanel() {
 		switchToPanel(INFORMATION_PANEL_ID);
-		updateMessageLabel();
+		updateOnScreenInformation();
 	}
 
+	/**
+	 * Shows the reviewing panel
+	 */
 	private void showReviewingPanel() {
 		if (m_state != MainWindowState.REVIEWING) {
 			ReviewManager.getInstance().start(m_reviewPanel);
 			m_state = MainWindowState.REVIEWING;
-
 		}
 		switchToPanel(REVIEW_PANEL_ID);
-		updateMessageLabel();
+		updateOnScreenInformation();
 	}
 
 	/**
@@ -493,7 +532,7 @@ public class MainWindow extends JFrame implements Listener {
 	 * reviewed.
 	 */
 	private void showReactivePanel() {
-		updateMessageLabel();
+		updateOnScreenInformation();
 		if (mustReviewNow()) {
 			if (DeckManager.getCurrentDeck().getStudyOptions().isTimed()) {
 				m_state = MainWindowState.WAITING_FOR_TIMER_START;
@@ -511,7 +550,7 @@ public class MainWindow extends JFrame implements Listener {
 		} else if (update.getType() == UpdateType.PROGRAMSTATE_CHANGED) {
 			m_state = MainWindowState.valueOf(update.getContents());
 			m_reviewPanel.refresh(); // there may be new cards to refresh
-			updateMessageLabel();
+			updateOnScreenInformation();
 			showCorrectPanel();
 		} else if (update.getType() == UpdateType.DECK_SWAPPED) {
 			MainWindowState newState = (mustReviewNow()) ? MainWindowState.REVIEWING

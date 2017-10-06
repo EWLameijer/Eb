@@ -1,0 +1,41 @@
+Book of Eb
+
+Contents
+
+High-level overview
+
+Eb is software that helps one study a subject, by allowing the user to create and review flashcards.
+
+It has the following options:
+
+1) Creating a new deck
+2) Adding cards to the deck
+3) Reviewing cards
+4) Editing cards
+5) Deleting cards
+6) Changing the study options
+
+
+1) Creating a new deck
+@@@
+
+2) Adding cards to the deck
+@@@
+
+3) Reviewing cards
+By default, whenever the time comes that cards need to be reviewed, the showReviewingPanel method is invoked. This sets the MainWindowState 
+to REVIEWING, and calls the start method of ReviewManager. When that is done, it uses switchToPanel to switch to the reviewing panel. 
+This calls the start() method of the ReviewManager singleton
+
+If the last review has been made, the program state is updated to SUMMARIZING, and the summarizing panel is shown.
+
+
+
+
+4) Editing cards
+5) Deleting cards
+6) Changing the study options
+
+
+Glossary:
+MainWindowState: what is the state of the main window? Is it REACTIVE (=waiting for the timer to indicate that a card needs to be reviewed)
