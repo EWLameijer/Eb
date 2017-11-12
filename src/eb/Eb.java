@@ -1,5 +1,10 @@
 package eb;
 
+import java.io.IOException;
+import java.net.ServerSocket;
+
+import javax.swing.JOptionPane;
+
 import eb.eventhandling.BlackBoard;
 import eb.eventhandling.UpdateType;
 import eb.mainwindow.MainWindow;
@@ -26,6 +31,10 @@ public class Eb {
 	 * @param args
 	 *          not used
 	 */
+	
+	public static ServerSocket serverSocket;
+  public static String errortype = "Access Error";
+  public static String error = "The application is already running.....";
 	public static void main(String[] args) {
 		// Avoid multiple instances of Eb running at same time. From
 		// http://stackoverflow.com/questions/19082265/how-to-ensure-only-one-instance-of-a-java-program-can-be-executed
@@ -35,11 +44,15 @@ public class Eb {
 		 * with application PID in the Sun JVM, but each JVM may have you own
 		 * implementation. So in a JVM, other than Sun, this code may not work., :(
 		 */
-
-		java.awt.EventQueue.invokeLater(new Runnable() {
-			public void run() {
-
-				// If exists another instance, show message and terminates the current
+		
+		
+	    try
+	    {
+	      //creating object of server socket and bind to some port number 
+	      serverSocket = new ServerSocket(14356);
+	        ////do not put common port number like 80 etc.
+	        ////Because they are already used by system
+	   // If exists another instance, show message and terminates the current
 				// instance.
 				// Otherwise starts application.
 
@@ -49,7 +62,11 @@ public class Eb {
 				BlackBoard.register(reviewManager, UpdateType.CARD_CHANGED);
 				BlackBoard.register(reviewManager, UpdateType.DECK_CHANGED);
 				MainWindow.display();
-			}
-		});
+	     }
+	     catch (IOException exc)
+	     {
+	    	  JOptionPane.showMessageDialog(null, error, errortype, JOptionPane.ERROR_MESSAGE);
+	        System.exit(0);
+	     }
 	};
 }

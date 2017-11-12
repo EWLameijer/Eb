@@ -80,6 +80,18 @@ public class SummarizingPanel extends JPanel {
 		        "requestFocusInWindow", null, "componentShown"));
 
 		m_backToReviewing.setMnemonic(KeyEvent.VK_G);
+		m_backToReviewing.getInputMap(WHEN_IN_FOCUSED_WINDOW)
+    .put(KeyStroke.getKeyStroke('g'), "goToNextReview");
+		m_backToReviewing.getActionMap().put("goToNextReview",
+		    new ProgrammableAction(() -> backToReviewingMode()));
+		m_backToReviewing.addActionListener(e -> backToReviewingMode());
+		/*JButton deleteButton = new JButton("Delete card");
+		deleteButton.setMnemonic(KeyEvent.VK_D);
+		deleteButton.getInputMap(WHEN_IN_FOCUSED_WINDOW)
+		    .put(KeyStroke.getKeyStroke('d'), "delete");
+		deleteButton.getActionMap().put("delete",
+		    new ProgrammableAction(() -> deleteCard()));
+		deleteButton.addActionListener(e -> deleteCard());*/
 		// m_backToReviewing.addActionListener(e -> backToReviewingMode());
 		makeButtonAndKeystrokeActivateRunnable(m_backToReviewing,
 		    KeyStroke.getKeyStroke('G'), "back to reviewing",
