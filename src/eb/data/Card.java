@@ -202,4 +202,9 @@ public class Card implements Serializable {
 		return successfulReviewCount;
 	}
 
+	public String getHistory() {
+		String output = String.valueOf(m_reviews.size());
+		return output;
+	}
+
 }

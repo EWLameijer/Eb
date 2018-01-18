@@ -60,4 +60,7 @@ public class Review implements Serializable {
 		return Utilities.durationToSeconds(m_thinkingTime);
 	}
 
+	public String toString() {
+		return "";
+	}
 }

@@ -1,9 +1,7 @@
 package eb;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
-
-//http://stackoverflow.com/questions/10508846/how-to-make-sure-that-only-a-single-instance-of-a-java-application-is-running
+import java.io.IOException;
+import java.net.ServerSocket;
 
 import javax.swing.JOptionPane;
 
@@ -33,6 +31,10 @@ public class Eb {
 	 * @param args
 	 *          not used
 	 */
+	
+	public static ServerSocket serverSocket;
+  public static String errortype = "Access Error";
+  public static String error = "The application is already running.....";
 	public static void main(String[] args) {
 		// Avoid multiple instances of Eb running at same time. From
 		// http://stackoverflow.com/questions/19082265/how-to-ensure-only-one-instance-of-a-java-program-can-be-executed
@@ -42,29 +44,29 @@ public class Eb {
 		 * with application PID in the Sun JVM, but each JVM may have you own
 		 * implementation. So in a JVM, other than Sun, this code may not work., :(
 		 */
-		RuntimeMXBean rt = ManagementFactory.getRuntimeMXBean();
-		final int runtimePid = Integer
-		    .parseInt(rt.getName().substring(0, rt.getName().indexOf("@")));
-
-		java.awt.EventQueue.invokeLater(new Runnable() {
-			public void run() {
-
-				// If exists another instance, show message and terminates the current
+		
+		
+	    try
+	    {
+	      //creating object of server socket and bind to some port number 
+	      serverSocket = new ServerSocket(14356);
+	        ////do not put common port number like 80 etc.
+	        ////Because they are already used by system
+	   // If exists another instance, show message and terminates the current
 				// instance.
 				// Otherwise starts application.
 
 				/* getMonitoredVMs(runtimePid) */
-				if (true) {
-					ReviewManager reviewManager = ReviewManager.getInstance();
-					BlackBoard.register(reviewManager, UpdateType.DECK_SWAPPED);
-					BlackBoard.register(reviewManager, UpdateType.CARD_CHANGED);
-					BlackBoard.register(reviewManager, UpdateType.DECK_CHANGED);
-					MainWindow.display();
-				} else
-					JOptionPane.showMessageDialog(null,
-					    "There is another instance of this application running.");
-
-			}
-		});
+				ReviewManager reviewManager = ReviewManager.getInstance();
+				BlackBoard.register(reviewManager, UpdateType.DECK_SWAPPED);
+				BlackBoard.register(reviewManager, UpdateType.CARD_CHANGED);
+				BlackBoard.register(reviewManager, UpdateType.DECK_CHANGED);
+				MainWindow.display();
+	     }
+	     catch (IOException exc)
+	     {
+	    	  JOptionPane.showMessageDialog(null, error, errortype, JOptionPane.ERROR_MESSAGE);
+	        System.exit(0);
+	     }
 	};
 }

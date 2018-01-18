@@ -1,4 +1,14 @@
-TEST!
+Buglist
+
+1) It seems that after rehearsal and adding new cards, the first review is wrong, of an existing card
+Reproduceable? 
+
+Yeah. Basically, whenever a new review session is opened, the last card reviewed is shown, including its back!
+
+
+->26/10: next part of review (after finishing normal section): incorrect card.
+
+
 *Strategy: if 4x10 test works sufficiently AND saving project works to
 phase 2, switch Programming to it 
 + start Chinese [5 min per 120 min non-maintenance]. 
@@ -6,6 +16,7 @@ Otherwise, debug until 4x10 continuously sufficiently satisfied with performance
 
 [Note: duolingo: investigate new courses only start of month. Investigated 0106, Vietnamese. Klingon still hatching (25%) Next: 0107 or further]
 
+edit card bug: 
 
 Philosophical question: 
 Ideally, the card should know the settings? Basically, what happens if something needs data from different leaves of the tree? Well, then ideally it should be calculated in the root, based on data delivered by the leaves.
@@ -121,7 +132,7 @@ Core features:
 		Basically, every card addition obeys a rule (a string) as well as a subrule (an index to the string). For example, a regular Japanese grammar card has the #1->#2 rule, index 1.
 		So 1.1 (the rules need to be stated in the deck, preferably also in the text)
 		tatta/only is #1->#2,#2->#1, or 2.1, while only/tatta is 2.2 
-		同人 -> doujin -> clique has #1 [p]->#2, #1 [m]->#3, #2->#3, #3->#2 (#1). So 同人 [m] -> clique = 3.2
+		 -> doujin -> clique has #1 [p]->#2, #1 [m]->#3, #2->#3, #3->#2 (#1). So [m] -> clique = 3.2
 		NEE: S->R heeft altijd een combinatie: bv kanji / kana / meaning. Bv kanji->meaning
 		OK. Dus na 2 tabs 3e aan eind van kaart: kanji->meaning, bijvoorbeeld.
 		Hoe dan ook, dat wil zeggen dat het netjes saven van kaarttypes eerst komt. Dus 10000+500 / 10+6 = 656/h*
@@ -183,7 +194,7 @@ just a next button.
 [DONE]
 1) create a timed combobox in the options window
 1b) add the status of the timed combobox to the equality comparisons.
-1c) also make changing the status of the combo box signal unsaved changes. Perhaps make it a subclass of a generic “InputElement” that defines a signalling method as 
+1c) also make changing the status of the combo box signal unsaved changes. Perhaps make it a subclass of a generic InputElement� that defines a signalling method as 
 well as an equality operator.
 2) create a (sometimes visible) TimeInputElement for the timer in the options window.
 	2a) Based on how the TimeInputElement handles the combo box, set the combo box to

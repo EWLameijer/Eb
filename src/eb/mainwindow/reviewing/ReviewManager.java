@@ -1,7 +1,6 @@
 package eb.mainwindow.reviewing;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,38 +17,7 @@ import eb.eventhandling.UpdateType;
 import eb.mainwindow.MainWindowState;
 import eb.utilities.Utilities;
 
-/**
- * FirstTimer registers a time the first time it is activated (set). Subsequent
- * settings do not change its value. Is useful if something has to happen
- * multiple times (like repainting) but only the instant of first usage is
- * important.
- * 
- * @author Eric-Wubbo Lameijer
- */
-class FirstTimer {
-	Instant m_firstInstant;
 
-	FirstTimer() {
-		reset();
-	}
-
-	void press() {
-		if (m_firstInstant == null) {
-			m_firstInstant = Instant.now();
-		} // else: instant already recorded, no nothing
-	}
-
-	void reset() {
-		m_firstInstant = null;
-	}
-
-	Instant getInstant() {
-		Utilities.require(m_firstInstant != null, "FirstTimer.getInstant() "
-		    + "error: attempt to use time object before any time has been registered.");
-		return m_firstInstant;
-	}
-
-}
 
 /**
  * Manages the review session much like Deck manages the LogicalDeck: there can
@@ -65,10 +33,19 @@ public class ReviewManager implements Listener {
 
 	private ReviewPanel m_reviewPanel;
 	private Deck m_currentDeck;
-	private List<Card> m_cardCollection;
+	private List<Card> m_cardsToBeReviewed;
+	
+	// m_counter stores the index of the card in the m_cardsToBeReviewed list that should be reviewed next.
 	private int m_counter;
+	
+	// m_startTimer is activated when the card is shown
 	private FirstTimer m_startTimer = new FirstTimer();
+	
+	// m_stopTimer is activated when the user presses the button to show the answer.
 	private FirstTimer m_stopTimer = new FirstTimer();
+	
+	// Should the answer (back of the card) be shown to the user? 'No'/false when the user is trying to recall the answer, 
+	// 'Yes'/true when the user needs to check the answer.
 	private boolean m_showAnswer;
 
 	/**
@@ -77,6 +54,12 @@ public class ReviewManager implements Listener {
 	private ReviewManager() {
 	}
 
+	/**
+	 * getInstance is the method to call the lone object stored in the ReviewManager Singleton - 
+	 * see the documentation on design patterns.
+	 * 
+	 * @return the only instance of the ReviewManager class that this program should have.
+	 */
 	public static ReviewManager getInstance() {
 		if (m_instance == null) {
 			m_instance = new ReviewManager();
@@ -84,16 +67,23 @@ public class ReviewManager implements Listener {
 		return m_instance;
 	}
 
+	/**
+	 * start starts the reviewing process,
+	 * 
+	 * @param reviewPanel
+	 */
+	// TODO:  
 	public void start(ReviewPanel reviewPanel) {
 		if (reviewPanel != null) {
 			m_reviewPanel = reviewPanel;
 			m_currentDeck = DeckManager.getContents();
 		}
+		initializeReviewSession();
 	}
 
 	private void ensureReviewSessionIsValid() {
 		if (m_currentDeck != DeckManager.getContents()
-		    || m_cardCollection == null) {
+		    || m_cardsToBeReviewed == null) {
 			m_currentDeck = DeckManager.getContents();
 			initializeReviewSession();
 		}
@@ -102,7 +92,7 @@ public class ReviewManager implements Listener {
 	public List<Review> getReviewResults() {
 		ensureReviewSessionIsValid();
 		List<Review> listOfReviews = new ArrayList<>();
-		for (Card card : m_cardCollection) {
+		for (Card card : m_cardsToBeReviewed) {
 			listOfReviews.add(card.getLastReview());
 		}
 		return listOfReviews;
@@ -132,12 +122,14 @@ public class ReviewManager implements Listener {
 	@Override
 	public void respondToUpdate(Update update) {
 		if (update.getType() == UpdateType.CARD_CHANGED) {
-			// updatePanels();
+			updatePanels();
 		} else if (update.getType() == UpdateType.DECK_CHANGED) {
 			// It can be that the current card has been deleted, OR another card has
 			// been deleted.
-			initializeReviewSession();
+			// initializeReviewSession();
+			updateCollection();
 		} else if (update.getType() == UpdateType.DECK_SWAPPED) {
+			initializeReviewSession();
 			// cleanUp();
 		}
 	}
@@ -175,9 +167,9 @@ public class ReviewManager implements Listener {
 		    .getTimeUntilNextReview(secondCard)
 		    .compareTo(currentDeck.getTimeUntilNextReview(firstCard)));
 		// get the first n for the review
-		m_cardCollection = new ArrayList<>(
+		m_cardsToBeReviewed = new ArrayList<>(
 		    reviewableCards.subList(0, numCardsToBeReviewed));
-		Collections.shuffle(m_cardCollection);
+		Collections.shuffle(m_cardsToBeReviewed);
 
 		m_counter = 0;
 		startCardReview();
@@ -194,7 +186,7 @@ public class ReviewManager implements Listener {
 	private Card getCurrentCard() {
 		Utilities.require(activeCardExists(),
 		    "ReviewSession.getCurrentCard() error: there is no current card.");
-		return m_cardCollection.get(m_counter);
+		return m_cardsToBeReviewed.get(m_counter);
 	}
 
 	private String getCurrentBack() {
@@ -206,7 +198,7 @@ public class ReviewManager implements Listener {
 	}
 
 	private boolean activeCardExists() {
-		return m_counter < m_cardCollection.size();
+		return m_counter < m_cardsToBeReviewed.size();
 	}
 
 	private void moveToNextReviewOrEnd() {
@@ -225,7 +217,7 @@ public class ReviewManager implements Listener {
 	 * @return the index of the last card in the session.
 	 */
 	private int indexOfLastCard() {
-		return m_cardCollection.size() - 1;
+		return m_cardsToBeReviewed.size() - 1;
 	}
 
 	/**
@@ -244,7 +236,7 @@ public class ReviewManager implements Listener {
 	 */
 	public int cardsToGoYet() {
 		ensureReviewSessionIsValid();
-		return m_cardCollection.size() - m_counter;
+		return m_cardsToBeReviewed.size() - m_counter;
 	}
 
 	/**
@@ -253,10 +245,10 @@ public class ReviewManager implements Listener {
 	 */
 	public void updateCollection() {
 		boolean deletingCurrentCard = false;
-		for (int cardIndex = 0; cardIndex < m_cardCollection.size(); cardIndex++) {
-			Card currentCard = m_cardCollection.get(cardIndex);
+		for (int cardIndex = 0; cardIndex < m_cardsToBeReviewed.size(); cardIndex++) {
+			Card currentCard = m_cardsToBeReviewed.get(cardIndex);
 			if (!deckContainsCardWithThisFront(currentCard.getFront())) {
-				m_cardCollection.remove(cardIndex);
+				m_cardsToBeReviewed.remove(cardIndex);
 				deletingCurrentCard = (cardIndex == m_counter);
 				if (cardIndex <= m_counter) {
 					m_counter--;
@@ -283,6 +275,16 @@ public class ReviewManager implements Listener {
 	private boolean deckContainsCardWithThisFront(String front) {
 		return DeckManager.getCurrentDeck().getCards().getCardWithFront(front)
 		    .isPresent();
+	}
+
+	/**
+	 * Allows the GUI to initialize the panel that displays the reviews
+	 * 
+	 * @param reviewPanel
+	 *          the name of the panel in which the reviews are performed.
+	 */
+	public void setPanel(ReviewPanel reviewPanel) {
+		m_reviewPanel = reviewPanel;
 	}
 
 }

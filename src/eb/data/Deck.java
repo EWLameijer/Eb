@@ -13,9 +13,11 @@ import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Function;
 import java.util.logging.Logger;
 
 import eb.Eb;
+import eb.disk_io.CardConverter;
 import eb.subwindow.ArchivingSettings;
 import eb.subwindow.StudyOptions;
 import eb.utilities.Utilities;
@@ -79,7 +81,7 @@ public class Deck implements Serializable {
 	 * Saves the deck to a text file (helpful for recovery), though it deletes all
 	 * repetition data...
 	 */
-	public void saveDeckToTextfile() {
+	public void saveDeckToTextfiles() {
 		// Phase 1: get proper filename for deck
 		LocalDateTime now = LocalDateTime.now();
 		String nameOfArchivingDirectory = m_archivingSettings.getDirectoryName();
@@ -87,17 +89,25 @@ public class Deck implements Serializable {
 		    : nameOfArchivingDirectory + File.separator;
 		String twoDigitFormat = "%02d"; // format numbers as 01, 02...99
 
-		String textFileName = textFileDirectory + getName() + "_"
+		String baseFileName = textFileDirectory + getName() + "_"
 		    + String.format(twoDigitFormat, now.get(ChronoField.DAY_OF_MONTH))
 		    + String.format(twoDigitFormat, now.get(ChronoField.MONTH_OF_YEAR))
 		    + String.format(twoDigitFormat, now.get(ChronoField.YEAR) % 100) + "_"
 		    + String.format(twoDigitFormat, now.get(ChronoField.HOUR_OF_DAY))
-		    + String.format(twoDigitFormat, now.get(ChronoField.MINUTE_OF_HOUR))
-		    + ".txt";
+		    + String.format(twoDigitFormat, now.get(ChronoField.MINUTE_OF_HOUR));
 
+		String textFileName = baseFileName + ".txt";
+		String reviewFileName = baseFileName + "_reviews.txt";
+
+		createTextFile(textFileName, CardConverter::cardToLine);
+		createTextFile(reviewFileName, CardConverter::reviewHistoryToLine);
+	}
+
+	private void createTextFile(String fileName,
+	    Function<Card, String> outputter) {
 		// Phase 2: write the deck itself
 		try (BufferedWriter outputFile = new BufferedWriter(
-		    new OutputStreamWriter(new FileOutputStream(textFileName), "UTF-8"));) {
+		    new OutputStreamWriter(new FileOutputStream(fileName), "UTF-8"));) {
 			// Phase 2a: write the header.
 			outputFile.write("Eb version " + Eb.VERSION_STRING + Utilities.EOL);
 			outputFile.write(
@@ -105,7 +115,7 @@ public class Deck implements Serializable {
 			outputFile.write(HEADER_BODY_SEPARATOR + Utilities.EOL);
 
 			// Phase 2b: write the card data
-			m_cardCollection.writeCards(outputFile);
+			m_cardCollection.writeCards(outputFile, outputter);
 
 		} catch (Exception e) {
 			Logger.getGlobal().info(e + "");
