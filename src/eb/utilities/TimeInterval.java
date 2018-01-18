@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.time.Duration;
 import java.util.Objects;
 
-import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
-
 /**
  * The TimeInterval class stores a time interval, for example "3.5 hours". It
  * stores the scalar ("3.5") and the unit ("hours") separately. (note that
@@ -95,7 +93,6 @@ public class TimeInterval implements Serializable {
 	 * @param unit
 	 *          the unit of this time interval, like second, hour or minute
 	 */
-	@EnsuresNonNull({ "m_scalar", "m_unit" })
 	private void setTo(eb.utilities.TimeInterval this,double scalar,
 	    TimeUnit unit) {
 		// preconditions: the scalar should be greater than 0, and the TimeUnit

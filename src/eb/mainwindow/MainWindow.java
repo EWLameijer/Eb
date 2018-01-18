@@ -400,6 +400,10 @@ public class MainWindow extends JFrame implements Listener {
 
 	private void setNameOfLastReviewedDeck() {
 		Path statusFilePath = Paths.get(EB_STATUS_FILE);
+		if (!Files.exists(statusFilePath)) {
+			DeckManager.setNameOfLastReviewedDeck("");
+			return;
+		}
 		final String mostRecentDeckIdentifier = "most_recently_reviewed_deck: ";
 		List<String> lines;
 		try {

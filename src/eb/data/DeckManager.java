@@ -199,7 +199,7 @@ public class DeckManager {
 		    + "problem creating and/or writing the new deck.");
 
 		// The deck has been changed. So ensure depending GUI-elements know that.
-		reportDeckChangeEvent();
+		reportDeckSwapEvent();
 
 	}
 
@@ -207,9 +207,9 @@ public class DeckManager {
 	 * After the deck has been swapped, ensure anything not handled by the
 	 * GUI-element activating the deck swap itself is performed.
 	 */
-	private static void reportDeckChangeEvent() {
+	private static void reportDeckSwapEvent() {
 		// A new review session is needed.
-		BlackBoard.post(new Update(UpdateType.DECK_CHANGED));
+		BlackBoard.post(new Update(UpdateType.DECK_SWAPPED));
 	}
 
 	/**
